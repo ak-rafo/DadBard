@@ -3,7 +3,7 @@
   'use strict';
   var DATA = window.CC_DATA, Calc = window.CocktailCalc;
   var ING = DATA.ING, DRINKS = DATA.DRINKS, TECH = DATA.TECH;
-  var STORE_KEY = 'specbook.v1';            // kept from v1 so existing notes carry over
+  var STORE_KEY = 'dadbard.v1', OLD_KEY = 'specbook.v1';
   var ROOT_ORDER = ['Old-Fashioned', 'Martini', 'Daiquiri', 'Sidecar', 'Whiskey Highball', 'Flip'];
   var CATS = ['Andrew’s', 'Modern', 'Classic', 'Tiki'];
   var AV_LABEL = 'Andrew’s version';
@@ -21,7 +21,7 @@
 
   /* ---------- persistence ---------- */
   function load() {
-    try { var u = JSON.parse(localStorage.getItem(STORE_KEY)); if (u && u.drinks) return u; } catch (e) {}
+    try { var u = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem(OLD_KEY)); if (u && u.drinks) return u; } catch (e) {}
     return { drinks: {}, tech: {}, settings: { unit: 'oz' } };
   }
   var user = load();
@@ -36,9 +36,7 @@
     return { label: label, mine: mine, spec: v.spec, m: v.m || d.m, tech: v.tech || d.tech, note: v.note || '', base: v.base || d.base,
       stats: Calc.compute(v.spec, v.m || d.m, ING) };
   }
-  function derive() {
-    DRINKS.forEach(function (d) {
-      byId[d.id] = d;
+  function deriveOne(d) {
       var vs = [];
       if (d.src === 'andrew' || d.mineMain) {
         vs.push(mkVersion(d, d, d.mainLabel || 'Andrew’s spec', true));
@@ -66,10 +64,27 @@
       var words = [d.name, d.base, d.fam, d.cat, d.prov.who, d.prov.where, d.flav.join(' '), d.said || ''];
       vs.forEach(function (v) { v.spec.forEach(function (s) { words.push((s[3] && s[3].label) || (ING[s[2]] && ING[s[2]].n) || ''); }); });
       d.search = words.join(' ').toLowerCase();
+          d.baseList = d.versions.map(function (v) { return v.base; });
+      d.strengthList = [d.strength];
+  }
+  var VAR = {};
+  function derive() {
+    Object.keys(byId).forEach(function (k) { delete byId[k]; }); VAR = {};
+    DRINKS.forEach(function (d) {
+      d.variants = [d].concat(d.vars || []);
+      d.variants.forEach(function (v, i) { deriveOne(v); byId[v.id] = d; VAR[v.id] = { main: d, i: i }; });
+      function u(k) { var m = {}; d.variants.forEach(function (v) { (v[k] || []).forEach(function (x) { m[x] = 1; }); }); return Object.keys(m); }
+      d.aBase = u('baseList'); d.aFlav = u('flav'); d.aTech = u('allTech'); d.aEquip = u('equip'); d.aStatus = u('status'); d.aStrength = u('strengthList');
+      d.aSearch = d.variants.map(function (v) { return v.search + ' ' + (v.vlabel || '').toLowerCase(); }).join(' ');
     });
     children = {};
-    DRINKS.forEach(function (d) { if (d.parent) (children[d.parent] = children[d.parent] || []).push(d); });
+    DRINKS.forEach(function (d) {
+      var p = d.parent && VAR[d.parent] ? VAR[d.parent].main.id : d.parent;
+      if (p && p !== d.id) (children[p] = children[p] || []).push(d);
+    });
   }
+  function allVariants() { var a = []; DRINKS.forEach(function (d) { a = a.concat(d.variants); }); return a; }
+
   function allFlags(d) { return (d.flags || []).concat(d.av && d.av.flags || []); }
   derive();
 
@@ -168,13 +183,13 @@
 
   /* ---------- browse ---------- */
   var FILTERS = [
-    { k: 'status', n: 'From my notes', get: function (d) { return d.status; }, order: ['In my notes', 'Has Andrew’s version', 'Experimental', 'Batch', 'Needs my check'] },
-    { k: 'base', n: 'Base spirit', get: function (d) { return [d.base]; } },
+    { k: 'status', n: 'From my notes', get: function (d) { return d.aStatus; }, order: ['In my notes', 'Has Andrew’s version', 'Experimental', 'Batch', 'Needs my check'] },
+    { k: 'base', n: 'Base spirit', get: function (d) { return d.aBase; } },
     { k: 'fam', n: 'Family', get: function (d) { return [d.fam]; }, order: ROOT_ORDER },
-    { k: 'flav', n: 'Flavor', get: function (d) { return d.flav; } },
-    { k: 'tech', n: 'Technique', get: function (d) { return d.allTech.map(function (t) { return TECH[t].t; }); } },
-    { k: 'strength', n: 'Strength', get: function (d) { return [d.strength]; }, order: ['Light', 'Medium', 'Strong'] },
-    { k: 'equip', n: 'Equipment', get: function (d) { return d.equip; } }
+    { k: 'flav', n: 'Flavor', get: function (d) { return d.aFlav; } },
+    { k: 'tech', n: 'Technique', get: function (d) { return d.aTech.map(function (t) { return TECH[t].t; }); } },
+    { k: 'strength', n: 'Strength', get: function (d) { return d.aStrength; }, order: ['Light', 'Medium', 'Strong'] },
+    { k: 'equip', n: 'Equipment', get: function (d) { return d.aEquip; } }
   ];
   var state = { q: '', cat: '', f: {}, sort: 'az', showFilters: false };
   FILTERS.forEach(function (g) { state.f[g.k] = {}; });
@@ -183,7 +198,7 @@
     if (state.cat && d.cat !== state.cat) return false;
     if (state.q) {
       var toks = state.q.toLowerCase().split(/\s+/).filter(Boolean);
-      for (var i = 0; i < toks.length; i++) if (d.search.indexOf(toks[i]) < 0) return false;
+      for (var i = 0; i < toks.length; i++) if (d.aSearch.indexOf(toks[i]) < 0) return false;
     }
     for (var j = 0; j < FILTERS.length; j++) {
       var g = FILTERS[j], sel = Object.keys(state.f[g.k]);
@@ -201,51 +216,98 @@
       rated: function (a, b) { return ((user.drinks[b.id] || {}).rating || 0) - ((user.drinks[a.id] || {}).rating || 0) || a.name.localeCompare(b.name); },
       sources: function (a, b) { return overlap(b.id) - overlap(a.id) || a.name.localeCompare(b.name); }
     }[state.sort];
-    return list.slice().sort(by);
+    var q = state.q.trim().toLowerCase();
+    if (!q) return list.slice().sort(by);
+    function rank(d) { var n = d.name.toLowerCase(); if (n === q) return 0; if (n.indexOf(q) === 0) return 1; if (n.indexOf(q) > -1) return 2;
+      if (d.variants.some(function (v) { return (v.name + ' ' + (v.vlabel || '')).toLowerCase().indexOf(q) > -1; })) return 3; return 4; }
+    return list.slice().sort(function (a, b) { return rank(a) - rank(b) || by(a, b); });
   }
+  var ROOT_COLORS = { 'Old-Fashioned': '#d6a24a', 'Martini': '#9bb7cf', 'Daiquiri': '#8fc04a', 'Sidecar': '#f39a3c', 'Whiskey Highball': '#74bfa1', 'Flip': '#c9a0dc' };
+  var BASE_ICON = { Cachaça: '🇧🇷', Whiskey: '🥃', Gin: '🌲', Rum: '🏝️', Agave: '🌵', Brandy: '🍇', Vodka: '🧊', 'Amaro & Liqueur': '🌿', 'Wine & Sherry': '🍷', Aquavit: '🌾' };
+  var FLAV_ICON = { citrusy: '🍋', refreshing: '💧', 'spirit-forward': '🥃', rich: '🍫', bitter: '🖤', herbal: '🌿', fruity: '🍓', tropical: '🍍', floral: '🌸', spicy: '🌶️', smoky: '🔥', nutty: '🌰', creamy: '🥛', coffee: '☕', sweet: '🍬', savory: '🧂' };
+  var STATUS_ICON = { 'In my notes': '✍️', 'Has Andrew’s version': '🎻', 'Experimental': '🧪', 'Batch': '🛢️', 'Needs my check': '⚑' };
+  var STRENGTH_ICON = { Light: '🪶', Medium: '⚖️', Strong: '🔥' };
+  var CAT_ICON = { 'Andrew’s': '🎻', Modern: '✨', Classic: '🎩', Tiki: '🌺' };
+  var GROUP_ICON = { status: STATUS_ICON, base: BASE_ICON, flav: FLAV_ICON, strength: STRENGTH_ICON };
+
+  /* tiles: big icon tiles in a horizontal rail. pills: compact pill row. Both multi-purpose. */
+  function tiles(name, items, isOn, cls) {
+    return '<div class="rail ' + (cls || '') + '">' + items.map(function (it) {
+      return '<button class="tile' + (isOn(it.v) ? ' on' : '') + '" data-tap="' + name + '" data-v="' + esc(it.v) + '"' + (it.color ? ' style="--c:' + it.color + '"' : '') + '>' +
+        '<i>' + (it.icon || '') + '</i><span>' + esc(it.label) + '</span>' + (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + (it.count != null ? '<b>' + it.count + '</b>' : '') + '</button>';
+    }).join('') + '</div>';
+  }
+  function pills(name, items, isOn) {
+    return '<div class="pillbar">' + items.map(function (it) {
+      return '<button class="' + (isOn(it.v) ? 'on' : '') + '" data-tap="' + name + '" data-v="' + esc(it.v) + '"' + (it.color ? ' style="--c:' + it.color + '"' : '') + '>' +
+        (it.icon ? '<i>' + it.icon + '</i>' : '') + esc(it.label) + (it.count != null ? ' <span>' + it.count + '</span>' : '') + '</button>';
+    }).join('') + '</div>';
+  }
+  function onTap(name, fn) { $app.querySelectorAll('[data-tap="' + name + '"]').forEach(function (b) { b.onclick = function () { fn(b.dataset.v, b); }; }); }
+  function card(d) {
+    var u = user.drinks[d.id] || {};
+    var marks = (d.variants.length > 1 ? '<span class="mk vars">' + d.variants.length + ' styles</span>' : '') +
+      (d.aStatus.indexOf('Has Andrew’s version') > -1 ? '<span class="mk av" title="Andrew’s version">AV</span>' : '') + (d.exp ? '<span class="mk exp" title="Experimental">exp.</span>' : '') +
+      (d.batch ? '<span class="mk">batch</span>' : '') + (d.aStatus.indexOf('Needs my check') > -1 ? '<span class="mk flag" title="Needs your check">⚑</span>' : '') +
+      (u.rating ? '<span class="mk star">' + '★'.repeat(u.rating) + '</span>' : '');
+    return '<li><a class="card" href="#/d/' + d.id + '" style="--c:' + ROOT_COLORS[d.fam] + '"><div class="cmain"><div class="cname">' + esc(d.name) +
+      (u.notes ? ' <span class="dot" title="Has notes"></span>' : '') + (u.verified ? ' <span class="tick" title="Spec verified">✓</span>' : '') + '</div>' +
+      '<div class="csub">' + (BASE_ICON[d.versions[d.vdef].base] || '') + ' ' + esc(d.aBase.length > 1 ? d.aBase.slice(0, 3).join(' / ') : d.versions[d.vdef].base) + ' · ' + esc(d.fam) + ' · ' + METHOD_LABEL[d.versions[d.vdef].m] + '</div>' + (marks ? '<div class="marks">' + marks + '</div>' : '') + '</div>' +
+      '<div class="cside"><span class="pill ' + catClass(d.cat) + '">' + d.cat + '</span><span class="abv">' + (d.stats.finalMl ? pct(d.stats.finalAbv, 0) : '—') + '</span></div></a></li>';
+  }
+
   function renderBrowse() {
     var list = sorted(DRINKS.filter(matches)), ac = activeCount();
+    var inCat = DRINKS.filter(function (d) { return !state.cat || d.cat === state.cat; });
     var counts = {}; DRINKS.forEach(function (d) { counts[d.cat] = (counts[d.cat] || 0) + 1; });
-    var h = '<header class="top hero"><div class="brand"><img src="icons/icon-192.png" alt="" class="logo"><div><h1>Dad Bard</h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
+    function vals(g) { var v = {}; inCat.forEach(function (d) { g.get(d).forEach(function (x) { v[x] = (v[x] || 0) + 1; }); }); return v; }
+    var baseG = FILTERS.filter(function (g) { return g.k === 'base'; })[0], bv = vals(baseG);
+    var h = '<header class="top hero"><div class="brand"><img src="icons/icon-192.png" alt="" class="logo"><div><h1>Dad Bard <span class="sym">🪕</span></h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
       '<div class="searchrow"><input id="q" type="search" placeholder="Search drinks, ingredients, creators" value="' + esc(state.q) + '" autocomplete="off">' +
-      '<button id="ftoggle" class="btn ' + (ac ? 'on' : '') + '">Filters' + (ac ? ' · ' + ac : '') + '</button></div>' +
-      '<div class="catbar"><button data-c="" class="' + (!state.cat ? 'on' : '') + '">All</button>' +
-      CATS.map(function (c) { return '<button data-c="' + c + '" class="' + (state.cat === c ? 'on' : '') + '">' + c + ' <span>' + counts[c] + '</span></button>'; }).join('') + '</div>' +
-      '<div class="sortrow"><span class="muted">' + list.length + ' of ' + DRINKS.length + ' songs</span>' +
+      '<button id="ftoggle" class="btn filterbtn ' + (ac ? 'on' : '') + '">⚙︎ Filters' + (ac ? ' <b>' + ac + '</b>' : '') + '</button></div>' +
+      pills('cat', [{ v: '', label: 'All', icon: '✦', count: DRINKS.length }].concat(CATS.map(function (c) { return { v: c, label: c, icon: CAT_ICON[c], count: counts[c] }; })), function (v) { return v === state.cat; }) +
+      tiles('base', Object.keys(bv).sort(function (a, b) { return bv[b] - bv[a]; }).map(function (b) { return { v: b, label: b.replace(' & Liqueur', '').replace(' & Sherry', ' & sherry'), icon: BASE_ICON[b], count: bv[b] }; }), function (v) { return state.f.base[v]; }, 'spirits');
+    // active filter chips
+    var act = [];
+    FILTERS.forEach(function (g) { Object.keys(state.f[g.k]).forEach(function (v) { act.push('<button class="achip" data-tap="achip" data-v="' + g.k + '|' + esc(v) + '">' + ((GROUP_ICON[g.k] || {})[v] || '') + ' ' + esc(v) + ' <b>×</b></button>'); }); });
+    if (act.length) h += '<div class="achips">' + act.join('') + '<button class="achip clear" id="fclear2">Clear all</button></div>';
+    h += '<div class="sortrow"><span class="muted">' + list.length + ' of ' + DRINKS.length + ' songs</span>' +
       '<select id="sort"><option value="az">A–Z</option><option value="rated">My rating</option><option value="strong">Strongest</option><option value="light">Lightest</option><option value="sources">Most sources ticked</option></select></div></header>';
-    if (state.showFilters) {
-      h += '<section class="filters">';
-      FILTERS.forEach(function (g) {
-        var vals = {}; DRINKS.forEach(function (d) { if (!state.cat || d.cat === state.cat) g.get(d).forEach(function (v) { vals[v] = (vals[v] || 0) + 1; }); });
-        var keys = g.order ? g.order.filter(function (k) { return vals[k]; }) : Object.keys(vals).sort();
-        if (!keys.length) return;
-        h += '<div class="fgroup"><div class="flabel">' + g.n + '</div><div class="chips">' +
-          keys.map(function (v) { return '<button class="chip ' + (state.f[g.k][v] ? 'on' : '') + '" data-g="' + g.k + '" data-v="' + esc(v) + '">' + esc(v) + ' <span>' + vals[v] + '</span></button>'; }).join('') + '</div></div>';
-      });
-      if (ac) h += '<button id="fclear" class="btn ghost">Clear all filters</button>';
-      h += '</section>';
-    }
-    h += '<ul class="cards">' + list.map(function (d) {
-      var u = user.drinks[d.id] || {};
-      var marks = (d.av && !d.match ? '<span class="mk av" title="Andrew’s version">AV</span>' : '') + (d.exp ? '<span class="mk exp" title="Experimental">exp.</span>' : '') +
-        (d.batch ? '<span class="mk">batch</span>' : '') + (allFlags(d).length ? '<span class="mk flag" title="Needs your check">⚑</span>' : '');
-      return '<li><a class="card" href="#/d/' + d.id + '"><div class="cmain"><div class="cname">' + esc(d.name) +
-        (u.notes ? ' <span class="dot" title="Has notes"></span>' : '') + (u.verified ? ' <span class="tick" title="Spec verified">✓</span>' : '') + '</div>' +
-        '<div class="csub">' + esc(d.fam) + ' · ' + esc(d.versions[d.vdef].base) + ' · ' + METHOD_LABEL[d.versions[d.vdef].m] + '</div>' + (marks ? '<div class="marks">' + marks + '</div>' : '') + '</div>' +
-        '<div class="cside"><span class="pill ' + catClass(d.cat) + '">' + d.cat + '</span><span class="abv">' + (d.stats.finalMl ? pct(d.stats.finalAbv, 0) : '—') + '</span></div></a></li>';
-    }).join('') + '</ul>';
+    h += '<ul class="cards">' + list.map(card).join('') + '</ul>';
     if (!list.length) h += '<p class="empty">No ballad by that name. Try another verse, or clear a filter.</p>';
+    // bottom sheet
+    if (state.showFilters) {
+      h += '<div class="sheet-bg" id="sheetbg"></div><div class="sheet" id="sheet"><div class="grab"></div><div class="sheet-head"><b>Filters</b>' + (ac ? '<button id="fclear" class="btn ghost small">Clear all</button>' : '') + '</div><div class="sheet-body">';
+      FILTERS.forEach(function (g) {
+        if (g.k === 'base') return;
+        var v = vals(g), keys = g.order ? g.order.filter(function (k) { return v[k]; }) : Object.keys(v).sort();
+        if (!keys.length) return;
+        h += '<div class="fgroup"><div class="flabel">' + g.n + '</div>';
+        if (g.k === 'fam') h += tiles('f-fam', keys.map(function (k) { return { v: k, label: k, icon: '<em class="dotc"></em>', color: ROOT_COLORS[k], count: v[k] }; }), function (x) { return state.f.fam[x]; }, 'fams');
+        else h += pills('f-' + g.k, keys.map(function (k) { return { v: k, label: k, icon: (GROUP_ICON[g.k] || {})[k], count: v[k] }; }), function (x) { return state.f[g.k][x]; });
+        h += '</div>';
+      });
+      h += '</div><button id="fdone" class="btn primary">Show ' + list.length + ' songs</button></div>';
+    }
+    var prevSheet = document.querySelector('.sheet-body'), sheetY = prevSheet ? prevSheet.scrollTop : 0;
     $app.innerHTML = h;
+    var nb = document.querySelector('.sheet-body'); if (nb) nb.scrollTop = sheetY;
+    document.body.classList.toggle('noscroll', !!state.showFilters);
     var q = document.getElementById('q');
-    q.addEventListener('input', function () { state.q = q.value; var pos = q.selectionStart; renderBrowse(); var nq = document.getElementById('q'); nq.focus(); nq.setSelectionRange(pos, pos); });
+    q.addEventListener('input', function () { state.q = q.value; var pos = q.selectionStart; keep(renderBrowse); var nq = document.getElementById('q'); nq.focus(); nq.setSelectionRange(pos, pos); });
     document.getElementById('sort').value = state.sort;
     document.getElementById('sort').onchange = function (e) { state.sort = e.target.value; renderBrowse(); };
-    document.getElementById('ftoggle').onclick = function () { state.showFilters = !state.showFilters; renderBrowse(); };
-    $app.querySelectorAll('.catbar button').forEach(function (b) { b.onclick = function () { state.cat = b.dataset.c; renderBrowse(); }; });
-    $app.querySelectorAll('.chip').forEach(function (c) {
-      c.onclick = function () { var g = c.dataset.g, v = c.dataset.v; if (state.f[g][v]) delete state.f[g][v]; else state.f[g][v] = 1; renderBrowse(); };
-    });
-    var fc = document.getElementById('fclear'); if (fc) fc.onclick = function () { FILTERS.forEach(function (g) { state.f[g.k] = {}; }); renderBrowse(); };
+    document.getElementById('ftoggle').onclick = function () { state.showFilters = true; keep(renderBrowse); };
+    onTap('cat', function (v) { state.cat = v; keep(renderBrowse); });
+    function tog(k, v) { if (state.f[k][v]) delete state.f[k][v]; else state.f[k][v] = 1; keep(renderBrowse); }
+    onTap('base', function (v) { tog('base', v); });
+    FILTERS.forEach(function (g) { onTap('f-' + g.k, function (v) { tog(g.k, v); }); });
+    onTap('achip', function (v) { var i = v.indexOf('|'); tog(v.slice(0, i), v.slice(i + 1)); });
+    function clearAll() { FILTERS.forEach(function (g) { state.f[g.k] = {}; }); keep(renderBrowse); }
+    ['fclear', 'fclear2'].forEach(function (id) { var b = document.getElementById(id); if (b) b.onclick = clearAll; });
+    function close() { state.showFilters = false; keep(renderBrowse); }
+    var bg = document.getElementById('sheetbg'); if (bg) bg.onclick = close;
+    var dn = document.getElementById('fdone'); if (dn) dn.onclick = close;
   }
 
   /* ---------- detail ---------- */
@@ -259,14 +321,19 @@
     }).join('') + '</ul>';
   }
   function renderDrink(id) {
-    var d = byId[id]; if (!d) return renderBrowse();
+    var vm = VAR[id]; if (!vm) return renderBrowse();
+    var main = vm.main, vIdx = vm.i, d = main.variants[vIdx];
     var u = ud(id), unit = user.settings.unit;
     var vi = user.vsel[id] != null && d.versions[user.vsel[id]] ? user.vsel[id] : d.vdef;
     var v = d.versions[vi], st = v.stats;
     var batchWord = d.batch ? (serves === 1 ? '1 batch' : serves + '× batch') : serves + ' ' + (serves === 1 ? 'serve' : 'serves');
 
     var h = '<header class="top detail"><a href="#/" class="back">‹ Songbook</a>' +
-      '<h1>' + esc(d.name) + '</h1><div class="badges"><span class="pill ' + catClass(d.cat) + '">' + d.cat + '</span>' +
+      '<h1>' + esc(main.name) + '</h1>' +
+      (main.variants.length > 1 ? '<div class="varpick"><div class="flabel">Style · ' + main.variants.length + '</div>' +
+        pills('variant', main.variants.map(function (v) { return { v: v.id, label: v.vlabel || v.name, icon: v.fromNotes ? '✍️' : '' }; }), function (v) { return v === d.id; }) +
+        (vIdx ? '<p class="varname">' + esc(d.name) + (d.changed ? ' · <span class="muted">' + esc(d.changed) + '</span>' : '') + '</p>' : '') + '</div>' : '') +
+      '<div class="badges"><span class="pill ' + catClass(d.cat) + '">' + d.cat + '</span>' +
       (d.exp ? '<span class="pill exp">Experimental</span>' : '') + (d.batch ? '<span class="pill">Batch</span>' : '') +
       '<span class="pill">' + esc(d.fam) + ' family</span><span class="pill">' + esc(v.base) + '</span>' + (st.finalMl ? '<span class="pill">' + Calc.strengthLabel(st.finalAbv) + '</span>' : '') + '</div>' +
       (d.famNote ? '<p class="muted small">' + esc(d.famNote) + '</p>' : '') + '</header>';
@@ -317,10 +384,12 @@
     h += '</section>';
 
     // lineage
-    var par = d.parent ? byId[d.parent] : null, kids = (children[d.id] || []).slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
+    var par = d.parent ? byId[d.parent] : null, kids = vIdx ? [] : (children[main.id] || []).slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
+    var isVarOfMain = vIdx && par === main;
     h += '<section class="panel"><h2>Bloodline</h2>';
     if (d.root) h += '<p><span class="pill root">Root cocktail</span> One of the six Codex templates. ' + link('#/lineage', 'Open the family tree') + '</p>';
-    if (par) h += '<div class="lin"><span class="muted">Parent</span> ' + link('#/d/' + par.id, esc(par.name)) + '</div>';
+    if (isVarOfMain) h += '<div class="lin"><span class="muted">Variation of</span> ' + link('#/d/' + main.id, esc(main.name) + ' (' + esc(main.vlabel) + ')') + '</div>';
+    else if (par) h += '<div class="lin"><span class="muted">Parent</span> ' + link('#/d/' + par.id, esc(par.name)) + '</div>';
     else if (d.parentText) h += '<div class="lin"><span class="muted">Parent</span> ' + esc(d.parentText) + ' <em class="muted">(not in collection)</em></div>';
     if (d.changed) h += '<div class="lin"><span class="muted">What changed</span> ' + esc(d.changed) + '</div>';
     if (kids.length) h += '<div class="lin"><span class="muted">Riffs in your collection</span><ul class="kids">' + kids.map(function (k) { return '<li>' + link('#/d/' + k.id, esc(k.name)) + (k.src === 'andrew' ? ' <span class="mk av">yours</span>' : '') + ' <small>' + esc(k.changed || '') + '</small></li>'; }).join('') + '</ul></div>';
@@ -354,6 +423,7 @@
     $app.innerHTML = h;
     $app.querySelectorAll('.seg button').forEach(function (b) { b.onclick = function () { user.settings.unit = b.dataset.u; save(); keep(renderDrink, id); }; });
     $app.querySelectorAll('.vtabs button').forEach(function (b) { b.onclick = function () { user.vsel[id] = +b.dataset.v; save(); keep(renderDrink, id); }; });
+    onTap('variant', function (v) { if (v !== id) { route.keepY = window.scrollY; location.replace('#/d/' + v); } });
     document.getElementById('sminus').onclick = function () { if (serves > 1) { serves--; keep(renderDrink, id); } };
     document.getElementById('splus').onclick = function () { if (serves < 24) { serves++; keep(renderDrink, id); } };
     $app.querySelectorAll('.src input').forEach(function (c) { c.onchange = function () { u.sources[c.dataset.s] = c.checked; save(); keep(renderDrink, id); }; });
@@ -366,54 +436,91 @@
   function keep(fn, arg) { var y = window.scrollY; fn(arg); window.scrollTo(0, y); }
 
   /* ---------- lineage ---------- */
+  var fam = { root: '', mine: false };
+  function linHeader() {
+    var mode = user.settings.linMode || 'evo';
+    return '<header class="top"><h1>Bloodlines</h1><p class="muted small">How drinks grew up: the whole craft from 1806 to today, or your songbook sorted into Cocktail Codex’s six families.</p>' +
+      pills('linmode', [{ v: 'evo', label: 'Evolution', icon: '🌳' }, { v: 'codex', label: 'Codex families', icon: '🧬' }], function (v) { return v === mode; }) + '</header>';
+  }
+  function bindLinMode() { onTap('linmode', function (v) { user.settings.linMode = v; save(); route(); }); }
   function topAncestor(d) { var seen = {}; while (d.parent && byId[d.parent] && !seen[d.id]) { seen[d.id] = 1; d = byId[d.parent]; } return d; }
+  function subtreeHasMine(d) { if (d.src === 'andrew' || (d.av && !d.match)) return true; return (children[d.id] || []).some(subtreeHasMine); }
   function node(d, rootFam, depth) {
     var kids = (children[d.id] || []).slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
+    if (fam.mine) kids = kids.filter(subtreeHasMine);
     var cross = d.fam !== rootFam ? ' <span class="pill tiny">' + esc(d.fam) + '</span>' : '';
     var yours = d.src === 'andrew' ? ' <span class="mk av">yours</span>' : (d.av && !d.match ? ' <span class="mk av">AV</span>' : '');
     return '<li>' + link('#/d/' + d.id, esc(d.name)) + yours + cross + (d.changed && depth ? '<small>' + esc(d.changed) + '</small>' : (d.parentText && !d.parent ? '<small>via ' + esc(d.parentText) + '</small>' : '')) +
       (kids.length ? '<ul>' + kids.map(function (k) { return node(k, rootFam, depth + 1); }).join('') + '</ul>' : '') + '</li>';
   }
   function renderLineage() {
-    var h = '<header class="top"><h1>Bloodlines</h1><p class="muted small">Every song descends from one of Cocktail Codex’s six root cocktails. Links show template and what changed, not strict chronology. <span class="mk av">yours</span> marks your originals.</p></header>';
-    ROOT_ORDER.forEach(function (fam) {
-      var root = DRINKS.filter(function (d) { return d.root && d.fam === fam; })[0];
-      var members = DRINKS.filter(function (d) { return d.fam === fam; });
+    var header = linHeader();
+    if ((user.settings.linMode || 'evo') === 'evo') return window.DBViews.evolution(header);
+    var h = header + '<section class="panel filterpanel"><div class="flabel">Family</div>' +
+      tiles('famroot', ROOT_ORDER.map(function (f) { return { v: f, label: f, icon: '<em class="dotc"></em>', color: ROOT_COLORS[f], count: DRINKS.filter(function (d) { return d.fam === f; }).length }; }), function (v) { return v === fam.root; }, 'fams') +
+      pills('fammine', [{ v: '1', label: 'Only branches with my drinks', icon: '🎻' }], function () { return fam.mine; }) + '</section>';
+    ROOT_ORDER.forEach(function (f) {
+      if (fam.root && fam.root !== f) return;
+      var root = DRINKS.filter(function (d) { return d.root && d.fam === f; })[0];
+      var members = DRINKS.filter(function (d) { return d.fam === f; });
       var mineN = members.filter(function (d) { return d.src === 'andrew'; }).length;
       var direct = (children[root.id] || []).slice();
-      var loose = DRINKS.filter(function (d) { return !d.root && d.fam === fam && topAncestor(d) === d && direct.indexOf(d) < 0; });
+      var loose = DRINKS.filter(function (d) { return !d.root && d.fam === f && topAncestor(d) === d && direct.indexOf(d) < 0; });
       var tops = direct.concat(loose).sort(function (a, b) { return a.name.localeCompare(b.name); });
-      h += '<section class="panel tree"><details' + (fam === 'Old-Fashioned' ? ' open' : '') + '><summary><b>' + esc(root.name) + '</b> <span class="muted">· ' + esc(fam) + ' · ' + members.length + ' drinks' + (mineN ? ', ' + mineN + ' yours' : '') + '</span></summary>' +
-        '<p class="small">' + link('#/d/' + root.id, 'Open the root spec') + '</p><ul class="treeul">' + tops.map(function (d) { return node(d, fam, d.parent ? 1 : 0); }).join('') + '</ul></details></section>';
+      if (fam.mine) tops = tops.filter(subtreeHasMine);
+      h += '<section class="panel tree" style="box-shadow:inset 3px 0 0 ' + ROOT_COLORS[f] + '"><details' + (fam.root || f === 'Old-Fashioned' ? ' open' : '') + '><summary><b>' + esc(root.name) + '</b> <span class="muted">· ' + esc(f) + ' · ' + members.length + ' drinks' + (mineN ? ', ' + mineN + ' yours' : '') + '</span></summary>' +
+        '<p class="small">' + link('#/d/' + root.id, 'Open the root spec') + '</p><ul class="treeul">' + tops.map(function (d) { return node(d, f, d.parent ? 1 : 0); }).join('') + '</ul></details></section>';
     });
     $app.innerHTML = h;
+    bindLinMode();
+    onTap('famroot', function (v) { fam.root = fam.root === v ? '' : v; keep(renderLineage); });
+    onTap('fammine', function () { fam.mine = !fam.mine; keep(renderLineage); });
   }
 
   /* ---------- craft (techniques + prep) ---------- */
   function usedIn(k) {
     var viaIng = Object.keys(ING).filter(function (i) { return ING[i].prep === k; });
-    return DRINKS.filter(function (d) {
+    return DRINKS.filter(function (m) { return m.variants.some(function (d) {
       if (d.allTech.indexOf(k) > -1) return true;
       return d.versions.some(function (v) { return v.spec.some(function (s) { return viaIng.indexOf(s[2]) > -1; }); }) ||
         (d.components || []).some(function (c) { return c.spec.some(function (s) { return viaIng.indexOf(s[2]) > -1; }); });
-    });
+    }); });
   }
+  var craft = { cat: '', q: '' };
+  var APO_LINK = { 'super-juice': '#/apothecary/super', 'acid-adjusted-oj': '#/apothecary/acid' };
+  (window.Apothecary ? window.Apothecary.SYRUPS : []).forEach(function (s) { if (s.prep) APO_LINK[s.prep] = '#/apothecary/syrups/' + s.id; });
   function renderTechIndex() {
     var keys = Object.keys(TECH);
+    var CAT = {
+      prep: function (k) { return TECH[k].tag === 'prep' && !TECH[k].missing; },
+      unwritten: function (k) { return TECH[k].missing && !user.tech[k]; },
+      home: function (k) { return TECH[k].tag === 'home'; },
+      equipment: function (k) { return TECH[k].tag === 'equipment'; }
+    };
+    var n = function (f) { return keys.filter(f).length; };
+    var h = '<header class="top"><h1>Bar craft</h1><p class="muted small">Techniques in my own words, plus your prep recipes and notes. Influences are credited, not paraphrased.</p>' +
+      '<input id="cq" type="search" class="full" placeholder="Search techniques & prep" value="' + esc(craft.q) + '">' +
+      tiles('craftcat', [{ v: '', label: 'Everything', icon: '✦', count: keys.length }, { v: 'prep', label: 'House prep', icon: '🎻', count: n(CAT.prep) }, { v: 'unwritten', label: 'Unwritten', icon: '✍️', count: n(CAT.unwritten) },
+        { v: 'home', label: 'Home technique', icon: '🏠', count: n(CAT.home) }, { v: 'equipment', label: 'Needs gear', icon: '🔧', count: n(CAT.equipment) }], function (v) { return v === craft.cat; }) + '</header>' +
+      '<a class="apocard" href="#/apothecary"><i>⚖️</i><div><b>The Apothecary</b><span>Super juice, syrup and acid-adjust calculators</span></div><em>›</em></a>';
     function row(k) {
       var c = usedIn(k).length, t = TECH[k];
-      return '<li>' + link('#/t/' + k, esc(t.t)) + (t.mine && t.mine.length && t.tag !== 'prep' ? ' <span class="mk av">your notes</span>' : '') + (t.flags ? ' <span class="mk flag">⚑</span>' : '') +
-        ' <span class="muted small">' + (c ? c + ' drinks' : '') + (t.infl && t.infl !== '—' ? ' · ' + esc(t.infl) : '') + '</span></li>';
+      return '<li>' + link('#/t/' + k, esc(t.t)) + (t.mine && t.mine.length && t.tag !== 'prep' ? ' <span class="mk av">your notes</span>' : '') + (t.flags ? ' <span class="mk flag">⚑</span>' : '') + (APO_LINK[k] ? ' <span class="mk calc">⚖️ calc</span>' : '') +
+        ' <span class="muted small">' + (c ? c + (c === 1 ? ' drink' : ' drinks') : '') + (t.infl && t.infl !== '—' ? ' · ' + esc(t.infl) : '') + '</span></li>';
     }
-    function group(filter, title, sub) {
-      var ks = keys.filter(filter).sort(function (a, b) { return TECH[a].t.localeCompare(TECH[b].t); });
-      return '<section class="panel"><h2>' + title + '</h2>' + (sub ? '<p class="muted small">' + sub + '</p>' : '') + '<ul class="tlist">' + ks.map(row).join('') + '</ul></section>';
+    function qmatch(k) { if (!craft.q) return true; var t = TECH[k], hay = [t.t, (t.body || []).join(' '), (t.mine || []).join(' ')].join(' ').toLowerCase(); return craft.q.toLowerCase().split(/\s+/).every(function (w) { return hay.indexOf(w) > -1; }); }
+    function group(key, title, sub) {
+      if (craft.cat && craft.cat !== key) return '';
+      var ks = keys.filter(CAT[key]).filter(qmatch).sort(function (a, b) { return TECH[a].t.localeCompare(TECH[b].t); });
+      if (!ks.length) return '';
+      return '<section class="panel' + (key === 'prep' || key === 'unwritten' ? ' mine' : '') + '"><h2>' + title + '</h2>' + (sub ? '<p class="muted small">' + sub + '</p>' : '') + '<ul class="tlist">' + ks.map(row).join('') + '</ul></section>';
     }
-    $app.innerHTML = '<header class="top"><h1>Bar craft</h1><p class="muted small">Techniques in my own words, plus your prep recipes and notes. Influences are credited, not paraphrased.</p></header>' +
-      group(function (k) { return TECH[k].tag === 'prep' && !TECH[k].missing; }, '🎻 Andrew’s house prep') +
-      group(function (k) { return TECH[k].missing; }, 'Unwritten verses', 'Used in your specs but not written down yet. Add the recipe on each page.') +
-      group(function (k) { return TECH[k].tag === 'home'; }, 'Home-feasible technique') +
-      group(function (k) { return TECH[k].tag === 'equipment'; }, 'Equipment required');
+    var body = group('prep', '🎻 Andrew’s house prep') + group('unwritten', '✍️ Unwritten verses', 'Used in your specs but not written down yet. The Apothecary has starter recipes you can save here.') +
+      group('home', '🏠 Home-feasible technique') + group('equipment', '🔧 Equipment required');
+    $app.innerHTML = h + (body || '<p class="empty">Nothing matches.</p>');
+    var cq = document.getElementById('cq');
+    cq.oninput = function () { craft.q = cq.value; var p = cq.selectionStart; keep(renderTechIndex); var nq = document.getElementById('cq'); nq.focus(); nq.setSelectionRange(p, p); };
+    onTap('craftcat', function (v) { craft.cat = v; keep(renderTechIndex); });
   }
   function renderTech(k) {
     var t = TECH[k]; if (!t) return renderTechIndex();
@@ -422,9 +529,10 @@
     var h = '<header class="top detail"><a href="#/tech" class="back">‹ Bar craft</a><h1>' + esc(t.t) + '</h1><div class="badges">' + tagPill +
       (t.infl && t.infl !== '—' ? '<span class="pill">Influence: ' + esc(t.infl) + '</span>' : '') + '</div></header>';
     h += flagBox(t.flags || []);
+    if (APO_LINK[k]) h += '<a class="apocard" href="' + APO_LINK[k] + '"><i>⚖️</i><div><b>Open the calculator</b><span>Scale it in the Apothecary</span></div><em>›</em></a>';
     if (t.mine && t.mine.length) h += '<section class="panel mine"><h2>🎻 From your notes</h2><ul class="bul">' + t.mine.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul>' +
       (t.note ? '<p class="muted small">' + esc(t.note) + '</p>' : '') + '</section>';
-    if (t.missing) h += '<section class="panel mine"><h2>🎻 Not written down yet</h2><p>This shows up in your specs but there’s no recipe in your notes. Add it below.</p>' + (t.note ? '<p class="muted small">' + esc(t.note) + '</p>' : '') + '</section>';
+    if (t.missing && !note) h += '<section class="panel mine"><h2>🎻 Not written down yet</h2><p>This shows up in your specs but there’s no recipe in your notes. Add it below.</p>' + (t.note ? '<p class="muted small">' + esc(t.note) + '</p>' : '') + '</section>';
     if (t.body.length || t.eq.length) h += '<section class="panel">' + (t.mine && t.mine.length ? '<h2>Technique</h2>' : '') + t.body.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
       (t.eq.length ? '<h3>Equipment</h3><ul class="bul">' + t.eq.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>' : '') + '</section>';
     if (t.links) h += '<section class="panel"><h2>Reference</h2>' + t.links.map(function (l) { return '<p><a target="_blank" rel="noopener" href="' + esc(l.u) + '">' + esc(l.n) + ' ↗</a></p>'; }).join('') + '</section>';
@@ -441,13 +549,13 @@
     var tried = 0, noted = 0, ver = 0;
     Object.keys(user.drinks).forEach(function (k) { var u = user.drinks[k]; if (u.tried) tried++; if (u.notes) noted++; if (u.verified) ver++; });
     var cats = {}; DRINKS.forEach(function (d) { cats[d.cat] = (cats[d.cat] || 0) + 1; });
-    var flagged = DRINKS.filter(function (d) { return allFlags(d).length; }).sort(function (a, b) { return a.name.localeCompare(b.name); });
+    var flagged = allVariants().filter(function (d) { return allFlags(d).length; }).sort(function (a, b) { return a.name.localeCompare(b.name); });
     var flaggedT = Object.keys(TECH).filter(function (k) { return TECH[k].flags; });
     var missing = Object.keys(TECH).filter(function (k) { return TECH[k].missing && !user.tech[k]; });
     var h = '<header class="top"><h1>The Tavern</h1><p class="muted small">Ledger, settings and housekeeping.</p></header>' +
       '<section class="panel"><h2>Your tab</h2><div class="stats">' +
       '<div><b>' + tried + '</b><span>Made</span></div><div><b>' + noted + '</b><span>With notes</span></div><div><b>' + ver + '</b><span>Verified / final</span></div></div>' +
-      '<p class="muted small">' + DRINKS.length + ' songs: ' + cats['Andrew’s'] + ' yours · ' + cats.Modern + ' modern · ' + cats.Classic + ' classic · ' + cats.Tiki + ' tiki.</p></section>';
+      '<p class="muted small">' + DRINKS.length + ' songs (' + allVariants().length + ' with styles): ' + cats['Andrew’s'] + ' yours · ' + cats.Modern + ' modern · ' + cats.Classic + ' classic · ' + cats.Tiki + ' tiki.</p></section>';
     h += '<section class="panel"><h2>⚑ Bard’s to-do list</h2><p class="muted small">Things marked [?] or flagged in your notes.</p><ul class="todo">' +
       flagged.map(function (d) { return '<li>' + link('#/d/' + d.id, esc(d.name)) + '<small>' + allFlags(d).map(esc).join('<br>') + '</small></li>'; }).join('') +
       flaggedT.map(function (k) { return '<li>' + link('#/t/' + k, esc(TECH[k].t)) + '<small>' + TECH[k].flags.map(esc).join('<br>') + '</small></li>'; }).join('') +
@@ -521,15 +629,28 @@
   function route() {
     var h = location.hash.replace(/^#/, '') || '/';
     var parts = h.split('/').filter(Boolean);
-    if (parts[0] === 'd') { setTab('browse'); if (parts[1] !== route.last) { serves = 1; window.scrollTo(0, 0); } route.last = parts[1]; return renderDrink(parts[1]); }
-    route.last = null; window.scrollTo(0, 0);
+    if (parts[0] === 'd') {
+      document.body.classList.remove('noscroll'); setTab('browse');
+      var m = VAR[parts[1]] ? VAR[parts[1]].main.id : parts[1];
+      if (m !== route.last) { serves = 1; window.scrollTo(0, 0); }
+      route.last = m; renderDrink(parts[1]);
+      if (route.keepY != null) { window.scrollTo(0, route.keepY); route.keepY = null; }
+      return;
+    }
+    route.last = null; window.scrollTo(0, 0); document.body.classList.remove('noscroll');
     if (parts[0] === 'lineage') { setTab('lineage'); return renderLineage(); }
+    if (parts[0] === 'evo') { setTab('lineage'); return window.DBViews.evoNode(parts[1]); }
+    if (parts[0] === 'apothecary') { setTab('apo'); return window.DBViews.apothecary(parts[1], parts[2]); }
     if (parts[0] === 'tech') { setTab('tech'); return renderTechIndex(); }
     if (parts[0] === 't') { setTab('tech'); return renderTech(parts[1]); }
     if (parts[0] === 'more') { setTab('more'); return renderMore(); }
     if (parts[0] === 'check') { setTab('more'); return renderCheck(); }
     setTab('browse'); renderBrowse();
   }
+  window.DB = {
+    get user() { return user; }, save: save, keep: keep, esc: esc, link: link, tiles: tiles, pills: pills, onTap: onTap, card: card,
+    bindLinMode: bindLinMode, ROOT_COLORS: ROOT_COLORS, TECH: TECH, ING: ING, DRINKS: DRINKS, byId: byId
+  };
   window.addEventListener('hashchange', route);
   route();
 

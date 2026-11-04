@@ -1,4 +1,4 @@
-# Dad Bard
+# Dad Bard 🪕
 
 *Songs of the home bar, sung slightly off-key.*
 
@@ -21,10 +21,14 @@ updates. Use More → Export JSON for backups.
 | File | What it is |
 |---|---|
 | `data.js` | Ingredients (ABV / sugar / acid), the core 100 drinks, technique pages |
+| `variations.js` | Missing classics & tiki, plus variation groups (Dry/Wet/Dirty Martini, etc.) |
 | `andrew.js` | **Your layer:** Andrew's versions, your originals, prep recipes, [?] flags |
 | `calc.js` | Dilution + stats engine (coefficients can be changed in-app) |
 | `tests.js` | Validation suite: `node tests.js` or More → Calculator check |
-| `app.js` | UI: browse, filters, detail, lineage, techniques, notes |
+| `app.js` | UI: songbook + filter sheet, detail, Codex families, bar craft, tavern |
+| `evolution.js` | Evolution tree: 34 styles from punch & the 1806 cocktail to today |
+| `apothecary.js` | Super juice (Kevin Kos ratios), syrups, acid-adjust data + math |
+| `views.js` | Evolution timeline/tree and Apothecary screens |
 | `sw.js`, `manifest.webmanifest`, `icons/` | Offline + home-screen app |
 
 ## Adding a drink
@@ -58,3 +62,14 @@ Copy any `add({...})` block in `data.js`. Spec items are `[amount, unit, ingredi
 - `said:` = your line exactly as written, shown on the drink page.
 - `flags:` = [?] items. They all collect in Tavern → Bard's to-do list. Delete a flag once it's resolved.
 - Prep pages with `missing:true` are recipes used in specs but not written down yet.
+
+## Apothecary sources
+- Super juice: Kevin Kos (lime 0.66× citric + 0.33× malic, lemon 1× citric, orange 0.9× citric + 0.1× malic, water 16.66× peel weight).
+- Acid adjust: published per-liter ratios for orange, grapefruit, pineapple; other fruits estimated from lime ≈ 4% citric + 2% malic, lemon ≈ 6% citric.
+- Syrup starter recipes are my wording. "Save to my … page" writes your version into the matching prep page.
+
+## Variations
+Drinks named "<style> <Base>" are folded into one entry with a Style picker (e.g. Martini: Dry, Wet,
+Fifty-Fifty, Perfect, Dirty, Gibson, Vesper). Each style keeps its own id, notes and rating, so old links
+(e.g. `#/d/dirty-martini`) still open the right style. Andrew's originals are never folded.
+Add a style in `variations.js` → `GROUPS`.
