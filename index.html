@@ -411,8 +411,8 @@ var ING = {
   applejuice:{n:'Apple juice (cloudy)',sug:.10,acid:.005,t:'juice'}, espresso:{n:'Espresso (fresh)',t:'juice'},
   simple:{n:'Simple syrup (1:1)',sug:.615,t:'syrup'}, rich:{n:'Rich simple syrup (2:1)',sug:.887,t:'syrup'},
   demerarasyrup:{n:'Rich demerara syrup (2:1)',sug:.887,t:'syrup'}, canesyrup:{n:'Cane syrup (2:1)',sug:.887,t:'syrup'},
-  rockcandy:{n:'Rock candy syrup (2:1)',sug:.887,t:'syrup'}, honey:{n:'Honey syrup',sug:.61,t:'syrup'},
-  honeyginger:{n:'Honey-ginger syrup',sug:.50,t:'syrup'}, agave:{n:'Agave syrup',sug:.545,t:'syrup'},
+  rockcandy:{n:'Rock candy syrup (2:1)',sug:.887,t:'syrup'}, honey:{n:'Honey syrup (3:1)',sug:.87,t:'syrup'},
+  honeyginger:{n:'Honey-ginger syrup',sug:.45,t:'syrup'}, agave:{n:'Agave syrup',sug:.545,t:'syrup'},
   maple:{n:'Maple syrup (dark)',sug:.88,t:'syrup'}, orgeat:{n:'Orgeat',sug:.60,t:'syrup'},
   grenadine:{n:'Grenadine',sug:.69,acid:.008,t:'syrup'}, passionsyrup:{n:'Passion fruit syrup',sug:.60,acid:.01,t:'syrup'},
   vanillasyrup:{n:'Vanilla syrup',sug:.615,t:'syrup'}, donsmix:{n:'Don’s Mix (2 grapefruit : 1 cinnamon syrup)',sug:.245,acid:.016,t:'syrup'},
@@ -948,7 +948,7 @@ var NEW = {
 };
 for (var k in NEW) ING[k] = NEW[k];
 ING.honey.prep = 'honey-syrup'; ING.orgeat.prep = 'orgeat'; ING.simple.prep = 'simple-syrup'; ING.coffeeliqueur.prep = 'coffee-liqueur';
-ING.rich.prep = 'rich-syrup'; ING.demerarasyrup.prep = 'rich-syrup'; ING.agave.prep = 'agave-syrup'; ING.honeyginger.prep = 'ginger-syrup'; ING.grenadine.prep = 'grenadine';
+ING.rich.prep = 'rich-syrup'; ING.demerarasyrup.prep = 'rich-syrup'; ING.agave.prep = 'agave-syrup'; ING.honeyginger.prep = 'honey-ginger-syrup'; ING.grenadine.prep = 'grenadine';
 
 /* ---------- Andrew's versions of traditional drinks ---------- */
 var AV = {
@@ -1168,9 +1168,10 @@ var P = {
   'banana-oleo':{t:'Banana oleo',tag:'prep',mine:['1 banana peel to ½ cup sugar.']},
   'simple-syrup':{t:'Simple syrup (1:1)',tag:'prep',mine:['Equal parts by weight: sugar (any kind) and water.','Rule of thumb: 1 oz simple syrup is about 15 g sugar. (Weighed 1:1 it works out nearer 18 g per oz.)']},
   'rich-syrup':{t:'Rich simple syrup (2:1)',tag:'prep',mine:['Two parts sugar (any kind) to one part water, by weight.']},
-  'honey-syrup':{t:'Honey syrup',tag:'prep',mine:['Honey by weight, plus water = honey weight × 0.64.','About 50% sugar.']},
+  'honey-syrup':{t:'Honey syrup (3:1)',tag:'prep',mine:['3 parts honey to 1 part water, by volume.','Stir with warm water until smooth. Cool and refrigerate.']},
+  'honey-ginger-syrup':{t:'Honey-ginger syrup',tag:'prep',mine:['Equal parts by volume: honey syrup (3:1) and rough-chopped ginger (no need to peel).','Blend until smooth, then strain through a fine strainer or cheesecloth.','Used in the Penicillin.']},
   'agave-syrup':{t:'Agave syrup',tag:'prep',mine:['Agave syrup by weight, plus water = agave weight × 0.64.','Watered down for the best results in cocktails.']},
-  'ginger-syrup':{t:'Ginger syrup',tag:'prep',mine:['Equal parts by volume: rough-chopped ginger (no need to peel), boiling water, and sugar or honey. 1 cup each is a good start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','Made with honey, it’s the honey-ginger syrup in a Penicillin.']},
+  'ginger-syrup':{t:'Ginger syrup',tag:'prep',mine:['Equal parts by volume: rough-chopped ginger (no need to peel), boiling water, and sugar or honey. 1 cup each is a good start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','For the Penicillin, use honey-ginger syrup instead (its own recipe).']},
   'cinnamon-syrup':{t:'Cinnamon syrup',tag:'prep',mine:['1 oz cinnamon sticks per 2 cups water (about 1 oz per 470 g water).','Sugar: equal weight to the water.']},
   'raspberry-syrup':{t:'Raspberry syrup',tag:'prep',mine:['2 cups sugar','1 cup water','1 cup raspberries (fresh or frozen)','Stir the sugar and water over low heat until the sugar has dissolved.','Remove from the heat, add the raspberries, and stir and mash the berries.','Let it cool completely, then strain through a sieve into a bowl, pushing all the liquid through the pulp with a spoon.','Jar it and refrigerate. Keeps up to 2 weeks.']},
   'grenadine':{t:'Grenadine',tag:'prep',infl:'Morgenthaler',mine:['2 cups / 500 ml fresh pomegranate juice','2 cups / 500 g sugar','2 oz / 60 ml pomegranate molasses','1 tsp / 5 ml orange blossom water','Heat the juice slightly, just enough for the rest to dissolve easily. Stir in the remaining ingredients, cool, and bottle.']},
@@ -1647,8 +1648,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       method:['Equal parts by weight: sugar (any kind) and water.','Stir until fully dissolved. Warm water speeds it up; no need to boil.','Cool, bottle and refrigerate.'] },
     { id:'rich', n:'Rich 2:1', cat:'Basic', icon:'💎', kind:'weight', parts:2, sweetName:'Sugar (any kind)', liquid:'Water', prep:'rich-syrup', house:true,
       method:['Two parts sugar (any kind) to one part water, by weight.','Warm the water and stir until clear. Rich syrup keeps longer than 1:1.','Cool, bottle and refrigerate.'] },
-    { id:'honey', n:'Honey', cat:'Basic', icon:'🍯', kind:'mult', sweet:'honey', water:0.64, liquid:'Water', prep:'honey-syrup', house:true,
-      method:['Weigh the honey. Add water = honey weight × 0.64.','Stir (warm water helps) until smooth. Comes out about 50% sugar.'] },
+    { id:'honey', n:'Honey 3:1', cat:'Basic', icon:'🍯', kind:'vol', sweet:'honey', parts:3, liquid:'Warm water', prep:'honey-syrup', house:true,
+      method:['3 parts honey to 1 part water, by volume.','Stir with warm water until smooth. Cool and refrigerate.'] },
     { id:'agave', n:'Agave', cat:'Basic', icon:'🌵', kind:'mult', sweet:'agave', water:0.64, liquid:'Water', prep:'agave-syrup', house:true,
       method:['Weigh the agave syrup. Add water = agave weight × 0.64.','Stir until combined. Watered down for the best results in cocktails.'] },
     { id:'cinnamon', n:'Cinnamon', cat:'Spiced', icon:'🪵', kind:'weight', parts:1, sweetName:'Sugar (equal weight to water)', liquid:'Water', prep:'cinnamon-syrup', house:true,
@@ -1656,7 +1657,10 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       method:['Simmer the cinnamon sticks in the water (1 oz per 2 cups, about 1 oz per 470 g).','Stir in an equal weight of sugar off the heat, steep to taste, then strain.'] },
     { id:'ginger', n:'Ginger', cat:'Spiced', icon:'🫚', kind:'scaled', prep:'ginger-syrup', house:true,
       items:[{ n:'Rough-chopped ginger (no need to peel)', q:1, unit:'cup' },{ n:'Boiling water', q:1, unit:'cup' },{ n:'Sugar or honey', q:1, unit:'cup' }],
-      method:['Equal parts by volume. 1 cup each is a good place to start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','Made with honey, it’s the honey-ginger syrup for a Penicillin.'] },
+      method:['Equal parts by volume. 1 cup each is a good place to start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','Want it with honey? See Honey-ginger.'] },
+    { id:'honey-ginger', n:'Honey-ginger', cat:'Spiced', icon:'🐝', kind:'scaled', prep:'honey-ginger-syrup', house:true,
+      items:[{ n:'Honey syrup (3:1)', q:1, unit:'cup', sub:'¾ cup honey + ¼ cup water' },{ n:'Rough-chopped ginger (no need to peel)', q:1, unit:'cup' }],
+      method:['Make the honey syrup first: 3 parts honey to 1 part water, by volume.','Combine equal volumes of honey syrup and rough-chopped ginger in a blender.','Blend until smooth, then strain through a fine strainer or cheesecloth.','Used in the Penicillin.'] },
     { id:'raspberry', n:'Raspberry', cat:'Fruit', icon:'<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 7c-1.6-3-4.8-4-7.5-2.6 2 .4 3.6 1.6 4.4 3.4z M16 7c1.6-3 4.8-4 7.5-2.6-2 .4-3.6 1.6-4.4 3.4z" fill="#5fa84a"/><rect x="15" y="3" width="2" height="5" rx="1" fill="#4a8a3a"/><circle cx="11" cy="11" r="3.3" fill="#c2185b"/><circle cx="16" cy="10.5" r="3.3" fill="#d81b60"/><circle cx="21" cy="11" r="3.3" fill="#c2185b"/><circle cx="8.5" cy="15.5" r="3.3" fill="#ad1457"/><circle cx="13.5" cy="15" r="3.3" fill="#e91e63"/><circle cx="18.5" cy="15" r="3.3" fill="#d81b60"/><circle cx="23.5" cy="15.5" r="3.3" fill="#ad1457"/><circle cx="10.5" cy="20" r="3.3" fill="#c2185b"/><circle cx="16" cy="19.5" r="3.3" fill="#e91e63"/><circle cx="21.5" cy="20" r="3.3" fill="#c2185b"/><circle cx="13" cy="24.5" r="3.3" fill="#ad1457"/><circle cx="19" cy="24.5" r="3.3" fill="#ad1457"/><circle cx="16" cy="28" r="3.3" fill="#880e4f"/><circle cx="15" cy="9.5" r="0.9" fill="#fff" opacity=".45"/><circle cx="12.5" cy="14" r="0.9" fill="#fff" opacity=".45"/><circle cx="15" cy="18.5" r="0.9" fill="#fff" opacity=".45"/><circle cx="20" cy="10" r="0.9" fill="#fff" opacity=".45"/></svg>', kind:'scaled', prep:'raspberry-syrup', house:true,
       items:[{ n:'Sugar', q:2, unit:'cup' },{ n:'Water', q:1, unit:'cup' },{ n:'Raspberries (fresh or frozen)', q:1, unit:'cup', gPerCup:125 }],
       method:['Stir the sugar and water over low heat until the sugar has dissolved.','Remove from the heat, add the raspberries, and stir and mash the berries.','Let it cool completely, then strain through a sieve into a bowl, pushing all the liquid through the pulp with a spoon.','Jar it and refrigerate. Keeps up to 2 weeks.'] },
@@ -1704,12 +1708,16 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var s = SWEET[sw], swG = target / (1 / s.dens + waterX), water = swG * waterX;
     var r = finish(swG, water, swG * s.sugar, target); r.sweetMl = swG / s.dens; return r;
   }
+  function volSyrup(sw, parts, target) {        // parts sweetener : 1 water, by volume
+    var s = SWEET[sw], swMl = target * parts / (parts + 1), water = target / (parts + 1), swG = swMl * s.dens;
+    var r = finish(swG, water, swG * s.sugar, target); r.sweetMl = swMl; return r;
+  }
   function finish(sweetG, liquidMl, sugarG, yieldMl) {
     return { sweetG:sweetG, liquidMl:liquidMl, sugarG:sugarG, yieldMl:yieldMl, brix: sugarG / (sweetG + liquidMl) * 100, gPerOz: sugarG / yieldMl * ML_PER_OZ, gPerMl: sugarG / yieldMl };
   }
   return { ML_PER_OZ:ML_PER_OZ, CUP_SUGAR_G:CUP_SUGAR_G, CUP_ML:CUP_ML, SUPER:SUPER, superJuice:superJuice,
     TARGETS:TARGETS, FRUITS:FRUITS, fruit:fruit, acidAdjust:acidAdjust, SWEET:SWEET, SYRUPS:SYRUPS, syrupById:syrupById,
-    sugarSyrup:sugarSyrup, honeySyrup:honeySyrup, weightSyrup:weightSyrup, multSyrup:multSyrup };
+    sugarSyrup:sugarSyrup, honeySyrup:honeySyrup, weightSyrup:weightSyrup, multSyrup:multSyrup, volSyrup:volSyrup };
 });
 
 </script>
@@ -1823,8 +1831,10 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       check('Simple: equal weight sugar and water (50% sugar)', near(s1.sweetG, s1.liquidMl) && near(s1.brix, 50, 1e-9));
       var s2 = Ap.weightSyrup(2, 500);
       check('Rich: 2 parts sugar : 1 water by weight', near(s2.sweetG, 2 * s2.liquidMl) && near(s2.yieldMl, 500));
-      var hs = Ap.multSyrup('honey', 0.64, 500);
-      check('Honey: water = honey weight × 0.64, about 50% sugar', near(hs.liquidMl, hs.sweetG * 0.64) && Math.abs(hs.brix - 50) < 0.5, hs.brix.toFixed(1) + '%');
+      var hs = Ap.volSyrup('honey', 3, 500);
+      check('Honey: 3 parts honey to 1 part water, by volume', near(hs.sweetMl, 375) && near(hs.liquidMl, 125), Math.round(hs.sweetG) + ' g honey');
+      var hg = Ap.syrupById('honey-ginger');
+      check('Honey-ginger: equal volume honey syrup (3:1) and chopped ginger', hg.items.length === 2 && hg.items[0].q === hg.items[1].q && /3:1/.test(hg.items[0].n) && DATA.ING.honeyginger.prep === 'honey-ginger-syrup');
       var ag = Ap.multSyrup('agave', 0.64, 500);
       check('Agave: water = agave weight × 0.64', near(ag.liquidMl, ag.sweetG * 0.64) && near(ag.yieldMl, 500));
       var ids2 = Ap.SYRUPS.map(function (x) { return x.id; });
@@ -2070,8 +2080,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       }).join('') + '</div></section>';
     h += '<section class="panel' + (p.mine || p.house ? ' mine' : '') + '"><h2>' + p.icon + ' ' + D.esc(p.n) + (p.mine ? ' · your recipe' : p.house ? ' · your house ratio' : '') + '</h2>' +
       (p.src ? '<p class="muted small">Recipe: ' + D.esc(p.src) + '</p>' : '');
-    if (p.kind === 'weight' || p.kind === 'mult') {
-      h += '<div class="ratio">' + (p.kind === 'weight' ? (p.parts === 1 ? '1 : 1' : p.parts + ' : 1') + ' sugar : water, by weight' : D.esc(A.SWEET[p.sweet].n) + ' by weight + water × ' + p.water) + '</div>' +
+    if (p.kind === 'weight' || p.kind === 'mult' || p.kind === 'vol') {
+      h += '<div class="ratio">' + (p.kind === 'weight' ? (p.parts === 1 ? '1 : 1' : p.parts + ' : 1') + ' sugar : water, by weight' : p.kind === 'vol' ? p.parts + ' : 1 ' + D.esc(A.SWEET[p.sweet].n).toLowerCase() + ' : water, by volume' : D.esc(A.SWEET[p.sweet].n) + ' by weight + water × ' + p.water) + '</div>' +
         '<label class="inlabel">How much do you want?</label>' + numIn('sytarget', st.target, 'ml', 50) +
         D.pills('syquick', [250,500,750,1000].map(function (x) { return { v:String(x), label: x < 1000 ? x + ' ml' : '1 L' }; }), function (v) { return +v === st.target; });
     } else if (p.kind === 'scaled') {
@@ -2090,12 +2100,14 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     document.getElementById('apo-body').innerHTML = h;
     function out() {
       var o = '', text = '';
-      if (p.kind === 'weight' || p.kind === 'mult') {
-        var rr = p.kind === 'weight' ? A.weightSyrup(p.parts, st.target) : A.multSyrup(p.sweet, p.water, st.target);
+      if (p.kind === 'weight' || p.kind === 'mult' || p.kind === 'vol') {
+        var rr = p.kind === 'weight' ? A.weightSyrup(p.parts, st.target) : p.kind === 'vol' ? A.volSyrup(p.sweet, p.parts, st.target) : A.multSyrup(p.sweet, p.water, st.target);
         var sw = p.kind === 'weight' ? p.sweetName : A.SWEET[p.sweet].n;
         var adds2 = (p.adds || []).map(function (a) { return { v:g(a.perLiquid * rr.liquidMl) + ' ' + a.unit, l:a.n, s:a.note }; });
         o = outGrid([
+          p.kind === 'vol' ? { v:r0(rr.sweetMl) + ' ml', l:sw, s:cups(rr.sweetMl / A.CUP_ML) + ' · ≈ ' + r0(rr.sweetG) + ' g', hi:true } :
           { v:r0(rr.sweetG) + ' g', l:sw, s: p.kind === 'mult' ? '≈ ' + r0(rr.sweetMl) + ' ml' : '≈ ' + cups(rr.sweetG / A.CUP_SUGAR_G), hi:true },
+          p.kind === 'vol' ? { v:r0(rr.liquidMl) + ' ml', l:p.liquid, s:cups(rr.liquidMl / A.CUP_ML), hi:true } :
           { v:r0(rr.liquidMl) + ' g', l:p.liquid, s:'= ' + r0(rr.liquidMl) + ' ml · ' + cups(rr.liquidMl / A.CUP_ML), hi:true }
         ].concat(adds2).concat([
           { v:r0(rr.yieldMl) + ' ml', l:'Yield', s:r1(rr.yieldMl / A.ML_PER_OZ) + ' oz' },
@@ -2113,7 +2125,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
           else if (it.unit === 'big handful') txt = r1(q) + ' big handful' + (q > 1 ? 's' : '');
           else if (it.unit === 'ml') txt = g(q) + ' ml (' + r1(q / A.ML_PER_OZ) + ' oz)';
           else txt = g(q) + ' ' + it.unit;
-          return '<li><span class="amt">' + D.esc(txt) + '</span><span class="ing">' + D.esc(it.n) + '</span></li>';
+          var subTxt = it.sub && m !== 1 ? (it.sub === '¾ cup honey + ¼ cup water' ? cups(0.75 * q) + ' honey + ' + cups(0.25 * q) + ' water' : it.sub) : it.sub;
+          return '<li><span class="amt">' + D.esc(txt) + '</span><span class="ing">' + D.esc(it.n) + (subTxt ? '<small>' + D.esc(subTxt) + '</small>' : '') + '</span></li>';
         }).join('') + '</ul>';
         if (p.id === 'orgeat') o += '<p class="muted small">Sugar converted at 200 g per cup.</p>';
       } else {
