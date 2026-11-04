@@ -389,10 +389,10 @@ var ING = {
   applejuice:{n:'Apple juice (cloudy)',sug:.10,acid:.005,t:'juice'}, espresso:{n:'Espresso (fresh)',t:'juice'},
   simple:{n:'Simple syrup (1:1)',sug:.615,t:'syrup'}, rich:{n:'Rich simple syrup (2:1)',sug:.887,t:'syrup'},
   demerarasyrup:{n:'Rich demerara syrup (2:1)',sug:.887,t:'syrup'}, canesyrup:{n:'Cane syrup (2:1)',sug:.887,t:'syrup'},
-  rockcandy:{n:'Rock candy syrup (2:1)',sug:.887,t:'syrup'}, honey:{n:'Honey syrup (1:1)',sug:.57,t:'syrup'},
-  honeyginger:{n:'Honey-ginger syrup',sug:.57,t:'syrup'}, agave:{n:'Agave syrup (2:1 nectar:water)',sug:.62,t:'syrup'},
+  rockcandy:{n:'Rock candy syrup (2:1)',sug:.887,t:'syrup'}, honey:{n:'Honey syrup',sug:.61,t:'syrup'},
+  honeyginger:{n:'Honey-ginger syrup',sug:.50,t:'syrup'}, agave:{n:'Agave syrup',sug:.545,t:'syrup'},
   maple:{n:'Maple syrup (dark)',sug:.88,t:'syrup'}, orgeat:{n:'Orgeat',sug:.60,t:'syrup'},
-  grenadine:{n:'Grenadine',sug:.60,acid:.005,t:'syrup'}, passionsyrup:{n:'Passion fruit syrup',sug:.60,acid:.01,t:'syrup'},
+  grenadine:{n:'Grenadine',sug:.69,acid:.008,t:'syrup'}, passionsyrup:{n:'Passion fruit syrup',sug:.60,acid:.01,t:'syrup'},
   vanillasyrup:{n:'Vanilla syrup',sug:.615,t:'syrup'}, donsmix:{n:'Don’s Mix (2 grapefruit : 1 cinnamon syrup)',sug:.245,acid:.016,t:'syrup'},
   marmalade:{n:'Orange marmalade',sug:.60,acid:.005,t:'syrup'}, creamcoconut:{n:'Cream of coconut',sug:.50,t:'syrup'},
   soda:{n:'Soda water',t:'mixer'}, gingerbeer:{n:'Ginger beer',sug:.10,acid:.003,t:'mixer'},
@@ -540,7 +540,7 @@ add({id:'paper-plane',name:'Paper Plane',cat:'Modern',fam:'Sidecar',base:'Whiske
  flav:['bitter','citrusy'],tech:['shake'],parent:'last-word',changed:'Keeps the equal-parts frame; bourbon, Aperol, Amaro Nonino, lemon.',
  prov:{who:'Sam Ross',where:'Created for The Violet Hour, Chicago',year:'2007',conf:'high',note:'Early version used Campari before settling on Aperol.'}});
 add({id:'gold-rush',name:'Gold Rush',cat:'Modern',fam:'Daiquiri',base:'Whiskey',m:'shake',glass:'Rocks',ice:'Large cube',garnish:'None',
- spec:[[2,'oz','bourbon'],[0.75,'oz','lemon'],[0.75,'oz','honey',{note:'Honey syrup ratios vary (1:1 to 3:1); verify'}]],
+ spec:[[2,'oz','bourbon'],[0.75,'oz','lemon'],[0.75,'oz','honey']],
  flav:['citrusy','rich'],tech:['shake'],parent:'whiskey-sour',changed:'Honey syrup replaces simple syrup.',
  prov:{who:'T.J. Siegal',where:'Milk & Honey, NYC',year:'c. 2000',conf:'medium',note:''}});
 add({id:'old-cuban',name:'Old Cuban',cat:'Modern',fam:'Daiquiri',base:'Rum',m:'shake',glass:'Coupe',ice:'Up',garnish:'Mint leaf',
@@ -926,6 +926,7 @@ var NEW = {
 };
 for (var k in NEW) ING[k] = NEW[k];
 ING.honey.prep = 'honey-syrup'; ING.orgeat.prep = 'orgeat'; ING.simple.prep = 'simple-syrup'; ING.coffeeliqueur.prep = 'coffee-liqueur';
+ING.rich.prep = 'rich-syrup'; ING.demerarasyrup.prep = 'rich-syrup'; ING.agave.prep = 'agave-syrup'; ING.honeyginger.prep = 'ginger-syrup'; ING.grenadine.prep = 'grenadine';
 
 /* ---------- Andrew's versions of traditional drinks ---------- */
 var AV = {
@@ -1095,8 +1096,7 @@ own({id:'rum-runnings',name:'Rum Runnings',exp:true,fam:'Martini',base:'Rum',m:'
  spec:[[2,'oz','darkrum'],[1,'oz','coffeeliqueur'],[0.5,'oz','triplesec'],[0.5,'oz','sweetvermouth']],
  components:[{name:'Amaretto cream foam',optional:true,spec:[[4,'oz','heavycream'],[4,'oz','amaretto'],[1,'egg','egg'],[0.5,'oz','simple'],[0.5,'oz','orgeat'],[4,'dash','orangebitters'],[4,'dash','chocbitters']],note:'Optional topper. Batch-sized (makes several). Not counted in the stats.'}],
  flav:['coffee','rich','creamy'],tech:['stir','foam'],parentText:'White Russian (cream-topped coffee liqueur drink)',changed:'Dark rum, triple sec and vermouth under an optional amaretto cream foam.',
- said:'2oz dark rum; 1oz coffee liqueur; 1/2oz triple sec; 1/2oz sweet vermouth. Foam: 4oz heavy cream; 4oz amaretto; whole egg; 1/2oz simple; 1/2oz orgeat; 4 dashes orange bitters; 4 dashes chocolate bitters',
- flags:['Method isn’t noted. Shown as stirred. Shaken or stirred?']});
+ said:'2oz dark rum; 1oz coffee liqueur; 1/2oz triple sec; 1/2oz sweet vermouth. Foam: 4oz heavy cream; 4oz amaretto; whole egg; 1/2oz simple; 1/2oz orgeat; 4 dashes orange bitters; 4 dashes chocolate bitters'});
 own({id:'tropic-blunder',name:'Tropic Blunder',exp:true,fam:'Daiquiri',base:'Rum',m:'shake',garnish:'Grated nutmeg',
  spec:[[1.5,'oz','pinerum'],[1,'oz','jamaicanrum'],[0.75,'oz','lime'],[0.5,'oz','creamcoconut'],[0.25,'oz','bananaoleo'],[1,'dash','angostura']],
  flav:['tropical','creamy'],tech:['shake'],parent:'painkiller',changed:'Pineapple and Jamaican rums, lime instead of juice, banana oleo.',
@@ -1144,20 +1144,27 @@ var P = {
   'acid-adjusted-oj':{t:'Acid-adjusted orange juice',tag:'prep',mine:['1 L orange juice, 20 g malic acid, 32 g citric acid.']},
   'orgeat':{t:'Orgeat',tag:'prep',mine:['2 cups almond milk, 3 cups sugar, ½ tsp almond extract, ½ tsp rose water, 1 tsp orange blossom water.']},
   'banana-oleo':{t:'Banana oleo',tag:'prep',mine:['1 banana peel to ½ cup sugar.']},
-  'simple-syrup':{t:'Simple syrup',tag:'prep',mine:['Rule of thumb: 1 oz simple syrup is about 15 g sugar.']},
+  'simple-syrup':{t:'Simple syrup (1:1)',tag:'prep',mine:['Equal parts by weight: sugar (any kind) and water.','Rule of thumb: 1 oz simple syrup is about 15 g sugar. (Weighed 1:1 it works out nearer 18 g per oz.)']},
+  'rich-syrup':{t:'Rich simple syrup (2:1)',tag:'prep',mine:['Two parts sugar (any kind) to one part water, by weight.']},
+  'honey-syrup':{t:'Honey syrup',tag:'prep',mine:['Honey by weight, plus water = honey weight × 0.64.','About 50% sugar.']},
+  'agave-syrup':{t:'Agave syrup',tag:'prep',mine:['Agave syrup by weight, plus water = agave weight × 0.64.','Watered down for the best results in cocktails.']},
+  'ginger-syrup':{t:'Ginger syrup',tag:'prep',mine:['Equal parts by volume: rough-chopped ginger (no need to peel), boiling water, and sugar or honey. 1 cup each is a good start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','Made with honey, it’s the honey-ginger syrup in a Penicillin.']},
+  'cinnamon-syrup':{t:'Cinnamon syrup',tag:'prep',mine:['1 oz cinnamon sticks per 2 cups water (about 1 oz per 470 g water).','Sugar: equal weight to the water.']},
+  'grenadine':{t:'Grenadine',tag:'prep',infl:'Morgenthaler',mine:['2 cups / 500 ml fresh pomegranate juice','2 cups / 500 g sugar','2 oz / 60 ml pomegranate molasses','1 tsp / 5 ml orange blossom water','Heat the juice slightly, just enough for the rest to dissolve easily. Stir in the remaining ingredients, cool, and bottle.']},
   'coffee-liqueur':{t:'House coffee liqueur',tag:'prep',mine:['50 g ground coffee, 250 ml vodka, 1 g cinnamon stick, 4 g organic orange peel. Sit 24 hours.','Then add 1 tsp vanilla extract, 100 g demerara sugar and 85 ml hot water.']},
   'mojito-cordial':{t:'Mojito cordial',tag:'prep',mine:['Big handful of mint, 100 ml lime juice, 150 ml water, 100 g sugar, 3 g lime peel.']},
   'basic-foam':{t:'Basic foam',tag:'prep',mine:['2 egg whites, 3 oz cold water, 1 oz simple syrup, 1 oz lemon juice.']},
   'whipped-cream':{t:'Whipped cream',tag:'prep',mine:['4 oz cream to 1 tbsp maple syrup.']}
 };
-[['honey-syrup','Honey syrup','Ratio not noted (1:1? 2:1?). The calculator assumes 1:1.'],['cinnamon-syrup','Cinnamon syrup',''],['raspberry-syrup','Raspberry simple syrup',''],
+[['raspberry-syrup','Raspberry simple syrup',''],
  ['green-tea-syrup','Green tea syrup',''],['rosemary-syrup','Rosemary syrup',''],['salted-tomato-syrup','Salted tomato syrup',''],['cherry-syrup','Cherry syrup',''],
  ['strawberry-rum','Strawberry-infused rum',''],['pineapple-rum','Pineapple-infused rum','Covers “pineapple rum” and “pineapple-soaked O.F.T.D.”'],['infused-bacardi','Infused Bacardi (Slushee)','What is it infused with?']
 ].forEach(function (x) { P[x[0]] = { t:x[1], tag:'prep', missing:true, mine:[], note:x[2] }; });
 for (var pk in P) { var p = P[pk]; p.eq = p.eq || []; p.body = p.body || []; p.infl = p.infl || '—'; TECH[pk] = p; }
 
-DATA.NORMALIZED = ['“mr back” → Mr Black','“pisco y” → pisco','“Jamaican run” → Jamaican rum','“ango” → Angostura','“AKs” → AK’s',
-  '“OFTD” → Planteray (formerly Plantation) O.F.T.D. overproof ✓ confirmed','“3 star” → Planteray 3 Stars ✓ confirmed','“all spice” → allspice'];
+DATA.NORMALIZED = ['“mr back” → Mr Black ✓','“pisco y” → pisco ✓','“Jamaican run” → Jamaican rum ✓','“ango” → Angostura ✓','“AKs” → AK’s ✓',
+  '“OFTD” → Planteray (formerly Plantation) O.F.T.D. overproof ✓','“3 star” → Planteray 3 Stars ✓','“all spice” → allspice ✓'];
+DATA.NORMALIZED_CONFIRMED = true;
 })(typeof self !== 'undefined' ? self : this);
 
 </script>
@@ -1613,34 +1620,26 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
   /* Syrups */
   var SWEET = { honey:{ n:'Honey', dens:1.42, sugar:0.82 }, agave:{ n:'Agave nectar', dens:1.36, sugar:0.75 } };
   var SYRUPS = [
-    { id:'simple', n:'Simple', cat:'Basic', icon:'🧂', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Water', prep:'simple-syrup',
-      method:['Stir sugar into water until fully dissolved. Warm water speeds it up; no need to boil.','Cool, bottle and refrigerate.'] },
-    { id:'rich', n:'Rich simple', cat:'Basic', icon:'💎', kind:'sugar', ratio:2, sugarName:'White sugar', liquid:'Water',
-      method:['Warm the water and stir in the sugar until clear. Rich syrup keeps longer than 1:1.','Cool, bottle and refrigerate.'] },
-    { id:'demerara', n:'Demerara', cat:'Basic', icon:'🟫', kind:'sugar', ratio:2, sugarName:'Demerara sugar', liquid:'Water',
-      method:['Warm the water and stir in the demerara until dissolved.','Great in Old Fashioneds and tiki.'] },
-    { id:'honey', n:'Honey', cat:'Basic', icon:'🍯', kind:'honey', sweet:'honey', ratio:1, ratioOpts:[1,2,3], liquid:'Warm water', prep:'honey-syrup',
-      method:['Stir honey into warm water until smooth.','Your ratio isn’t in your notes yet. Pick one, then save it to your prep page.'] },
-    { id:'agave', n:'Agave', cat:'Basic', icon:'🌵', kind:'honey', sweet:'agave', ratio:2, ratioOpts:[1,2], liquid:'Water',
-      method:['Stir agave nectar into water until combined. No heat needed.'] },
-    { id:'cinnamon', n:'Cinnamon', cat:'Spiced', icon:'🪵', kind:'sugar', ratio:1, sugarName:'White or demerara sugar', liquid:'Water', prep:'cinnamon-syrup',
-      adds:[{ n:'Cinnamon sticks, broken', per500:10, unit:'g' }],
-      method:['Simmer the water with the broken cinnamon for about 5 minutes.','Stir in the sugar off the heat, steep 30–60 minutes (taste as you go), then strain.'] },
-    { id:'ginger', n:'Ginger', cat:'Spiced', icon:'🫚', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Fresh ginger juice',
-      method:['Juice fresh ginger (or blend with a splash of water and press through a cloth).','Stir sugar into the juice cold. No heat keeps the bite.'] },
-    { id:'honey-ginger', n:'Honey-ginger', cat:'Spiced', icon:'🐝', kind:'honey', sweet:'honey', ratio:1, ratioOpts:[1,2], liquid:'Fresh ginger juice',
-      method:['Stir honey into fresh ginger juice until combined. Used in the Penicillin.'] },
+    { id:'simple', n:'Simple 1:1', cat:'Basic', icon:'🧂', kind:'weight', parts:1, sweetName:'Sugar (any kind)', liquid:'Water', prep:'simple-syrup', house:true,
+      method:['Equal parts by weight: sugar (any kind) and water.','Stir until fully dissolved. Warm water speeds it up; no need to boil.','Cool, bottle and refrigerate.'] },
+    { id:'rich', n:'Rich 2:1', cat:'Basic', icon:'💎', kind:'weight', parts:2, sweetName:'Sugar (any kind)', liquid:'Water', prep:'rich-syrup', house:true,
+      method:['Two parts sugar (any kind) to one part water, by weight.','Warm the water and stir until clear. Rich syrup keeps longer than 1:1.','Cool, bottle and refrigerate.'] },
+    { id:'honey', n:'Honey', cat:'Basic', icon:'🍯', kind:'mult', sweet:'honey', water:0.64, liquid:'Water', prep:'honey-syrup', house:true,
+      method:['Weigh the honey. Add water = honey weight × 0.64.','Stir (warm water helps) until smooth. Comes out about 50% sugar.'] },
+    { id:'agave', n:'Agave', cat:'Basic', icon:'🌵', kind:'mult', sweet:'agave', water:0.64, liquid:'Water', prep:'agave-syrup', house:true,
+      method:['Weigh the agave syrup. Add water = agave weight × 0.64.','Stir until combined. Watered down for the best results in cocktails.'] },
+    { id:'cinnamon', n:'Cinnamon', cat:'Spiced', icon:'🪵', kind:'weight', parts:1, sweetName:'Sugar (equal weight to water)', liquid:'Water', prep:'cinnamon-syrup', house:true,
+      adds:[{ n:'Cinnamon sticks', perLiquid:28.35 / 473, unit:'g', note:'1 oz per 2 cups water' }],
+      method:['Simmer the cinnamon sticks in the water (1 oz per 2 cups, about 1 oz per 470 g).','Stir in an equal weight of sugar off the heat, steep to taste, then strain.'] },
+    { id:'ginger', n:'Ginger', cat:'Spiced', icon:'🫚', kind:'scaled', prep:'ginger-syrup', house:true,
+      items:[{ n:'Rough-chopped ginger (no need to peel)', q:1, unit:'cup' },{ n:'Boiling water', q:1, unit:'cup' },{ n:'Sugar or honey', q:1, unit:'cup' }],
+      method:['Equal parts by volume. 1 cup each is a good place to start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','Made with honey, it’s the honey-ginger syrup for a Penicillin.'] },
     { id:'raspberry', n:'Raspberry', cat:'Fruit', icon:'🫐', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Water', prep:'raspberry-syrup',
       adds:[{ n:'Raspberries (fresh or frozen)', perSugar:1, unit:'g' }],
       method:['Warm water and sugar until dissolved, add the berries and lightly crush.','Hold below a simmer for 10 minutes, cool, and fine-strain without pressing hard.'] },
-    { id:'grenadine', n:'Grenadine', cat:'Fruit', icon:'🍒', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Pomegranate juice (100%)',
-      adds:[{ n:'Orange blossom water (optional)', per500:2, unit:'ml' }],
-      method:['Stir sugar into pomegranate juice over low heat until dissolved. Don’t boil.','Add the orange blossom water off the heat.'] },
-    { id:'cherry', n:'Cherry', cat:'Fruit', icon:'🍒', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Water', prep:'cherry-syrup',
-      adds:[{ n:'Pitted cherries (fresh or frozen)', perSugar:1, unit:'g' }],
-      method:['Simmer cherries in the water about 10 minutes, crushing them as they soften.','Strain, then stir in the sugar while warm.'] },
-    { id:'passion', n:'Passion fruit', cat:'Fruit', icon:'💛', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Passion fruit purée',
-      method:['Stir sugar into the purée cold until dissolved. Strain seeds if using fresh fruit.'] },
+    { id:'grenadine', n:'Grenadine', cat:'Fruit', icon:'🍷', kind:'scaled', prep:'grenadine', house:true, src:'Jeffrey Morgenthaler',
+      items:[{ n:'Fresh pomegranate juice', q:500, unit:'ml' },{ n:'Sugar', q:500, unit:'g' },{ n:'Pomegranate molasses', q:60, unit:'ml' },{ n:'Orange blossom water', q:5, unit:'ml' }],
+      method:['Heat the juice slightly, just enough to let the other ingredients dissolve easily.','Stir in the remaining ingredients, let it cool, and bottle.'] },
     { id:'tomato', n:'Salted tomato', cat:'Fruit', icon:'🍅', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Tomato water or strained juice', prep:'salted-tomato-syrup',
       adds:[{ n:'Salt', pctTotal:1, unit:'g' }],
       method:['Blend ripe tomatoes and strain through a cloth for tomato water (or use strained juice).','Stir in sugar and salt cold. Start with salt at about 1% of the total and taste.'] },
@@ -1674,12 +1673,20 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var liquid = target / (1 + swPer), swMl = liquid * swPer, swG = swMl * s.dens;
     var r = finish(swG, liquid, swG * s.sugar, target); r.sweetMl = swMl; return r;
   }
+  function weightSyrup(parts, target) {        // parts sugar : 1 water, by weight
+    var liquid = target / (1 + parts * SUCROSE_ML_PER_G), sugar = liquid * parts;
+    return finish(sugar, liquid, sugar, target);
+  }
+  function multSyrup(sw, waterX, target) {      // sweetener by weight + water = weight × waterX
+    var s = SWEET[sw], swG = target / (1 / s.dens + waterX), water = swG * waterX;
+    var r = finish(swG, water, swG * s.sugar, target); r.sweetMl = swG / s.dens; return r;
+  }
   function finish(sweetG, liquidMl, sugarG, yieldMl) {
     return { sweetG:sweetG, liquidMl:liquidMl, sugarG:sugarG, yieldMl:yieldMl, brix: sugarG / (sweetG + liquidMl) * 100, gPerOz: sugarG / yieldMl * ML_PER_OZ, gPerMl: sugarG / yieldMl };
   }
   return { ML_PER_OZ:ML_PER_OZ, CUP_SUGAR_G:CUP_SUGAR_G, CUP_ML:CUP_ML, SUPER:SUPER, superJuice:superJuice,
     TARGETS:TARGETS, FRUITS:FRUITS, fruit:fruit, acidAdjust:acidAdjust, SWEET:SWEET, SYRUPS:SYRUPS, syrupById:syrupById,
-    sugarSyrup:sugarSyrup, honeySyrup:honeySyrup };
+    sugarSyrup:sugarSyrup, honeySyrup:honeySyrup, weightSyrup:weightSyrup, multSyrup:multSyrup };
 });
 
 </script>
@@ -1756,7 +1763,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     check('Drinks from your notes', said === 44, said + ' of 44 (Slushy Mojito deleted)');
     check('Slushy Mojito deleted', !find('slushy-mojito'));
     var openFlags = D.filter(function (d) { return (d.flags || []).length; }).map(function (d) { return d.id; });
-    check('To-do answers applied (only Rum Runnings method left open)', openFlags.join() === 'rum-runnings', openFlags.join(', '));
+    check('To-do list clear (Rum Runnings confirmed stirred)', !openFlags.length && find('rum-runnings').m === 'stir', openFlags.join(', '));
+    check('All name normalizations confirmed', !!DATA.NORMALIZED_CONFIRMED && DATA.NORMALIZED.every(function (x) { return x.indexOf('✓') > -1; }));
     check('Mezcalrita renamed Orange Mezcalrita', find('mezcalrita').name === 'Orange Mezcalrita');
     check('Bijou kept as Anders E’s version', find('bijou').av.by === 'Anders E');
     check('Tropical Coffee Sour: lime, 1¾ + ¼ oz rum', JSON.stringify(find('tropical-coffee-sour').spec).indexOf('[1.75,"oz","agedrum"') > -1 && JSON.stringify(find('tropical-coffee-sour').spec).indexOf('"lime"') > -1);
@@ -1788,11 +1796,22 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       check('Super juice target mode inverts', near(Ap.superJuice('lime', { mode:'target', target:1666 }).peel, 100, 1e-6));
       var oj = Ap.acidAdjust('orange', 'lime', 1000);
       check('Orange → lime: 32 g citric + 20 g malic per L (matches your note)', near(oj.citric, 32) && near(oj.malic, 20));
-      var s1 = Ap.sugarSyrup(1, 500, 'weight');
-      check('1:1 syrup by weight is 50° Brix', near(s1.brix, 50, 1e-9));
-      check('2:1 rich syrup ≈ 66.7° Brix', near(Ap.sugarSyrup(2, 500, 'weight').brix, 200 / 3, 1e-9));
-      var hs = Ap.honeySyrup('honey', 1, 500, 'volume');
-      check('Honey 1:1 by volume splits evenly', near(hs.sweetMl, 250) && near(hs.liquidMl, 250));
+      var s1 = Ap.weightSyrup(1, 500);
+      check('Simple: equal weight sugar and water (50% sugar)', near(s1.sweetG, s1.liquidMl) && near(s1.brix, 50, 1e-9));
+      var s2 = Ap.weightSyrup(2, 500);
+      check('Rich: 2 parts sugar : 1 water by weight', near(s2.sweetG, 2 * s2.liquidMl) && near(s2.yieldMl, 500));
+      var hs = Ap.multSyrup('honey', 0.64, 500);
+      check('Honey: water = honey weight × 0.64, about 50% sugar', near(hs.liquidMl, hs.sweetG * 0.64) && Math.abs(hs.brix - 50) < 0.5, hs.brix.toFixed(1) + '%');
+      var ag = Ap.multSyrup('agave', 0.64, 500);
+      check('Agave: water = agave weight × 0.64', near(ag.liquidMl, ag.sweetG * 0.64) && near(ag.yieldMl, 500));
+      var ids2 = Ap.SYRUPS.map(function (x) { return x.id; });
+      check('Cherry and passion fruit syrups removed', ids2.indexOf('cherry') < 0 && ids2.indexOf('passion') < 0);
+      var gr = Ap.syrupById('grenadine');
+      check('Grenadine: 500 ml juice, 500 g sugar, 60 ml molasses, 5 ml orange blossom', gr.items.map(function (i) { return i.q; }).join() === '500,500,60,5');
+      var ci = Ap.syrupById('cinnamon');
+      check('Cinnamon: 1 oz sticks per 2 cups water, sugar equal weight', near(ci.adds[0].perLiquid * 473, 28.35, 1e-9) && ci.parts === 1);
+      var badPrep2 = Ap.SYRUPS.filter(function (x) { return x.prep && !DATA.TECH[x.prep]; }).map(function (x) { return x.id; });
+      check('Every syrup links to a prep page', !badPrep2.length, badPrep2.join(', '));
     }
     // 8. Evolution
     if (DATA.EVO) {
@@ -2022,10 +2041,15 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var unwritten = function (s) { return s.prep && D.TECH[s.prep] && D.TECH[s.prep].missing && !D.user.tech[s.prep]; };
     var h = '<section class="panel">' + D.pills('sycat', SY_CATS, function (v) { return v === st.cat; }) +
       '<div class="sygrid">' + list.map(function (s) {
-        return '<button class="sytile' + (s.id === p.id ? ' on' : '') + (s.mine ? ' mine' : '') + '" data-sy="' + s.id + '"><i>' + s.icon + '</i><span>' + D.esc(s.n) + '</span>' + (unwritten(s) ? '<em title="Not in your notes yet">✍️</em>' : '') + '</button>';
+        return '<button class="sytile' + (s.id === p.id ? ' on' : '') + (s.mine || s.house ? ' mine' : '') + '" data-sy="' + s.id + '"><i>' + s.icon + '</i><span>' + D.esc(s.n) + '</span>' + (unwritten(s) ? '<em title="Not in your notes yet">✍️</em>' : s.house ? '<em title="Your house ratio">🎻</em>' : '') + '</button>';
       }).join('') + '</div></section>';
-    h += '<section class="panel' + (p.mine ? ' mine' : '') + '"><h2>' + p.icon + ' ' + D.esc(p.n) + (p.mine ? ' · your recipe' : '') + '</h2>';
-    if (p.kind === 'scaled') {
+    h += '<section class="panel' + (p.mine || p.house ? ' mine' : '') + '"><h2>' + p.icon + ' ' + D.esc(p.n) + (p.mine ? ' · your recipe' : p.house ? ' · your house ratio' : '') + '</h2>' +
+      (p.src ? '<p class="muted small">Recipe: ' + D.esc(p.src) + '</p>' : '');
+    if (p.kind === 'weight' || p.kind === 'mult') {
+      h += '<div class="ratio">' + (p.kind === 'weight' ? (p.parts === 1 ? '1 : 1' : p.parts + ' : 1') + ' sugar : water, by weight' : D.esc(A.SWEET[p.sweet].n) + ' by weight + water × ' + p.water) + '</div>' +
+        '<label class="inlabel">How much do you want?</label>' + numIn('sytarget', st.target, 'ml', 50) +
+        D.pills('syquick', [250,500,750,1000].map(function (x) { return { v:String(x), label: x < 1000 ? x + ' ml' : '1 L' }; }), function (v) { return +v === st.target; });
+    } else if (p.kind === 'scaled') {
       h += '<label class="inlabel">Batch size</label>' + D.pills('symult', [0.5,1,2,3,4].map(function (m) { return { v:String(m), label:(m === 0.5 ? '½' : m) + '×' }; }), function (v) { return +v === st.mult; });
     } else {
       var opts = p.ratioOpts || [1,1.5,2], ratio = st.ratio || p.ratio;
@@ -2037,11 +2061,24 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     }
     h += '<div id="syout"></div></section>';
     h += '<section class="panel"><h2>Method</h2><ol class="steps">' + p.method.map(function (m) { return '<li>' + D.esc(m) + '</li>'; }).join('') + '</ol>' +
-      (p.kind === 'sugar' && !p.mine ? '<p class="muted small">Starter recipe in my wording. Tweak it, then save your version to your prep page.</p>' : '') + '</section>';
+      (p.kind === 'sugar' && !p.mine && !p.house ? '<p class="muted small">Starter recipe in my wording. Tweak it, then save your version to your prep page.</p>' : '') + '</section>';
     document.getElementById('apo-body').innerHTML = h;
     function out() {
       var o = '', text = '';
-      if (p.kind === 'scaled') {
+      if (p.kind === 'weight' || p.kind === 'mult') {
+        var rr = p.kind === 'weight' ? A.weightSyrup(p.parts, st.target) : A.multSyrup(p.sweet, p.water, st.target);
+        var sw = p.kind === 'weight' ? p.sweetName : A.SWEET[p.sweet].n;
+        var adds2 = (p.adds || []).map(function (a) { return { v:g(a.perLiquid * rr.liquidMl) + ' ' + a.unit, l:a.n, s:a.note }; });
+        o = outGrid([
+          { v:r0(rr.sweetG) + ' g', l:sw, s: p.kind === 'mult' ? '≈ ' + r0(rr.sweetMl) + ' ml' : '≈ ' + cups(rr.sweetG / A.CUP_SUGAR_G), hi:true },
+          { v:r0(rr.liquidMl) + ' g', l:p.liquid, s:'= ' + r0(rr.liquidMl) + ' ml · ' + cups(rr.liquidMl / A.CUP_ML), hi:true }
+        ].concat(adds2).concat([
+          { v:r0(rr.yieldMl) + ' ml', l:'Yield', s:r1(rr.yieldMl / A.ML_PER_OZ) + ' oz' },
+          { v:r1(rr.brix) + '%', l:'Sugar by weight' },
+          { v:r1(rr.gPerOz) + ' g', l:'Sugar per oz' }
+        ]));
+        if (p.id === 'simple') o += '<p class="muted small">Your rule of thumb says about 15 g sugar per oz; weighed 1:1 it comes out nearer 18 g.</p>';
+      } else if (p.kind === 'scaled') {
         var m = st.mult;
         o = '<ul class="spec">' + p.items.map(function (it) {
           var q = it.q * m, txt;
@@ -2049,6 +2086,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
           else if (it.unit === 'tsp') txt = (q === 0.5 ? '½' : q === 0.25 ? '¼' : r1(q)) + ' tsp';
           else if (it.unit === '') txt = r1(q) + ' ' + (p.unitLabel || '');
           else if (it.unit === 'big handful') txt = r1(q) + ' big handful' + (q > 1 ? 's' : '');
+          else if (it.unit === 'ml') txt = g(q) + ' ml (' + r1(q / A.ML_PER_OZ) + ' oz)';
           else txt = g(q) + ' ' + it.unit;
           return '<li><span class="amt">' + D.esc(txt) + '</span><span class="ing">' + D.esc(it.n) + '</span></li>';
         }).join('') + '</ul>';
@@ -2073,7 +2111,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
         text = p.n + ' syrup (' + new Date().toLocaleDateString() + '): ' + (ratio === 1.5 ? '1½' : ratio) + ':1 ' + (st.basis === 'volume' ? 'by volume' : 'by weight') + '. ' + r0(r.sweetG) + ' g ' + swName.toLowerCase() + ' + ' + r0(r.liquidMl) + ' ml ' + p.liquid.toLowerCase() +
           (adds.length ? ' + ' + adds.map(function (a) { return a.v + ' ' + a.l.toLowerCase(); }).join(' + ') : '') + ' → about ' + r0(r.yieldMl) + ' ml.';
       }
-      document.getElementById('syout').innerHTML = o + (p.mine ? '' : saveBtn(p.prep, text));
+      document.getElementById('syout').innerHTML = o + (p.mine || p.house || !text ? '' : saveBtn(p.prep, text));
       bindSave();
     }
     $app().querySelectorAll('.sytile').forEach(function (b) { b.onclick = function () { st.id = b.dataset.sy; st.ratio = null; st.mult = 1; D.save(); D.keep(syrupView); }; });
