@@ -1,23 +1,27 @@
-# The Spec Book
+# Dad Bard
 
-A personal, offline-capable cocktail reference: 100 drinks (70 modern, 20 classic, 10 tiki),
+*Songs of the home bar, sung slightly off-key.*
+
+A personal, offline cocktail songbook: the core 100 (70 modern, 20 classic, 10 tiki) plus your notes
+(27 originals, 5 classics added, 13 Andrew's versions), your house prep recipes,
 a technique layer, a lineage view anchored on Cocktail Codex's six root cocktails, and a
 dilution/ABV/sugar/acid calculator. Plain HTML/JS. No build step and no dependencies.
 
 ## Publish on GitHub Pages
-1. Create a repo (e.g. `spec-book`) and upload **everything in this folder**, keeping `icons/`.
+1. Create a repo (e.g. `dad-bard`) and upload **everything in this folder**, keeping `icons/`.
 2. Settings → Pages → Source: *Deploy from a branch* → `main` / root → Save.
-3. Open `https://<you>.github.io/spec-book/` in Safari → Share → **Add to Home Screen**.
+3. Open `https://<you>.github.io/dad-bard/` in Safari → Share → **Add to Home Screen**.
 
 ## Updating
-Edit the files, upload, then bump `VERSION` in `sw.js` (e.g. `specbook-v1.0.1`) so phones
+Edit the files, upload, then bump `VERSION` in `sw.js` (e.g. `dadbard-v2.0.1`) so phones
 fetch the new copy. Your notes are stored on the device (localStorage) and are not touched by
 updates. Use More → Export JSON for backups.
 
 ## Files
 | File | What it is |
 |---|---|
-| `data.js` | Ingredients (ABV / sugar / acid), the 100 drinks, technique pages |
+| `data.js` | Ingredients (ABV / sugar / acid), the core 100 drinks, technique pages |
+| `andrew.js` | **Your layer:** Andrew's versions, your originals, prep recipes, [?] flags |
 | `calc.js` | Dilution + stats engine (coefficients can be changed in-app) |
 | `tests.js` | Validation suite: `node tests.js` or More → Calculator check |
 | `app.js` | UI: browse, filters, detail, lineage, techniques, notes |
@@ -45,3 +49,12 @@ Copy any `add({...})` block in `data.js`. Spec items are `[amount, unit, ingredi
 - Batching: `Calc.compute()` already returns water per serve. Batch = spec × N + water × N.
 - Side-by-side compare and template view: group by `fam`, normalize specs to ratios.
 - Tasting log: extend `user.drinks[id]` with dated entries.
+
+## Your notes layer (`andrew.js`)
+- `av:` on a traditional drink = **Andrew's version**. The drink page opens on your version, with a
+  Traditional tab and a "What changed" diff.
+- `match:true` = your notes agree with the traditional spec (Last Word, Carajillo).
+- `src:'andrew'` = your original; `exp:true` = experimental; `batch:true` = large format.
+- `said:` = your line exactly as written, shown on the drink page.
+- `flags:` = [?] items. They all collect in Tavern → Bard's to-do list. Delete a flag once it's resolved.
+- Prep pages with `missing:true` are recipes used in specs but not written down yet.

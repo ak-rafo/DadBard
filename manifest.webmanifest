@@ -1,11 +1,11 @@
 {
-  "name": "The Spec Book",
-  "short_name": "Spec Book",
+  "name": "Dad Bard",
+  "short_name": "Dad Bard",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#14161a",
-  "theme_color": "#14161a",
+  "background_color": "#17110d",
+  "theme_color": "#17110d",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }

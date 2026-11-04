@@ -10,8 +10,8 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   var ML_PER_OZ = 29.5735;
   // volume of non-oz units, in ml
-  var UNIT_ML = { oz: ML_PER_OZ, dash: 0.8, drop: 0.05, tsp: 4.93, bsp: 4.0, white: 30, egg: 45 };
-  var SOLID = { leaf: 1, leaves: 1, slice: 1, sprig: 1, whole: 1, pinch: 1, rinse: 1, handful: 1, piece: 1 };
+  var UNIT_ML = { oz: ML_PER_OZ, ml: 1, dash: 0.8, drop: 0.05, tsp: 4.93, tbsp: 14.8, bsp: 4.0, white: 30, egg: 45 };
+  var SOLID = { leaf: 1, leaves: 1, slice: 1, sprig: 1, whole: 1, pinch: 1, rinse: 1, handful: 1, piece: 1, coin: 1, free: 1, garnish: 1 };
 
   // Default coefficients [a, b, c] for d = a*A^2 + b*A + c.
   // VERIFY against your copy of Liquid Intelligence; secondary sources quote the stirred
@@ -39,14 +39,17 @@
         return { d: stirredDilution(A), model: 'stirred' };
       case 'build':
         return { d: 0, model: 'built (no ice melt counted)', warn: 'Assumes chilled ingredients; real melt on the rocks keeps adding water.' };
+      case 'freeze':
+        return { d: 0, model: 'frozen (any water is already in the recipe)' };
       default:
         return { d: 0, model: 'none' };
     }
   }
 
   function itemMl(item) {
-    var amt = item[0], unit = item[1], opts = item[3] || {};
-    if (opts.side || unit === 'rinse' || SOLID[unit]) return 0;
+    var unit = item[1], opts = item[3] || {};
+    var amt = opts.to != null ? (item[0] + opts.to) / 2 : item[0];   // ranges use the midpoint
+    if (opts.side || opts.opt || unit === 'rinse' || SOLID[unit]) return 0;
     if (unit === 'top') return amt * ML_PER_OZ;
     var per = UNIT_ML[unit];
     return per ? amt * per : 0;

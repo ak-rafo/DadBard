@@ -50,27 +50,48 @@
     })();
 
     // 5. Scaling invariance and ethanol conservation across the whole collection
-    var conserveFail = [], scaleFail = [];
+    function specsOf(d) {
+      var out = [{ spec: d.spec, m: d.m }];
+      if (d.av) out.push({ spec: d.av.spec, m: d.av.m || d.m });
+      (d.alts || []).forEach(function (a) { out.push({ spec: a.spec, m: a.m || d.m }); });
+      return out;
+    }
+    var conserveFail = [], scaleFail = [], nSpecs = 0;
     D.forEach(function (dr) {
-      var r = Calc.compute(dr.spec, dr.m, ING);
-      var eth = 0;
-      dr.spec.forEach(function (it) { var ml = Calc.itemMl(it); if (ml && ING[it[2]]) eth += ml * (ING[it[2]].abv || 0); });
-      if (!near(r.finalAbv * r.finalMl, eth, 1e-6)) conserveFail.push(dr.id);
-      var dbl = dr.spec.map(function (it) { return [it[0] * 2, it[1], it[2], it[3]]; });
-      var r2 = Calc.compute(dbl, dr.m, ING);
-      if (!near(r2.finalAbv, r.finalAbv, 1e-9) || !near(r2.finalMl, r.finalMl * 2, 1e-6)) scaleFail.push(dr.id);
+      specsOf(dr).forEach(function (v) {
+        nSpecs++;
+        var r = Calc.compute(v.spec, v.m, ING);
+        var eth = 0;
+        v.spec.forEach(function (it) { var ml = Calc.itemMl(it); if (ml && ING[it[2]]) eth += ml * (ING[it[2]].abv || 0); });
+        if (!near(r.finalAbv * r.finalMl, eth, 1e-6)) conserveFail.push(dr.id);
+        var dbl = v.spec.map(function (it) { var o = it[3]; if (o && o.to != null) { o = JSON.parse(JSON.stringify(o)); o.to *= 2; } return [it[0] * 2, it[1], it[2], o]; });
+        var r2 = Calc.compute(dbl, v.m, ING);
+        if (!near(r2.finalAbv, r.finalAbv, 1e-9) || !near(r2.finalMl, r.finalMl * 2, 1e-6)) scaleFail.push(dr.id);
+      });
     });
-    check('Ethanol conserved for all ' + D.length + ' drinks', !conserveFail.length, conserveFail.join(', '));
+    check('Ethanol conserved for all ' + nSpecs + ' specs (' + D.length + ' drinks, incl. your versions)', !conserveFail.length, conserveFail.join(', '));
+    (function () {
+      var r = Calc.compute([[0.5, 'oz', 'lemon', { to: 1 }], [1, 'oz', 'gin', { opt: true }]], 'build', ING);
+      check('Ranges use the midpoint; optional items excluded', near(r.startMl, 0.75 * OZ));
+      var f = Calc.compute([[2, 'oz', 'whiterum'], [1, 'oz', 'simple']], 'freeze', ING);
+      check('Frozen drinks add no ice melt', near(f.dilution, 0));
+    })();
     check('Doubling a spec keeps ABV and doubles volume', !scaleFail.length, scaleFail.join(', '));
 
     // 6. Data integrity
     var ids = {}, dup = [], badIng = [], badParent = [], badTech = [];
     D.forEach(function (d) { if (ids[d.id]) dup.push(d.id); ids[d.id] = 1; });
     D.forEach(function (d) {
-      d.spec.forEach(function (it) { if (!ING[it[2]]) badIng.push(d.id + ':' + it[2]); });
+      specsOf(d).concat((d.components || []).map(function (c) { return { spec: c.spec }; })).forEach(function (v) {
+        v.spec.forEach(function (it) { if (!ING[it[2]]) badIng.push(d.id + ':' + it[2]); });
+      });
       if (d.parent && !ids[d.parent]) badParent.push(d.id);
-      d.tech.forEach(function (t) { if (!DATA.TECH[t]) badTech.push(d.id + ':' + t); });
+      d.tech.concat(d.av && d.av.tech || []).forEach(function (t) { if (!DATA.TECH[t]) badTech.push(d.id + ':' + t); });
     });
+    var badPrep = Object.keys(ING).filter(function (k) { return ING[k].prep && !DATA.TECH[ING[k].prep]; });
+    check('Every house-prep link has a page', !badPrep.length, badPrep.join(', '));
+    var said = D.filter(function (d) { return d.said; }).length;
+    check('Drinks from your notes', said === 45, said + ' of 45 matched');
     check('Unique drink ids', !dup.length, dup.join(', '));
     check('Every ingredient is defined', !badIng.length, badIng.join(', '));
     check('Every parent link resolves', !badParent.length, badParent.join(', '));
@@ -78,12 +99,12 @@
     var roots = D.filter(function (d) { return d.root; }).map(function (d) { return d.fam; }).sort().join('|');
     check('Six Codex roots present', roots === 'Daiquiri|Flip|Martini|Old-Fashioned|Sidecar|Whiskey Highball', roots);
     var cats = {}; D.forEach(function (d) { cats[d.cat] = (cats[d.cat] || 0) + 1; });
-    check('Collection mix', true, 'Modern ' + (cats.Modern || 0) + ' · Classic ' + (cats.Classic || 0) + ' · Tiki ' + (cats.Tiki || 0));
+    check('Collection mix', true, 'Andrew’s ' + (cats['Andrew’s'] || 0) + ' · Modern ' + (cats.Modern || 0) + ' · Classic ' + (cats.Classic || 0) + ' · Tiki ' + (cats.Tiki || 0));
 
     // 7. Plausibility bands (WARN only; tune to your book)
     var bands = { stir: [0.18, 0.32], shake: [0.11, 0.22], dryshake: [0.10, 0.20] };
     D.forEach(function (d) {
-      var b = bands[d.m]; if (!b) return;
+      var b = bands[d.m]; if (!b || d.src === 'andrew' || d.mineMain) return;
       var r = Calc.compute(d.spec, d.m, ING);
       if (r.finalAbv < b[0] || r.finalAbv > b[1]) warn(d.name + ' outside ' + d.m + ' band', (r.finalAbv * 100).toFixed(1) + '% (band ' + b[0] * 100 + '–' + b[1] * 100 + '%)');
     });
@@ -94,7 +115,7 @@
     module.exports = runTests;
     if (require.main === module) {
       global.self = global;
-      var Calc = require('./calc.js'); require('./data.js');
+      var Calc = require('./calc.js'); require('./data.js'); require('./andrew.js');
       var res = runTests(Calc, global.CC_DATA), f = 0, w = 0;
       res.forEach(function (r) { if (r.status === 'FAIL') f++; if (r.status === 'WARN') w++; console.log(r.status.padEnd(5), r.name, r.detail ? '— ' + r.detail : ''); });
       console.log('\n' + (res.length - f - w) + ' passed, ' + f + ' failed, ' + w + ' warnings');
