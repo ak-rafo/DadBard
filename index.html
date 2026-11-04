@@ -273,6 +273,8 @@ nav.tabs a.on{color:var(--accent2)}
 .iconpick{display:flex;flex-wrap:wrap;gap:6px}
 .iconpick button{font-size:20px;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--card2);cursor:pointer}
 .iconpick button.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.ico{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.15em}
+.sytile i .ico{width:26px;height:26px}
 @media (min-width:700px){ .stats{grid-template-columns:repeat(6,1fr)} }
 </style>
 </head>
@@ -932,7 +934,7 @@ var NEW = {
   passionpuree:{n:'Passion fruit purée',sug:.12,acid:.03,t:'juice'},
   superlime:{n:'Lime super juice',sug:.005,acid:.06,t:'juice',prep:'super-juice'},
   coffee:{n:'Strong coffee',t:'juice'}, water:{n:'Water',t:'mixer'}, heavycream:{n:'Heavy cream',sug:.03,t:'other'},
-  raspberrysyrup:{n:'Raspberry simple syrup',sug:.60,acid:.005,t:'syrup',prep:'raspberry-syrup'},
+  raspberrysyrup:{n:'Raspberry syrup',sug:.67,acid:.01,t:'syrup',prep:'raspberry-syrup'},
   cinnamonsyrup:{n:'Cinnamon syrup',sug:.615,t:'syrup',prep:'cinnamon-syrup'},
   greenteasyrup:{n:'Green tea syrup',sug:.615,t:'syrup',prep:'green-tea-syrup'},
   rosemarysyrup:{n:'Rosemary syrup',sug:.615,t:'syrup',prep:'rosemary-syrup'},
@@ -1170,13 +1172,14 @@ var P = {
   'agave-syrup':{t:'Agave syrup',tag:'prep',mine:['Agave syrup by weight, plus water = agave weight × 0.64.','Watered down for the best results in cocktails.']},
   'ginger-syrup':{t:'Ginger syrup',tag:'prep',mine:['Equal parts by volume: rough-chopped ginger (no need to peel), boiling water, and sugar or honey. 1 cup each is a good start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','Made with honey, it’s the honey-ginger syrup in a Penicillin.']},
   'cinnamon-syrup':{t:'Cinnamon syrup',tag:'prep',mine:['1 oz cinnamon sticks per 2 cups water (about 1 oz per 470 g water).','Sugar: equal weight to the water.']},
+  'raspberry-syrup':{t:'Raspberry syrup',tag:'prep',mine:['2 cups sugar','1 cup water','1 cup raspberries (fresh or frozen)','Stir the sugar and water over low heat until the sugar has dissolved.','Remove from the heat, add the raspberries, and stir and mash the berries.','Let it cool completely, then strain through a sieve into a bowl, pushing all the liquid through the pulp with a spoon.','Jar it and refrigerate. Keeps up to 2 weeks.']},
   'grenadine':{t:'Grenadine',tag:'prep',infl:'Morgenthaler',mine:['2 cups / 500 ml fresh pomegranate juice','2 cups / 500 g sugar','2 oz / 60 ml pomegranate molasses','1 tsp / 5 ml orange blossom water','Heat the juice slightly, just enough for the rest to dissolve easily. Stir in the remaining ingredients, cool, and bottle.']},
   'coffee-liqueur':{t:'House coffee liqueur',tag:'prep',mine:['50 g ground coffee, 250 ml vodka, 1 g cinnamon stick, 4 g organic orange peel. Sit 24 hours.','Then add 1 tsp vanilla extract, 100 g demerara sugar and 85 ml hot water.']},
   'mojito-cordial':{t:'Mojito cordial',tag:'prep',mine:['Big handful of mint, 100 ml lime juice, 150 ml water, 100 g sugar, 3 g lime peel.']},
   'basic-foam':{t:'Basic foam',tag:'prep',mine:['2 egg whites, 3 oz cold water, 1 oz simple syrup, 1 oz lemon juice.']},
   'whipped-cream':{t:'Whipped cream',tag:'prep',mine:['4 oz cream to 1 tbsp maple syrup.']}
 };
-[['raspberry-syrup','Raspberry simple syrup',''],
+[
  ['green-tea-syrup','Green tea syrup',''],['rosemary-syrup','Rosemary syrup',''],['salted-tomato-syrup','Salted tomato syrup',''],['cherry-syrup','Cherry syrup',''],
  ['strawberry-rum','Strawberry-infused rum',''],['pineapple-rum','Pineapple-infused rum','Covers “pineapple rum” and “pineapple-soaked O.F.T.D.”'],['infused-bacardi','Infused Bacardi (Slushee)','What is it infused with?']
 ].forEach(function (x) { P[x[0]] = { t:x[1], tag:'prep', missing:true, mine:[], note:x[2] }; });
@@ -1654,9 +1657,9 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     { id:'ginger', n:'Ginger', cat:'Spiced', icon:'🫚', kind:'scaled', prep:'ginger-syrup', house:true,
       items:[{ n:'Rough-chopped ginger (no need to peel)', q:1, unit:'cup' },{ n:'Boiling water', q:1, unit:'cup' },{ n:'Sugar or honey', q:1, unit:'cup' }],
       method:['Equal parts by volume. 1 cup each is a good place to start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','Made with honey, it’s the honey-ginger syrup for a Penicillin.'] },
-    { id:'raspberry', n:'Raspberry', cat:'Fruit', icon:'🫐', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Water', prep:'raspberry-syrup',
-      adds:[{ n:'Raspberries (fresh or frozen)', perSugar:1, unit:'g' }],
-      method:['Warm water and sugar until dissolved, add the berries and lightly crush.','Hold below a simmer for 10 minutes, cool, and fine-strain without pressing hard.'] },
+    { id:'raspberry', n:'Raspberry', cat:'Fruit', icon:'<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 7c-1.6-3-4.8-4-7.5-2.6 2 .4 3.6 1.6 4.4 3.4z M16 7c1.6-3 4.8-4 7.5-2.6-2 .4-3.6 1.6-4.4 3.4z" fill="#5fa84a"/><rect x="15" y="3" width="2" height="5" rx="1" fill="#4a8a3a"/><circle cx="11" cy="11" r="3.3" fill="#c2185b"/><circle cx="16" cy="10.5" r="3.3" fill="#d81b60"/><circle cx="21" cy="11" r="3.3" fill="#c2185b"/><circle cx="8.5" cy="15.5" r="3.3" fill="#ad1457"/><circle cx="13.5" cy="15" r="3.3" fill="#e91e63"/><circle cx="18.5" cy="15" r="3.3" fill="#d81b60"/><circle cx="23.5" cy="15.5" r="3.3" fill="#ad1457"/><circle cx="10.5" cy="20" r="3.3" fill="#c2185b"/><circle cx="16" cy="19.5" r="3.3" fill="#e91e63"/><circle cx="21.5" cy="20" r="3.3" fill="#c2185b"/><circle cx="13" cy="24.5" r="3.3" fill="#ad1457"/><circle cx="19" cy="24.5" r="3.3" fill="#ad1457"/><circle cx="16" cy="28" r="3.3" fill="#880e4f"/><circle cx="15" cy="9.5" r="0.9" fill="#fff" opacity=".45"/><circle cx="12.5" cy="14" r="0.9" fill="#fff" opacity=".45"/><circle cx="15" cy="18.5" r="0.9" fill="#fff" opacity=".45"/><circle cx="20" cy="10" r="0.9" fill="#fff" opacity=".45"/></svg>', kind:'scaled', prep:'raspberry-syrup', house:true,
+      items:[{ n:'Sugar', q:2, unit:'cup' },{ n:'Water', q:1, unit:'cup' },{ n:'Raspberries (fresh or frozen)', q:1, unit:'cup', gPerCup:125 }],
+      method:['Stir the sugar and water over low heat until the sugar has dissolved.','Remove from the heat, add the raspberries, and stir and mash the berries.','Let it cool completely, then strain through a sieve into a bowl, pushing all the liquid through the pulp with a spoon.','Jar it and refrigerate. Keeps up to 2 weeks.'] },
     { id:'grenadine', n:'Grenadine', cat:'Fruit', icon:'🍷', kind:'scaled', prep:'grenadine', house:true, src:'Jeffrey Morgenthaler',
       items:[{ n:'Fresh pomegranate juice', q:500, unit:'ml' },{ n:'Sugar', q:500, unit:'g' },{ n:'Pomegranate molasses', q:60, unit:'ml' },{ n:'Orange blossom water', q:5, unit:'ml' }],
       method:['Heat the juice slightly, just enough to let the other ingredients dissolve easily.','Stir in the remaining ingredients, let it cool, and bottle.'] },
@@ -1826,6 +1829,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       check('Agave: water = agave weight × 0.64', near(ag.liquidMl, ag.sweetG * 0.64) && near(ag.yieldMl, 500));
       var ids2 = Ap.SYRUPS.map(function (x) { return x.id; });
       check('Cherry and passion fruit syrups removed', ids2.indexOf('cherry') < 0 && ids2.indexOf('passion') < 0);
+      var rs = Ap.syrupById('raspberry');
+      check('Raspberry: 2 cups sugar, 1 cup water, 1 cup raspberries', rs.kind === 'scaled' && rs.items.map(function (i) { return i.q + i.unit; }).join() === '2cup,1cup,1cup' && !DATA.TECH['raspberry-syrup'].missing && rs.icon.indexOf('<svg') === 0);
       var gr = Ap.syrupById('grenadine');
       check('Grenadine: 500 ml juice, 500 g sugar, 60 ml molasses, 5 ml orange blossom', gr.items.map(function (i) { return i.q; }).join() === '500,500,60,5');
       var ci = Ap.syrupById('cinnamon');
@@ -2102,7 +2107,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
         var m = st.mult;
         o = '<ul class="spec">' + p.items.map(function (it) {
           var q = it.q * m, txt;
-          if (it.unit === 'cup') txt = cups(q) + (/sugar/i.test(it.n) ? ' (' + r0(q * A.CUP_SUGAR_G) + ' g)' : ' (' + r0(q * A.CUP_ML) + ' ml)');
+          if (it.unit === 'cup') txt = cups(q) + (it.gPerCup ? ' (≈' + r0(q * it.gPerCup) + ' g)' : /sugar/i.test(it.n) ? ' (' + r0(q * A.CUP_SUGAR_G) + ' g)' : ' (' + r0(q * A.CUP_ML) + ' ml)');
           else if (it.unit === 'tsp') txt = (q === 0.5 ? '½' : q === 0.25 ? '¼' : r1(q)) + ' tsp';
           else if (it.unit === '') txt = r1(q) + ' ' + (p.unitLabel || '');
           else if (it.unit === 'big handful') txt = r1(q) + ' big handful' + (q > 1 ? 's' : '');
