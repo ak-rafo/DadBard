@@ -1,7 +1,9 @@
-# Dad Bard v5.25
+# Dad Bard v5.26
 
-Negroni family cards use the matching drink title in grouped type browsing: Enzoni under Citrus; Negroni Sbagliato under Highball; Negroni under Spirit-forward. Each opens the corresponding recipe directly. All variants remain housed under Negroni. Search and A-Z behavior, recipe amounts and calculations are unchanged.
+Removed subtitles from the five Apothecary tool buttons: What can I make?, Slushee, Super juice, Syrups and Acid adjust. Buttons use centered icons and names with compact, consistent spacing. The Apothecary heading and tagline are unchanged.
 
-Validation: browser tests at 320 and 1280 px passed for all three filtered titles and direct recipe opening. 70 built-in checks passed, zero failures, six informational plausibility warnings. No page errors. Physical iPhone testing not performed.
+Added global horizontal button-row continuity for rails, pill bars and icon pickers. Scrolling position is retained when selections rerender the row or navigate between calculator tabs. The clicked option is kept visible with minimal horizontal adjustment. Applies to Apothecary tool/category rows, Craft categories and other matching horizontal selector rows. Positions are in-memory and do not alter recipe data. Search-focus preservation remains intact.
 
-Update: back up through Tavern > Export JSON. Replace the six app files with the same filenames and site URL. Open online once to refresh cache v5.25.0.
+Validation: 70 built-in checks passed, zero failures, six informational plausibility warnings. Tests at 320, 390 and 1280 px verified subtitle removal, Acid adjust selection retaining the row position and selected-button visibility, syrup-category and Craft-row selection, and search focus/Enter dismissal. No page errors. Physical iPhone/Safari testing not performed.
+
+Update: Export JSON backup in Tavern first. Replace index.html, sw.js, manifest.webmanifest and the three icons with the same filenames and site URL. Open online once to refresh cache v5.26.0.
