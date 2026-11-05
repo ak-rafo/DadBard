@@ -2592,6 +2592,11 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         var buckets={};out.forEach(function(d){var main=byId[d.id],key=main.id+'|'+d.pStyle;var group=buckets[key]||(buckets[key]={main:main,items:[]});group.items.push(d);});
         out=Object.keys(buckets).map(function(key){var b=buckets[key],items=sorted(b.items),rep=items.filter(function(d){return d.id===b.main.id;})[0]||items[0];
           var group=Object.assign({},rep,{id:b.main.id,name:b.main.name,src:b.main.src,exp:b.main.exp,custom:b.main.custom,mainName:null,openId:rep.id,variants:items.map(function(d){return d.variants[0];}),aBase:Array.from(new Set([].concat.apply([],items.map(function(d){return d.aBase;})))),aStatus:Array.from(new Set([].concat.apply([],items.map(function(d){return d.aStatus;})))),grouped:true});
+          if(b.main.id==='negroni'){
+            var displayId=rep.pStyle==='Citrus'?'enzoni':rep.pStyle==='Highball'?'negroni-sbagliato':null;
+            var named=items.filter(function(d){return d.id===displayId;})[0];
+            if(named)group=Object.assign({},group,{id:named.id,name:named.name,src:named.src,exp:named.exp,custom:named.custom,openId:named.id,displayVi:named.displayVi,stats:named.stats,mainName:null});
+          }
           return group;
         });
       }

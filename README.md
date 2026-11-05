@@ -1,7 +1,7 @@
-# Dad Bard v5.24
+# Dad Bard v5.25
 
-Renamed the Sour drink-type category to Citrus across type selection, filters, grouped headings, recipe badges, editor options and calculated type classification. Saved or imported Sour type overrides migrate to Citrus. Cocktail names such as Whiskey Sour, Amaretto Sour and Trinidad Sour, historical sour-family descriptions, ingredient amounts, recipe grouping and calculator formulas are unchanged.
+Negroni family cards use the matching drink title in grouped type browsing: Enzoni under Citrus; Negroni Sbagliato under Highball; Negroni under Spirit-forward. Each opens the corresponding recipe directly. All variants remain housed under Negroni. Search and A-Z behavior, recipe amounts and calculations are unchanged.
 
-Validation: 70 built-in checks passed, zero failures, six informational plausibility warnings. Browser tests at 320 px confirmed Citrus selection, grouped browsing, A-Z expansion, recipe badges, saved override migration and unchanged Whiskey Sour name. No page errors. Physical iPhone testing not performed.
+Validation: browser tests at 320 and 1280 px passed for all three filtered titles and direct recipe opening. 70 built-in checks passed, zero failures, six informational plausibility warnings. No page errors. Physical iPhone testing not performed.
 
-Update: Export JSON backup in Tavern. Replace the six app files with the same filenames and site URL. Open online once to refresh cache v5.24.0.
+Update: back up through Tavern > Export JSON. Replace the six app files with the same filenames and site URL. Open online once to refresh cache v5.25.0.
