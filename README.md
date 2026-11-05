@@ -1,13 +1,11 @@
-# Dad Bard v5.14
+# Dad Bard v5.15
 
-Slushee volume: 1 to 10 L in 0.5 L steps only. Saved quarter-liter values round to nearest half-liter. Removed duplicate recalculation.
+Craft labels: Bard’s Favorites replaces Andrew’s house prep; Home Technique’s replaces Home-feasible. Updated matching Craft category tiles, badges and editor labels. Apothecary syrup category Andrew’s becomes Bard’s; saved category selection migrates.
 
-Search: Enter/Search dismisses focus (and the mobile keyboard) without clearing the query. Typing retains focus. Applied across Songbook, Craft, Bloodlines and ingredient search.
+Added 12 user-supplied recipes: Halekulani, Cobra’s Fang, Lost Lake, Downhill Daring, Elderflower Spritz, Old Maid, Old Pal, Pantheon, Right Hand, Smoky Cokey, South Slope and Spicy Margarita. Existing Gin-Gin Mule, Siesta and Red Hook remain unchanged and are not duplicated, as requested. All supplied amounts and optional ingredients are preserved; alternate sweeteners/salt remain recipe notes. The calculations use the primary listed ingredient, not alternate notes. Existing ingredient defaults and new ingredient chemistry are estimates, not verified bottle measurements. Methods, glassware, collection categories and parent grouping are app defaults where not supplied. No historical creator claims added.
 
-Filtering: evaluates each named drink and recipe version independently, showing matching variants rather than unrelated parent cards. Category, style, flavor, base, strength, technique, equipment and favorites apply to the same matching recipe. No filters keeps the grouped family view. Category counts now count individual named drinks. Bloody Mary and tomato/Clamato variants stay in Sweet & Savory, not Highball. Decaf espresso also remains in Sweet & Savory. Filtered cards open the matching recipe version.
+New recipes are included in search, filtering, ingredient matching and slushee recipe loading. Clear parent riffs are grouped with their cocktail family. No changes to stored notes or favorites.
 
-Added Surfer on Acid equal-parts cocktail, half-ounce equal-parts shot and Robby Dow's PUNCH riff. Sources are recorded in recipe lore. Coconut rum chemistry is an estimate, not a measured brand value. Original and shot use Sweet & Savory; the lime-forward PUNCH riff uses Sour. New recipes participate in ingredient matching and slushee loading.
+Validation: 70 built-in checks passed, zero failures, 10 informational plausibility warnings. Phone-sized browser checks verified 12 individually searchable recipes, slushee loading, Craft labels and four Bard’s syrup entries. No page errors. Physical iPhone testing not performed.
 
-Validation: 67 built-in checks passed, zero failures, 10 informational plausibility warnings. Browser tests at 320, 390 and 1280 px verified each style and category, individual Bard cards, Bloody variants, continuous search focus, Enter blur, three Surfer search results, and half-liter volume choices. No page errors. Physical iPhone keyboard and machine testing not performed.
-
-Update: Tavern > Export JSON first. Replace existing app files with the same filenames. Open online once to update offline cache.
+Update: Export JSON backup through Tavern first. Replace the existing app files with the same filenames, then open online once to refresh the offline cache.

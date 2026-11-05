@@ -1,5 +1,5 @@
 /* Dad Bard offline cache. Bump VERSION whenever you upload a new index.html. */
-var VERSION = 'dadbard-v5.14.0';
+var VERSION = 'dadbard-v5.15.0';
 var FILES = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(VERSION).then(function (c) { return Promise.all(FILES.map(function (f) { return c.add(f).catch(function () {}); })); }));
