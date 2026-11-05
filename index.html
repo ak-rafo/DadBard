@@ -2871,7 +2871,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       function vals(g) { var v = {}; inCat.forEach(function (d) { g.get(d).forEach(function (x) { v[x] = (v[x] || 0) + 1; }); }); return v; }
       var sv = vals(FILTERS[0]);
       var h = '<header class="top hero"><div class="brand"><img src="' + LOGO + '" alt="Dad Bard" class="logo"><div><h1>Dad Bard <span class="sym">🪕</span></h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
-        '<div class="searchrow"><input id="q" type="search" placeholder="Search drinks, ingredients, creators" value="' + esc(state.q) + '" autocomplete="off">' +
+        '<div class="searchrow"><input id="q" type="search" placeholder="Search" value="' + esc(state.q) + '" autocomplete="off">' +
         '<button id="ftoggle" class="btn filterbtn ' + (ac ? 'on' : '') + '">⚙︎ Filters' + (ac ? ' <b>' + ac + '</b>' : '') + '</button></div>' +
         pills('cat', [{ v:'', label:'All', icon:'✦' }].concat(CATS.map(function (c) { return { v:c, label:c, icon:CAT_ICON[c] }; })), function (v) { return v === state.cat; }) +
         '<div class="rail stylegrid">' + STYLES.map(function (s) {
@@ -2891,7 +2891,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       if (!list.length) h += '<p class="empty">No ballad by that name. Try another verse, or clear a filter.</p>';
       h += '<a class="fab" href="#/new/' + encodeURIComponent(state.cat || 'Bard’s') + '" aria-label="New recipe" title="New recipe">＋</a>';
       if (state.showFilters) {
-        h += '<div class="sheet-bg" id="sheetbg"></div><div class="sheet" id="sheet"><div class="sheet-top"><div class="grab"></div><div class="sheet-head"><b>Filters</b><span class="swipehint">Swipe down to close</span>' + (ac ? '<button id="fclear" class="btn ghost small">Clear all</button>' : '') + '</div></div><div class="sheet-body">';
+        h += '<div class="sheet-bg" id="sheetbg"></div><div class="sheet" id="sheet"><div class="sheet-top"><div class="grab"></div><div class="sheet-head"><b>Filters</b>' + (ac ? '<button id="fclear" class="btn ghost small">Clear all</button>' : '') + '</div></div><div class="sheet-body">';
         FILTERS.forEach(function (g) {
           var v = vals(g), keys = g.order ? g.order.filter(function (k) { return v[k]; }) : Object.keys(v).sort();
           if (!keys.length) return;
