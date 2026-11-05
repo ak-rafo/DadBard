@@ -2157,7 +2157,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
       return '<li style="--c:' + D.ROOT_COLORS[p.root] + '"' + (p.id === n.id ? ' class="here"' : '') + '>' + (p.id === n.id ? '<b>' + D.esc(p.n) + '</b>' : D.link('#/evo/' + p.id, D.esc(p.n))) + ' <small>' + D.esc(p.year) + '</small></li>';
     }).join('') + '</ol>' + (also ? '<p class="small">Also shaped by ' + D.link('#/evo/' + also.id, D.esc(also.n)) + '.</p>' : '') + '</section>';
     h += '<section class="panel" style="box-shadow:inset 3px 0 0 ' + D.ROOT_COLORS[n.root] + '"><div class="formula big">' + D.esc(n.formula) + '</div><p>' + D.esc(n.blurb) + '</p>' +
-      (n.tech && !D.user.hiddenCraft[n.tech] ? '<p>' + D.link('#/t/' + n.tech, 'Technique: ' + D.esc(D.TECH[n.tech].t) + ' →') + '</p>' : '') + '</section>';
+      (n.tech && D.craftOk(n.tech) ? '<p>' + D.link('#/t/' + n.tech, 'Technique: ' + D.esc(D.TECH[n.tech].t) + ' →') + '</p>' : '') + '</section>';
     if (ks.length) h += '<section class="panel"><h2>Branches</h2><ul class="tlist">' + ks.map(function (k) { return '<li>' + D.link('#/evo/' + k.id, D.esc(k.n)) + ' <span class="muted small">' + D.esc(k.year) + ' · ' + D.esc(k.formula) + '</span></li>'; }).join('') + '</ul></section>';
     h += '<section class="panel"><h2>In your songbook · ' + ds.length + '</h2>' + (ds.length ? '<ul class="cards">' + ds.map(D.card).join('') + '</ul>' : '<p class="muted">None yet.</p>') + '</section>';
     $app().innerHTML = h; window.scrollTo(0, 0);
@@ -2406,6 +2406,11 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
     try { var u = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem(OLD_KEY)); if (u && u.drinks) return u; } catch (e) {}
     return { drinks:{} };
   }
+
+  var REMOVED_CRAFT = {};
+  var removedCraftTitles = ["Acid-adjusted orange juice", "Agave syrup", "Banana oleo", "Build", "Cinnamon syrup", "Foams & cream toppers", "Ginger syrup", "Green tea syrup", "Grenadine", "Honey syrup (3:1)", "Honey-ginger syrup", "House coffee liqueur", "Mojito cordial", "Orgeat", "Raspberry syrup", "Rich simple syrup (2:1)", "Salted tomato syrup", "Simple syrup (1:1)", "Super juice", "Top with bubbles"];
+  Object.keys(TECH).forEach(function(k){if(removedCraftTitles.indexOf(TECH[k].t)>=0){REMOVED_CRAFT[k]=true;TECH[k].mine=[];TECH[k].body=[];TECH[k].note='';}});
+
   var user = load();
   function norm() {
     user.drinks = user.drinks || {}; user.tech = user.tech || {}; user.settings = user.settings || { unit:'oz' }; user.settings.unit = user.settings.unit || 'oz';
@@ -2503,7 +2508,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
   var BUILTIN_SEC = { prep:{ n:'House prep', icon:'🎻' }, home:{ n:'Home technique', icon:'🏠' }, equipment:{ n:'Needs gear', icon:'🔧' } };
   function isHidden(d) { return !!user.hidden[d.id]; }
   function craftHidden(k) { return !!user.hiddenCraft[k]; }
-  function craftOk(k) { return TECH[k] && !craftHidden(k); }
+  function craftOk(k) { return TECH[k] && !REMOVED_CRAFT[k] && !craftHidden(k); }
   /* ---------- derived data ---------- */
   var byId = {}, children = {}, VAR = {};
   function isMineMain(d) { return d.src === 'andrew' || d.mineMain || d.custom; }
@@ -3234,7 +3239,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
     user.craft.sections.push(sec); return sec;
   }
   function renderTechIndex() {
-    var keys = Object.keys(TECH).filter(function (k) { return !craftHidden(k); });
+    var keys = Object.keys(TECH).filter(function (k) { return !REMOVED_CRAFT[k] && !craftHidden(k); });
     var CAT = {
       prep: function (k) { return TECH[k].tag === 'prep' && !TECH[k].missing; },
       home: function (k) { return TECH[k].tag === 'home'; },
@@ -3252,7 +3257,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
       '</header>';
     function row(k) {
       var c = usedIn(k).length, t = TECH[k];
-      return '<li>' + link('#/t/' + k, esc(t.t)) + (t.customItem ? ' <span class="mk edit">yours</span>' : '') + (t.mine && t.mine.length && t.tag !== 'prep' ? ' <span class="mk av">your notes</span>' : '') + (t.flags ? ' <span class="mk flag">⚑</span>' : '') + (APO_LINK[k] ? ' <span class="mk calc">⚖️ calc</span>' : '') +
+      return '<li>' + link('#/t/' + k, esc(t.t)) + (t.customItem ? ' <span class="mk edit">yours</span>' : '') + (t.mine && t.mine.length && t.tag !== 'prep' ? ' <span class="mk av">Bard’s Notes</span>' : '') + (t.flags ? ' <span class="mk flag">⚑</span>' : '') + (APO_LINK[k] ? ' <span class="mk calc">⚖️ calc</span>' : '') +
         ' <span class="muted small">' + (c ? c + (c === 1 ? ' drink' : ' drinks') : '') + (t.infl && t.infl !== '—' ? ' · ' + esc(t.infl) : '') + '</span></li>';
     }
     function qmatch(k) { if (!craft.q) return true; var t = TECH[k], hay = [t.t, (t.body || []).join(' '), (t.mine || []).join(' ')].join(' ').toLowerCase(); return craft.q.toLowerCase().split(/\s+/).every(function (w) { return hay.indexOf(w) > -1; }); }
@@ -3328,7 +3333,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
     };
   }
   function renderTech(k) {
-    var t = TECH[k]; if (!t) return renderTechIndex();
+    var t = TECH[k]; if(REMOVED_CRAFT[k]){if(APO_LINK[k]){location.hash=APO_LINK[k];return;}return renderTechIndex();} if (!t) return renderTechIndex();
     var used = usedIn(k), note = user.tech[k] || '';
     var tagPill = t.tag === 'custom' ? '<span class="pill cat-andrew">' + secIcon(t.sec) + ' ' + esc(secName(t.sec)) + '</span>' :
       t.tag === 'prep' ? '<span class="pill cat-andrew">House prep</span>' : '<span class="pill ' + (t.tag === 'home' ? 'home' : 'equip') + '">' + (t.tag === 'home' ? 'Home-feasible' : 'Equipment required') + '</span>';
@@ -3337,7 +3342,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
       (t.infl && t.infl !== '—' ? '<span class="pill">Influence: ' + esc(t.infl) + '</span>' : '') + '</div></header>';
     h += flagBox(t.flags || []);
     if (APO_LINK[k]) h += '<a class="apocard" href="' + APO_LINK[k] + '"><i>⚖️</i><div><b>Open the calculator</b><span>Scale it in the Apothecary</span></div><em>›</em></a>';
-    if (t.mine && t.mine.length) h += '<section class="panel mine"><h2>🎻 From your notes</h2><ul class="bul">' + t.mine.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul>' + (t.note ? '<p class="muted small">' + esc(t.note) + '</p>' : '') + '</section>';
+    if (t.mine && t.mine.length) h += '<section class="panel mine"><h2>🎻 Bard’s Notes</h2><ul class="bul">' + t.mine.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul>' + (t.note ? '<p class="muted small">' + esc(t.note) + '</p>' : '') + '</section>';
     if (t.missing && !note) h += '<section class="panel mine"><h2>🎻 Not written down yet</h2><p>This shows up in your specs but there’s no recipe in your notes. Add it below.</p>' + (t.note ? '<p class="muted small">' + esc(t.note) + '</p>' : '') + '</section>';
     if (t.customItem && t.body.length) h += '<section class="panel mine"><h2>🎻 Your recipe</h2><ol class="steps">' + t.body.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ol>' +
       (t.eq.length ? '<h3>Equipment</h3><ul class="bul">' + t.eq.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>' : '') + '</section>';
@@ -3346,7 +3351,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
     if (t.links) h += '<section class="panel"><h2>Reference</h2>' + t.links.map(function (l) { return '<p><a target="_blank" rel="noopener" href="' + esc(l.u) + '">' + esc(l.n) + ' ↗</a></p>'; }).join('') + '</section>';
     if (k === 'dilution-math') h += '<section class="panel"><p>' + link('#/check', 'Open Calculator check →') + '</p></section>';
     if (used.length) h += '<section class="panel"><h2>Used in</h2><div class="chips static">' + used.map(function (d) { return link('#/d/' + d.id, esc(d.name), 'chip'); }).join('') + '</div></section>';
-    h += '<section class="panel"><h2>' + (t.missing ? 'Your recipe' : 'More notes') + '</h2><textarea id="tnotes" rows="6" placeholder="' + (t.missing ? 'Ratio, method, shelf life…' : 'Your method, ratios, timings…') + '">' + esc(note) + '</textarea><p class="muted small" id="saved"></p></section>';
+    h += '<section class="panel"><h2>' + (t.missing ? 'Your recipe' : 'Bard’s Notes') + '</h2><textarea id="tnotes" rows="6" placeholder="' + (t.missing ? 'Ratio, method, shelf life…' : 'Your method, ratios, timings…') + '">' + esc(note) + '</textarea><p class="muted small" id="saved"></p></section>';
     h += '<section class="panel hidepanel">' + (craftHidden(k)
       ? '<p class="small">Hidden from Bar craft and from links on drink pages.</p><button class="btn" id="cunhide">👁 Unhide ' + esc(t.t) + '</button>'
       : '<button class="btn ghost hidebtn" id="chide">🙈 Hide this page</button><p class="muted small">Takes it out of Bar craft and drink links. Bring it back from the bottom of the Tavern.</p>') + '</section>';
@@ -3394,7 +3399,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
           '<button class="btn small" data-tap="unhide" data-v="' + esc(d.id) + '">👁 Unhide</button></li>';
       }).join('') + '</ul><button class="btn ghost small" id="unhideall">Unhide all</button>'
       : '<p class="muted small">Nothing hidden. Use “🙈 Hide” at the bottom of any drink to tuck it away.</p>') + '</section>';
-    var hidC = Object.keys(user.hiddenCraft).filter(function (k) { return TECH[k]; }).sort(function (a, b) { return TECH[a].t.localeCompare(TECH[b].t); });
+    var hidC = Object.keys(user.hiddenCraft).filter(function (k) { return TECH[k] && !REMOVED_CRAFT[k]; }).sort(function (a, b) { return TECH[a].t.localeCompare(TECH[b].t); });
     h += '<section class="panel" id="hiddencraft"><h2>🙈 Hidden craft pages · ' + hidC.length + '</h2>' +
       (hidC.length ? '<ul class="hidlist">' + hidC.map(function (k) {
         return '<li><div>' + link('#/t/' + k, esc(TECH[k].t)) + '<small>' + esc(TECH[k].tag === 'custom' ? secName(TECH[k].sec) : TECH[k].tag === 'prep' ? 'House prep' : TECH[k].tag === 'home' ? 'Home technique' : 'Needs gear') + '</small></div>' +
@@ -3501,7 +3506,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
   }
   window.DB = {
     get user() { return user; }, get byId() { return byId; }, save:save, keep:keep, esc:esc, link:link, tiles:tiles, pills:pills, onTap:onTap, card:card,
-    bindLinMode:bindLinMode, isHidden:isHidden, ROOT_COLORS:ROOT_COLORS, TECH:TECH, ING:ING, DRINKS:DRINKS
+    bindLinMode:bindLinMode, isHidden:isHidden, craftOk:craftOk, removedCraft:REMOVED_CRAFT, ROOT_COLORS:ROOT_COLORS, TECH:TECH, ING:ING, DRINKS:DRINKS
   };
   window.addEventListener('hashchange', route);
   route();
