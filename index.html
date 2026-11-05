@@ -523,8 +523,8 @@ add({id:'jungle-bird',name:'Jungle Bird',cat:'Tiki',fam:'Daiquiri',base:'Rum',m:
  spec:[[1.5,'oz','blackstrap'],[0.75,'oz','campari'],[1.5,'oz','pineapple'],[0.5,'oz','lime'],[0.5,'oz','demerarasyrup']],
  flav:['bitter','tropical'],tech:['shake'],
  prov:{who:'Attributed to Jeffrey Ong; modern blackstrap spec popularized by Giuseppe González',where:'Aviary Bar, Kuala Lumpur Hilton',year:'1978',conf:'medium',note:'Original used more pineapple and a darker Jamaican rum.'}});
-add({id:'saturn',name:'Saturn',cat:'Tiki',fam:'Daiquiri',base:'Gin',m:'blend',glass:'Coupe or tiki glass',ice:'Crushed',garnish:'Lemon peel “ring”, cherry',
- spec:[[1.25,'oz','gin'],[0.5,'oz','lemon'],[0.5,'oz','passionsyrup'],[0.25,'oz','orgeat'],[0.25,'oz','falernum']],
+add({id:'saturn',name:'Saturn',cat:'Tiki',fam:'Daiquiri',base:'Gin',m:'blend',glass:'Coupe or tiki glass',ice:'Crushed',garnish:'Edible flower, orange twist',
+ spec:[[1.25,'oz','gin'],[0.5,'oz','lemon'],[0.5,'oz','passionsyrup'],[0.25,'oz','falernum'],[0.25,'oz','orgeat']],
  flav:['tropical','floral','citrusy'],tech:['flash-blend'],
  prov:{who:'J. “Popo” Galsini',where:'California',year:'1967',conf:'medium',note:'A rare gin-based tiki classic; won a 1967 cocktail competition.'}});
 add({id:'painkiller',name:'Painkiller',cat:'Tiki',fam:'Daiquiri',base:'Rum',m:'shake',glass:'Tiki mug or hurricane',ice:'Crushed',garnish:'Fresh nutmeg, orange wheel',
@@ -561,7 +561,7 @@ add({id:'paper-plane',name:'Paper Plane',cat:'Modern',fam:'Sidecar',base:'Whiske
  spec:[[0.75,'oz','bourbon'],[0.75,'oz','aperol'],[0.75,'oz','nonino'],[0.75,'oz','lemon']],
  flav:['bitter','citrusy'],tech:['shake'],parent:'last-word',changed:'Keeps the equal-parts frame; bourbon, Aperol, Amaro Nonino, lemon.',
  prov:{who:'Sam Ross',where:'Created for The Violet Hour, Chicago',year:'2007',conf:'high',note:'Early version used Campari before settling on Aperol.'}});
-add({id:'gold-rush',name:'Gold Rush',cat:'Modern',fam:'Daiquiri',base:'Whiskey',m:'shake',glass:'Rocks',ice:'Large cube',garnish:'None',
+add({id:'gold-rush',name:'Gold Rush',cat:'Modern',fam:'Daiquiri',base:'Whiskey',m:'shake',glass:'Rocks',ice:'Large cube',garnish:'Lemon twist',
  spec:[[2,'oz','bourbon'],[0.75,'oz','lemon'],[0.75,'oz','honey']],
  flav:['citrusy','rich'],tech:['shake'],parent:'whiskey-sour',changed:'Honey syrup replaces simple syrup.',
  prov:{who:'T.J. Siegal',where:'Milk & Honey, NYC',year:'c. 2000',conf:'medium',note:''}});
@@ -1212,7 +1212,9 @@ var NEW = {
   roseslime:{n:'Lime cordial (Rose’s style)',sug:.30,acid:.02,t:'syrup'}, gardenia:{n:'Gardenia mix (butter, honey, spice)',sug:.45,t:'syrup'},
   grapefruitsoda:{n:'Grapefruit soda',sug:.10,acid:.003,t:'mixer'}, tomatojuice:{n:'Tomato juice',sug:.03,acid:.004,t:'juice'},
   hotcoffee:{n:'Hot coffee',t:'juice'}, worcestershire:{n:'Worcestershire sauce',t:'bitters'}, hotsauce:{n:'Hot sauce',t:'bitters'},
-  orangeflower:{n:'Orange flower water',t:'bitters'}, onion:{n:'Cocktail onions',t:'solid'}, pepper:{n:'Black pepper',t:'solid'}
+  orangeflower:{n:'Orange flower water',t:'bitters'},
+  appleton12:{n:'Appleton Estate 12 Year rum',abv:.43,t:'spirit'}, xaymaca:{n:'Planteray Xaymaca Special Dry rum',abv:.43,t:'spirit'},
+  barbadosrum:{n:'Aged Barbados rum',abv:.43,t:'spirit'}, onion:{n:'Cocktail onions',t:'solid'}, pepper:{n:'Black pepper',t:'solid'}
 };
 for (var k in NEW) ING[k] = NEW[k];
 
@@ -1323,6 +1325,14 @@ add({id:'tomato-margarita',name:'50/50 Tomato Margarita',cat:'Modern',fam:'Daiqu
  prov:{who:'Not noted',where:'—',year:'—',conf:'low',note:'Added from your recipe card. Tools: shaker, strainer.'}});
 
 /* ---------- tiki & tropical ---------- */
+add({id:'corn-n-oil',name:'Corn ’n’ Oil',cat:'Tiki',fam:'Old-Fashioned',base:'Rum',m:'build',glass:'Rocks',ice:'Cubes',garnish:'Lime wedge',
+ spec:[[2,'oz','blackstrap',{label:'Blackstrap rum (or aged Barbados rum)'}],[0.5,'oz','falernum'],[0.5,'oz','lime'],[3,'dash','angostura']],
+ flav:['rich','spicy'],tech:['build'],parentText:'Barbados rum & falernum tradition',changed:'Dark rum with falernum, lime and bitters, built over ice.',
+ prov:{who:'Barbados tradition',where:'Barbados',year:'—',conf:'low',note:'Spec from your recipe card.'}});
+add({id:'pina-verde',name:'Piña Verde',cat:'Tiki',fam:'Daiquiri',base:'Amaro & Liqueur',m:'shake',glass:'Double rocks',ice:'Crushed',garnish:'Mint sprig',
+ spec:[[1.5,'oz','greenchartreuse'],[1.5,'oz','pineapple'],[0.5,'oz','lime'],[0.75,'oz','creamcoconut',{note:'such as Coco López'}]],
+ flav:['herbal','tropical','creamy'],tech:['shake'],parent:'pina-colada',changed:'Green Chartreuse replaces the rum.',
+ prov:{who:'Erick Castro',where:'Polite Provisions, San Diego',year:'c. 2010',conf:'medium',note:'Spec from your recipe card.'}});
 add({id:'pina-colada',name:'Piña Colada',cat:'Tiki',fam:'Daiquiri',base:'Rum',m:'blend',glass:'Hurricane',ice:'Crushed',garnish:'Pineapple wedge, cherry',
  spec:[[2,'oz','whiterum'],[1.5,'oz','creamcoconut'],[1.5,'oz','pineapple'],[0.5,'oz','lime']],
  flav:['tropical','creamy','sweet'],tech:['flash-blend'],parentText:'Pineapple–coconut drinks',changed:'Blended with cream of coconut.',
@@ -1414,7 +1424,13 @@ var GROUPS = {
     { id:'new-york-sour', label:'New York', name:'New York Sour', spec:[[2,'oz','bourbon'],[0.75,'oz','lemon'],[0.75,'oz','simple'],[0.5,'oz','redwine',{post:true,label:'Dry red wine, float'}]], changed:'Red wine floated on top.', tech:['shake','float'],
       prov:{who:'Unknown (first known as the Continental Sour)',where:'Chicago / New York',year:'1880s',conf:'medium',note:''} }
   ]},
-  'mai-tai': { label:'Trader Vic 1944', items:[['monkeypod-mai-tai','Monkeypod'],['bitter-mai-tai','Bitter']] },
+  'mai-tai': { label:'Trader Vic 1944', items:[['monkeypod-mai-tai','Monkeypod'],['bitter-mai-tai','Bitter'],
+    { id:'ultimate-mai-tai', label:'Ultimate', name:'Ultimate Mai Tai',
+      spec:[[1,'oz','lime'],[0.5,'oz','orgeat',{note:'Latitude 29'}],[0.25,'oz','demerarasyrup',{note:'BG Reynolds or Liber'}],[0.5,'oz','curacao',{note:'Ferrand Dry Curaçao or Clément Créole Shrubb'}],
+            [0.5,'oz','appleton12'],[0.5,'oz','smithcross'],[0.5,'oz','oftd'],[0.5,'oz','xaymaca']],
+      changed:'Four-rum blend (Appleton 12, Smith & Cross, O.F.T.D., Xaymaca).',
+      prov:{who:'Kevin Crossman',where:'—',year:'—',conf:'medium',note:'Spec from your recipe card.'} }] },
+  'revolver': { label:'Classic', items:[['ray-gun','Ray Gun']] },
   'gimlet': { label:'Fresh lime', items:[
     { id:'gimlet-cordial', label:'Cordial', name:'Gimlet (cordial)', spec:[[2,'oz','gin'],[0.75,'oz','roseslime']], changed:'Lime cordial instead of fresh lime and sugar: the original style.' }
   ]},
@@ -1573,7 +1589,7 @@ var S = [
     ex:['corpse-reviver-2','french-75','boulevardier','bloody-mary','el-presidente','pegu-club'] },
   { id:'tiki', n:'Tiki', era:'midcentury', year:'1934', type:'tropical', root:'Daiquiri', parent:'punch', also:'sour',
     formula:'Several rums · several citrus · spiced syrups', blurb:'Donn Beach in Hollywood rebuilt punch as escapist theater, and Trader Vic followed. Layered rums, secret syrups and crushed ice.',
-    ex:['zombie','mai-tai','navy-grog','three-dots','test-pilot','fog-cutter','saturn','painkiller','jungle-bird','pina-colada','hurricane','scorpion','queens-park-swizzle','suffering-bastard','missionarys-downfall','pearl-diver'] },
+    ex:['corn-n-oil','pina-verde','zombie','mai-tai','navy-grog','three-dots','test-pilot','fog-cutter','saturn','painkiller','jungle-bird','pina-colada','hurricane','scorpion','queens-park-swizzle','suffering-bastard','missionarys-downfall','pearl-diver'] },
   { id:'frozen', n:'Frozen', era:'midcentury', year:'1930s–50s', type:'frozen', root:'Daiquiri', parent:'sour',
     formula:'Sour · shaved ice · blender', blurb:'Havana’s frozen Daiquiris and the electric blender made slushy drinks a thing. Slushie machines brought them back as a craft move.',
     ex:['slushee','cafe-granita','pina-colada'] },
@@ -1817,13 +1833,17 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var tmg = find('tomato-margarita');
     check('50/50 Tomato Margarita added', tmg && JSON.stringify(tmg.spec) === JSON.stringify([[1,'oz','mezcal'],[1,'oz','manzanilla'],[0.75,'oz','tomatosyrup'],[0.75,'oz','lime']]) && tmg.glass === 'Double rocks');
     check('Last Word riffs as styles (Final Ward, Ultima Palabra, Closing Argument)', DATA.ALIAS['final-ward'] === 'last-word' && DATA.ALIAS['ultima-palabra'] === 'last-word' && DATA.ALIAS['closing-argument'] === 'last-word');
+    check('Ultimate Mai Tai is a Mai Tai style (Kevin Crossman)', DATA.ALIAS['ultimate-mai-tai'] === 'mai-tai' && find('ultimate-mai-tai').prov.who === 'Kevin Crossman' && find('ultimate-mai-tai').spec.length === 8);
+    check('Ray Gun is a Revolver style', DATA.ALIAS['ray-gun'] === 'revolver');
+    check('Corn n Oil and Piña Verde added', !!find('corn-n-oil') && !!find('pina-verde'));
+    check('Saturn & Gold Rush updated', find('saturn').garnish === 'Edible flower, orange twist' && find('gold-rush').garnish === 'Lemon twist');
     check('Mezcalrita renamed Orange Mezcalrita', find('mezcalrita').name === 'Orange Mezcalrita');
     check('Bijou kept as Anders E’s version', find('bijou').av.by === 'Anders E');
     check('Tropical Coffee Sour: lime, 1¾ + ¼ oz rum', JSON.stringify(find('tropical-coffee-sour').spec).indexOf('[1.75,"oz","agedrum"') > -1 && JSON.stringify(find('tropical-coffee-sour').spec).indexOf('"lime"') > -1);
     if (DATA.ALIAS) {
       var leak = TOP.filter(function (d) { return DATA.ALIAS[d.id]; }).map(function (d) { return d.id; });
       check('Variations folded inside their main drink', !leak.length, leak.join(', '));
-      var fa = Object.keys(DATA.ALIAS).filter(function (x) { var d = find(x); return d && d.src === 'andrew'; });
+      var fa = Object.keys(DATA.ALIAS).filter(function (x) { var d = find(x); return d && d.src === 'andrew' && x !== 'ray-gun'; });
       check('Andrew’s originals are never folded', !fa.length, fa.join(', '));
     }
     // 6. Four styles
