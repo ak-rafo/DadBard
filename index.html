@@ -1514,7 +1514,7 @@ Object.keys(GROUPS).forEach(function (mid) {
   ING.coconutrum={n:'Coconut rum (Malibu-style)',abv:.21,sug:.20,t:'spirit'};
   ING.saline20={n:'Saline solution (1 salt : 4 water by weight)',t:'other'};
   var surfer={id:'surfer-on-acid',name:'Surfer on Acid',style:'Sweet & Savory',cat:'Modern',fam:'Daiquiri',base:'Rum',m:'shake',glass:'Rocks',ice:'Cubes',garnish:'Pineapple wedge',flav:['tropical','herbal','sweet'],tech:['shake'],spec:[[1,'oz','jager'],[1,'oz','coconutrum'],[1,'oz','pineapple']],prov:{who:'Eric Tecosky (widely credited)',where:'Los Angeles',year:'early 1990s',conf:'medium',note:'Equal-parts recipe: https://www.surfertoday.com/surfing/how-to-make-a-surfer-on-acid-drink . Coconut rum sugar is an estimate; update from your bottle label.'},vlabel:'Equal parts'};
-  surfer.vars=[Object.assign({},surfer,{id:'surfer-on-acid-shot',name:'Surfer on Acid (shot)',vlabel:'Shot',variantOf:surfer.id,parent:surfer.id,glass:'Shot glass',ice:'Up',garnish:'None',spec:[[.5,'oz','jager'],[.5,'oz','coconutrum'],[.5,'oz','pineapple']],prov:{who:'Eric Tecosky (widely credited)',where:'Los Angeles',year:'early 1990s',conf:'medium',note:'Half-ounce equal-parts shot: https://tipsy-app.com/cocktails/surfer-on-acid'}}),Object.assign({},surfer,{id:'surfer-on-acid-punch',name:'Surfer on Acid (Robby Dow)',style:'Sour',vlabel:'Robby Dow',variantOf:surfer.id,parent:surfer.id,cat:'Tiki',ice:'Large cube',garnish:'Freshly grated nutmeg',spec:[[1.5,'oz','pineapple'],[1.25,'oz','whiterum'],[.75,'oz','jager'],[.5,'oz','simple'],[.5,'oz','lime'],[.25,'oz','jamaicanrum'],[.25,'oz','coconutrum'],[1,'dash','saline20']],prov:{who:'Robby Dow',where:'Wilmington, North Carolina',year:'Not specified',conf:'medium',note:'Published riff: https://punchdrink.com/recipes/surfer-on-acid/'}})];
+  surfer.vars=[Object.assign({},surfer,{id:'surfer-on-acid-shot',name:'Surfer on Acid (shot)',vlabel:'Shot',variantOf:surfer.id,parent:surfer.id,glass:'Shot glass',ice:'Up',garnish:'None',spec:[[.5,'oz','jager'],[.5,'oz','coconutrum'],[.5,'oz','pineapple']],prov:{who:'Eric Tecosky (widely credited)',where:'Los Angeles',year:'early 1990s',conf:'medium',note:'Half-ounce equal-parts shot: https://tipsy-app.com/cocktails/surfer-on-acid'}}),Object.assign({},surfer,{id:'surfer-on-acid-punch',name:'Surfer on Acid (Robby Dow)',style:'Citrus',vlabel:'Robby Dow',variantOf:surfer.id,parent:surfer.id,cat:'Tiki',ice:'Large cube',garnish:'Freshly grated nutmeg',spec:[[1.5,'oz','pineapple'],[1.25,'oz','whiterum'],[.75,'oz','jager'],[.5,'oz','simple'],[.5,'oz','lime'],[.25,'oz','jamaicanrum'],[.25,'oz','coconutrum'],[1,'dash','saline20']],prov:{who:'Robby Dow',where:'Wilmington, North Carolina',year:'Not specified',conf:'medium',note:'Published riff: https://punchdrink.com/recipes/surfer-on-acid/'}})];
   if(!byId(surfer.id))D.push(surfer);surfer.vars.forEach(function(v){DATA.ALIAS[v.id]=surfer.id;});
 /* v5.15: user-supplied specifications, with duplicate-name guard. */
 Object.assign(ING,{"fassionola": {"n": "Fassionola syrup", "t": "syrup", "sug": 0.6, "acid": 0.01}, "americanobianco": {"n": "Americano bianco", "t": "wine", "abv": 0.165, "sug": 0.12, "acid": 0.006}, "sauvignonblanc": {"n": "Sauvignon Blanc wine", "t": "wine", "abv": 0.125, "sug": 0.002, "acid": 0.006}, "angosturaorange": {"n": "Orange Bitters by Angostura", "t": "bitters", "abv": 0.28}, "abbotts": {"n": "Bob’s Abbotts bitters", "t": "bitters", "abv": 0.4}, "chili": {"n": "Red jalapeño/Fresno chili (deseeded)", "t": "solid"}, "cilantro": {"n": "Coriander/Cilantro leaves", "t": "solid"}});
@@ -1530,7 +1530,7 @@ DATA.ALL.forEach(function(d){if(d.cat==='Bard’s')d.cat='Bard’s';});
    Sweet & Savory: flips, coffee drinks (every espresso martini), Bloody Mary and other odd ones */
 DATA.STYLES = [
   { k:'Spirit-forward', icon:'🥃', sub:'Stirred · Old Fashioned · Martini', color:'#d6a24a' },
-  { k:'Sour', icon:'🍋', sub:'Daiquiri · Sidecar', color:'#8fc04a' },
+  { k:'Citrus', icon:'🍋', sub:'Daiquiri · Sidecar', color:'#8fc04a' },
   { k:'Highball', icon:'🫧', sub:'Soda & sparkling toppers', color:'#74bfa1' },
   { k:'Sweet & Savory', icon:'☕', sub:'Flip · Coffee · Other', color:'#c9a0dc' }
 ];
@@ -1539,11 +1539,11 @@ DATA.FIZZ = FIZZ;
 var SS_ING = { espresso:1, coffee:1, hotcoffee:1, decafespresso:1, tomatojuice:1, clamato:1 };   // coffee & savory drinks
 DATA.SS_ING = SS_ING;
 DATA.styleOf = function (d, spec, m) {
-  if (d.style) return d.style === 'Flip' ? 'Sweet & Savory' : d.style;
+  if (d.style) return d.style === 'Flip' ? 'Sweet & Savory' : d.style === 'Sour' ? 'Citrus' : d.style;
   if (d.fam === 'Flip' || (spec || []).some(function (it) { return SS_ING[it[2]]; })) return 'Sweet & Savory';
   if (d.fam === 'Highball' || (spec || []).some(function (it) { var o = it[3] || {}; return (it[1] === 'top' || it[1] === 'free') && !o.side && FIZZ[it[2]]; })) return 'Highball';
   if (m === 'stir' || d.fam === 'Old-Fashioned' || d.fam === 'Martini') return 'Spirit-forward';
-  return 'Sour';
+  return 'Citrus';
 };
 })(typeof self !== 'undefined' ? self : this);
 
@@ -1982,8 +1982,8 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     // 6. Four styles
     if (DATA.styleOf) {
       function sty(id) { var d = find(id); return DATA.styleOf(d, d.spec, d.m); }
-      var exp = { 'old-fashioned':'Spirit-forward', 'martini':'Spirit-forward', 'manhattan':'Spirit-forward', 'negroni':'Spirit-forward', 'daiquiri':'Sour', 'sidecar':'Sour', 'margarita':'Sour',
-        'tom-collins':'Highball', 'french-75':'Highball', 'mojito':'Highball', 'whisky-highball':'Highball', 'flip':'Sweet & Savory', 'irish-coffee':'Sweet & Savory', 'bloody-mary':'Sweet & Savory', 'espresso-martini':'Sweet & Savory', 'balanced-espresso-martini':'Sweet & Savory', 'amaretto-espresso-martini':'Sweet & Savory', 'fancy-xpressi-martini':'Sweet & Savory', 'mai-tai':'Sour' };
+      var exp = { 'old-fashioned':'Spirit-forward', 'martini':'Spirit-forward', 'manhattan':'Spirit-forward', 'negroni':'Spirit-forward', 'daiquiri':'Citrus', 'sidecar':'Citrus', 'margarita':'Citrus',
+        'tom-collins':'Highball', 'french-75':'Highball', 'mojito':'Highball', 'whisky-highball':'Highball', 'flip':'Sweet & Savory', 'irish-coffee':'Sweet & Savory', 'bloody-mary':'Sweet & Savory', 'espresso-martini':'Sweet & Savory', 'balanced-espresso-martini':'Sweet & Savory', 'amaretto-espresso-martini':'Sweet & Savory', 'fancy-xpressi-martini':'Sweet & Savory', 'mai-tai':'Citrus' };
       var wrong = Object.keys(exp).filter(function (id) { return sty(id) !== exp[id]; }).map(function (id) { return id + '→' + sty(id); });
       check('Four styles sort correctly (stirred / sour / soda-topped / flip)', !wrong.length, wrong.join(', '));
       var cnt = {}; TOP.forEach(function (d) { var s = DATA.styleOf(d, d.spec, d.m); cnt[s] = (cnt[s] || 0) + 1; });
@@ -2457,6 +2457,10 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
   
     var user = load();
     function norm() {
+      // Migrate legacy type overrides only; never rename cocktail names or notes.
+      function migrateType(o){if(!o||typeof o!=='object')return;Object.keys(o).forEach(function(k){if(k==='style'&&o[k]==='Sour')o[k]='Citrus';else if(k!=='notes'&&k!=='said'&&typeof o[k]==='object')migrateType(o[k]);});}
+      migrateType(user);
+
       user.drinks = user.drinks || {}; user.tech = user.tech || {}; user.settings = user.settings || { unit:'oz' }; user.settings.unit = user.settings.unit || 'oz';
       user.vsel = user.vsel || {}; user.edits = user.edits || {}; user.custom = user.custom || []; user.ing = user.ing || {};
       Object.keys(user.edits).forEach(function(k){if(/^(Andrew|Bard)[’']s$/.test(user.edits[k].cat))user.edits[k].cat='Bard’s';});
@@ -2540,21 +2544,24 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       if(d.id==='mezcalrita'){d.parent='margarita';d.variantOf='margarita';}
       if(d.id==='ginori'){d.mainLabel='Bard’s no. 1';(d.alts||[]).forEach(function(a,i){a.label='Bard’s no. '+(i+2);});}
     });});
-      houseVariants();
+      NAVIGATION_HOMES={"bijou": "martini", "hanky-panky": "manhattan", "el-presidente": "martini", "bamboo": "martini", "adonis": "martini", "downhill-daring": "manhattan", "godfather": "old-fashioned", "rusty-nail": "old-fashioned", "corn-n-oil": "old-fashioned", "white-lady": "sidecar", "breakfast-martini": "gimlet", "penicillin": "whiskey-sour", "fitzgerald": "gimlet", "amaretto-sour": "whiskey-sour", "business": "gimlet", "gin-gin-mule": "moscow-mule", "el-diablo": "moscow-mule", "lost-lake": "jungle-bird", "dark-n-stormy": "moscow-mule", "kentucky-buck": "moscow-mule", "suffering-bastard": "moscow-mule", "pantheon": "whiskey-sour", "bramble": "gimlet", "london-calling": "gimlet", "mary-pickford": "daiquiri"};
+    DRINKS.forEach(function(p){[p].concat(p.vars||[]).forEach(function(d){if(NAVIGATION_HOMES[d.id]){d.parent=NAVIGATION_HOMES[d.id];d.variantOf=NAVIGATION_HOMES[d.id];}});});
+    houseVariants();
       derive();
     }
   
     /* Group named riffs using recorded parent relationships, including Bard originals.
        Preserve ids, provenance, versions and local notes; flatten nested variants once. */
-    function houseVariants() {
+    var NAVIGATION_HOMES;
+  function houseVariants() {
       var all=[],map={},owners={},roots={};
       DRINKS.forEach(function(d){all.push(d);map[d.id]=d;(d.vars||[]).forEach(function(v){all.push(v);map[v.id]=v;owners[v.id]=d.id;});});
       var anchors={};
       ['old-fashioned','martini','daiquiri','margarita','mai-tai','negroni','manhattan','whiskey-sour','gimlet','last-word','espresso-martini','white-russian','revolver','bloody-mary','caipirinha','hot-toddy','cuba-libre','pina-colada','spritz','french-75','sazerac','sidecar','paloma','mojito','zombie','test-pilot','army-navy','penicillin','pisco-sour'].forEach(function(k){if(map[k])anchors[k]=1;});
       function root(id){var seen={},path=[],cur=id;
         while(map[cur]){if(seen[cur]){return path.slice().sort()[0];}seen[cur]=1;path.push(cur);
-          if(anchors[cur])return cur;
-          var next=owners[cur]||map[cur].variantOf||map[cur].parent;
+          if(anchors[cur]&&!NAVIGATION_HOMES[cur])return cur;
+          var next=NAVIGATION_HOMES[cur]||owners[cur]||map[cur].variantOf||map[cur].parent;
           if(!next||!map[next]||next===cur)return cur;cur=next;
         }return id;
       }
@@ -2567,7 +2574,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     function searchText(x){return String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
     function variantCard(v,main,vs,vi){return Object.assign({},v,{cat:vs[0].mine||vs[0].sharedWithBard||v.fromNotes&&!v.av?'Bard’s':v.cat,aStatus:(v.status||[]).filter(function(x){return x!=='Has Bard’s version'||vs.some(function(z){return z.mine||z.sharedWithBard;});}),aBase:Array.from(new Set(vs.map(function(z){return z.base;}))),aFlav:v.flav||[],aTech:Array.from(new Set([].concat.apply([],vs.map(function(z){return z.tech||[];})))),aEquip:Array.from(new Set([].concat.apply([],vs.map(function(z){return (z.tech||[]).map(function(t){return EQUIP[t];}).filter(Boolean);})).concat(/crushed|pebble|cone/i.test(v.ice||'')?['Crushed ice']:[]))),aStyle:Array.from(new Set(vs.map(function(z){return z.style;}))),aStrength:Array.from(new Set(vs.map(function(z){return Calc.strengthLabel(z.stats.finalAbv);}))),pStyle:vs[0].style,stats:vs[0].stats,versions:v.versions,vdef:vi,variants:[v],mainName:main.name,displayVi:vs[0].sourceIndex});}
     function songResults(list){
-      if(!state.q.trim()&&!state.cat&&!state.favorites&&!activeCount())return sorted(list.filter(function(d){return !isHidden(d);}));
+      if(state.sort!=='az'&&!state.q.trim()&&!state.cat&&!state.favorites&&!activeCount())return sorted(list.filter(function(d){return !isHidden(d);}));
       var out=[],tokens=searchText(state.q).trim().split(/\s+/).filter(Boolean);
       list.forEach(function(main){if(isHidden(main))return;main.variants.forEach(function(v){
         if(user.hidden[v.id]||(state.favorites&&!(user.drinks[v.id]||{}).favorite))return;
@@ -2578,7 +2585,17 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
           if(!FILTERS.every(function(g){var sel=Object.keys(state.f[g.k]);return !sel.length||sel.some(function(k){return g.get(d).indexOf(k)>=0;});}))return false;
           if(vi<0)vi=i;return true;
         });if(vs.length)out.push(variantCard(v,main,vs,vi));
-      });});return sorted(out);
+      });});
+      // A-Z and search are explicit discovery views. Type-only browsing stays compact.
+      var typeBrowsing=state.sort!=='az'&&!state.q.trim()&&!state.cat&&!state.favorites&&Object.keys(state.f.style).length>0&&FILTERS.every(function(g){return g.k==='style'||Object.keys(state.f[g.k]).length===0;});
+      if(typeBrowsing){
+        var buckets={};out.forEach(function(d){var main=byId[d.id],key=main.id+'|'+d.pStyle;var group=buckets[key]||(buckets[key]={main:main,items:[]});group.items.push(d);});
+        out=Object.keys(buckets).map(function(key){var b=buckets[key],items=sorted(b.items),rep=items.filter(function(d){return d.id===b.main.id;})[0]||items[0];
+          var group=Object.assign({},rep,{id:b.main.id,name:b.main.name,src:b.main.src,exp:b.main.exp,custom:b.main.custom,mainName:null,openId:rep.id,variants:items.map(function(d){return d.variants[0];}),aBase:Array.from(new Set([].concat.apply([],items.map(function(d){return d.aBase;})))),aStatus:Array.from(new Set([].concat.apply([],items.map(function(d){return d.aStatus;})))),grouped:true});
+          return group;
+        });
+      }
+      return sorted(out);
     }
     // variant objects keep their id through restore because ORIG holds it; this guard is for safety only
     function ORIG_VARS_ID(v) { for (var k in ORIG_OBJ) if (ORIG_OBJ[k] === v) return k; }
@@ -2772,7 +2789,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         (d.aStatus.indexOf('Needs my check') > -1 ? '<span class="mk flag" title="Needs your check">⚑</span>' : '') +
         (d.custom ? '<span class="mk edit">custom</span>' : d.aStatus.indexOf('My edits & recipes') > -1 ? '<span class="mk edit">edited</span>' : '') +
         (u.rating ? '<span class="mk star">' + '★'.repeat(u.rating) + '</span>' : '');
-      return '<li><a class="card" href="#/d/' + d.id + (d.displayVi!=null?'/'+d.displayVi:'') + '"' + (d.displayVi!=null?' data-recipe-id="'+esc(d.id)+'" data-recipe-vi="'+d.displayVi+'"':'') + ' style="--c:' + (st.color || 'transparent') + '"><div class="cmain"><div class="cname">' + esc(d.name) +
+      return '<li><a class="card" href="#/d/' + (d.openId||d.id) + (d.displayVi!=null?'/'+d.displayVi:'') + '"' + (d.displayVi!=null?' data-recipe-id="'+esc(d.openId||d.id)+'" data-recipe-vi="'+d.displayVi+'"':'') + ' style="--c:' + (st.color || 'transparent') + '"><div class="cmain"><div class="cname">' + esc(d.name) +
         (u.notes ? ' <span class="dot" title="Has notes"></span>' : '') + (u.verified ? ' <span class="tick" title="Spec verified">✓</span>' : '') + '</div>' +
         (d.mainName && d.mainName !== d.name ? '<div class="csub">Variant of ' + esc(d.mainName) + '</div>' : '') + '<div class="csub">' + (st.icon || '') + ' ' + esc(d.pStyle) + ' · ' + esc(d.aBase.length > 1 ? d.aBase.slice(0, 3).join(' / ') : d.versions[d.vdef].base) + ' · ' + METHOD_LABEL[d.versions[d.vdef].m] + '</div>' +
         (marks ? '<div class="marks">' + marks + '</div>' : '') + '</div>' +
