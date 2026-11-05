@@ -1,9 +1,7 @@
-# Dad Bard v5.11
+# Dad Bard v5.12
 
-Fixed mobile Apothecary tool label wrapping. Ingredient finder now includes all named songs, styles and distinct recipe versions, showing complete matches plus partial matches sorted by missing ingredient count. Generic Rum includes standard rum types but not infused/overproof; other inputs match exact ingredients. Hidden songs remain excluded. Search is accent-insensitive. Recipe versions with identical specifications are not double listed.
+What can I make: possible combinations begin at two distinct matched inputs from any categories, including citrus plus syrup without a spirit. Multiple styles of the same spirit count as one input. Spirit selection is simplified to Rum, Gin, Vodka, Whiskey, Tequila, Mezcal, Brandy, Pisco, Cachaca and Aquavit. All known styles, including infused and overproof, are matched by family. Exact recipe bottles and strengths are retained on recipe pages and in the slushee calculator. Family matches are discovery suggestions, not proof that bottles are interchangeable. Existing stock selections migrate to family selections. Missing ingredients remain listed; hidden songs remain excluded.
 
-Slushee: Scratch recipe option; category-specific Add ingredient picker; one name per ingredient row; X removes; duplicates blocked. Base quantities remain single-recipe inputs; final batch quantities scale all base ingredients together. Additional Brix syrup is separately labeled. Changes recalculate immediately. Scratch state and edits persist after reload.
+Validation: mobile-sized browser tests confirmed two-input matching, family picker deduplication, citrus-plus-syrup matching, scratch recipe persistence and unchanged lime scaling. 67 built-in checks pass, zero failures, no page errors. Physical iPhone testing not performed.
 
-Validation: 67 built-in checks pass, zero failures. Phone-sized Chromium interaction tests passed, no page errors. All indexed recipes match when supplied their own required inputs. 666 Daiquiri batch combinations passed Brix, volume, ABV and rum/lime ratio checks. Lime scales from 75 ml at 1 L to 150 ml at 2 L under default 8% ABV settings. Physical iPhone and machine testing not performed. Ingredient sugar/density values remain estimates; freezing is not guaranteed.
-
-Update: Export JSON backup in Tavern. Replace the existing app files with the same filenames. Open online once to update offline cache.
+Update: Export JSON backup in Tavern, then replace app files in your existing repository with the same filenames. Open online once to update offline cache.
