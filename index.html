@@ -298,6 +298,7 @@ nav.tabs{position:fixed!important;bottom:0!important;top:auto!important;transfor
 .search-clear:hover{background:var(--card2);color:var(--text)}.search-clear[hidden]{display:none}
 .selected-style{font-size:20px;color:var(--accent2);margin:4px 0 12px}
 .rail.tools .tile span,.rail.tools .tile small{white-space:normal;overflow-wrap:anywhere;text-align:center;max-width:100%;line-height:1.25}.rail.tools .tile{min-width:118px;flex:0 0 118px}.slush-row b{overflow-wrap:anywhere}#slpicker{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px}.stock-results .hidlist li{display:block}.stock-results .hidlist small{margin-top:4px}
+.sortrow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}.sortrow .favorite-filter{margin:0;flex:0 0 auto;min-height:36px;padding:7px 12px}.sortrow select{min-width:0;max-width:55%}
 </style>
 </head>
 <body>
@@ -2147,7 +2148,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       if (!shown.length) h += '<p class="empty">No styles match. Loosen a filter.</p>';
       h += '</div>';
     }
-    $app().innerHTML = h;
+    DB().renderHTML(h);
     var q = document.getElementById('evoq');
     q.oninput = function () { evo.q = q.value; var p = q.selectionStart; D.keep(function () { evolution(header); }); var nq = document.getElementById('evoq'); nq.focus(); nq.setSelectionRange(p, p); };
     function tog(map, v) { if (map[v]) delete map[v]; else map[v] = 1; D.keep(function () { evolution(header); }); }
@@ -2172,7 +2173,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       (n.tech && D.craftOk(n.tech) ? '<p>' + D.link('#/t/' + n.tech, 'Technique: ' + D.esc(D.TECH[n.tech].t) + ' →') + '</p>' : '') + '</section>';
     if (ks.length) h += '<section class="panel"><h2>Branches</h2><ul class="tlist">' + ks.map(function (k) { return '<li>' + D.link('#/evo/' + k.id, D.esc(k.n)) + ' <span class="muted small">' + D.esc(k.year) + ' · ' + D.esc(k.formula) + '</span></li>'; }).join('') + '</ul></section>';
     h += '<section class="panel"><h2>In your songbook · ' + ds.length + '</h2>' + (ds.length ? '<ul class="cards">' + ds.map(D.card).join('') + '</ul>' : '<p class="muted">None yet.</p>') + '</section>';
-    $app().innerHTML = h; window.scrollTo(0, 0);
+    DB().renderHTML(h); window.scrollTo(0, 0);
   }
 
   /* ================= APOTHECARY ================= */
@@ -2743,6 +2744,24 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       if (d.variants.some(function (v) { return searchText(v.name + ' ' + (v.vlabel || '')).indexOf(q) > -1; })) return 3; return 4; }
     return list.slice().sort(function (a, b) { return rank(a) - rank(b) || by(a, b); });
   }
+  function renderHTML(html) {
+    var active=document.activeElement;
+    if(!active||!$app.contains(active)||!(active.matches('input[type="search"],#stocksearch'))){$app.innerHTML=html;return;}
+    var temp=document.createElement('div');temp.innerHTML=html;
+    var next=temp.querySelector('#'+active.id);if(!next){$app.innerHTML=html;return;}
+    var oldWrap=active.closest('.search-clear-wrap');
+    if(oldWrap&&!next.closest('.search-clear-wrap')){var wrap=oldWrap.cloneNode(true);wrap.querySelector('input').value=active.value;next.replaceWith(wrap);next=wrap.querySelector('input');}
+    function patch(oldNode,newNode){
+      if(oldNode===active||oldNode===oldWrap)return;
+      var keep=Array.from(oldNode.children).find(function(c){return c===active||c.contains(active);});
+      var fresh=Array.from(newNode.children).find(function(c){return c===next||c.contains(next);});
+      if(!keep||!fresh)return;
+      Array.from(oldNode.childNodes).forEach(function(c){if(c!==keep)oldNode.removeChild(c);});
+      var after=false;Array.from(newNode.childNodes).forEach(function(c){if(c===fresh){after=true;return;}if(after)oldNode.appendChild(c);else oldNode.insertBefore(c,keep);});
+      patch(keep,fresh);
+    }
+    patch($app,temp);
+  }
   function renderBrowse() {
     var list = songResults(sorted(DRINKS.filter(matches))), ac = activeCount();
     var VIS = DRINKS.filter(function (d) { return !isHidden(d); }), nHid = DRINKS.length - VIS.length;
@@ -2753,7 +2772,6 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     var h = '<header class="top hero"><div class="brand"><img src="' + LOGO + '" alt="Dad Bard" class="logo"><div><h1>Dad Bard <span class="sym">🪕</span></h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
       '<div class="searchrow"><input id="q" type="search" placeholder="Search drinks, ingredients, creators" value="' + esc(state.q) + '" autocomplete="off">' +
       '<button id="ftoggle" class="btn filterbtn ' + (ac ? 'on' : '') + '">⚙︎ Filters' + (ac ? ' <b>' + ac + '</b>' : '') + '</button></div>' +
-      '<button class="btn small favorite-filter' + (state.favorites ? ' on' : '') + '" id="favorites" aria-pressed="' + state.favorites + '">★ Favorites</button>' +
       pills('cat', [{ v:'', label:'All', icon:'✦', count:VIS.length }].concat(CATS.map(function (c) { return { v:c, label:c, icon:CAT_ICON[c], count:counts[c] || 0 }; })), function (v) { return v === state.cat; }) +
       '<div class="rail stylegrid">' + STYLES.map(function (s) {
         return '<button class="tile' + (state.f.style[s.k] ? ' on' : '') + '" data-tap="f-style" data-v="' + esc(s.k) + '" style="--c:' + s.color + '"><i>' + s.icon + '</i><span>' + esc(s.k) + '</span><small>' + esc(s.sub) + '</small><b>' + (sv[s.k] || 0) + '</b></button>';
@@ -2761,7 +2779,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     var act = [];
     FILTERS.forEach(function (g) { Object.keys(state.f[g.k]).forEach(function (v) { act.push('<button class="achip" data-tap="achip" data-v="' + g.k + '|' + esc(v) + '">' + ((GROUP_ICON[g.k] || {})[v] || '') + ' ' + esc(v) + ' <b>×</b></button>'); }); });
     if (act.length) h += '<div class="achips">' + act.join('') + '<button class="achip clear" id="fclear2">Clear all</button></div>';
-    h += '<div class="sortrow"><span class="muted">' + list.length + ' ' + (state.q.trim() ? 'matching recipes' : 'of ' + VIS.length + ' songs') + '</span>' +
+    h += '<div class="sortrow">' + '<button class="btn small favorite-filter' + (state.favorites ? ' on' : '') + '" id="favorites" aria-pressed="' + state.favorites + '">★ Favorites</button>' +
       '<select id="sort"><option value="style">By style</option><option value="az">A–Z</option><option value="rated">My rating</option><option value="strong">Strongest</option><option value="light">Lightest</option><option value="sources">Most sources ticked</option></select></div></header>';
     if (state.sort === 'style' && !state.q.trim()) {
       STYLES.forEach(function (s) {
@@ -2784,12 +2802,12 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       h += '</div><button id="fdone" class="btn primary">Show ' + list.length + ' songs</button></div>';
     }
     var prevSheet = document.querySelector('.sheet-body'), sheetY = prevSheet ? prevSheet.scrollTop : 0;
-    $app.innerHTML = h;
+    renderHTML(h);
     var nb = document.querySelector('.sheet-body'); if (nb) nb.scrollTop = sheetY;
     document.body.classList.toggle('noscroll', !!state.showFilters);
     document.getElementById('favorites').onclick=function(){state.favorites=!state.favorites;keep(renderBrowse);};
     var q = document.getElementById('q');
-    q.addEventListener('input', function () { state.q = q.value; var pos = q.selectionStart; keep(renderBrowse); var nq = document.getElementById('q'); nq.focus(); nq.setSelectionRange(pos, pos); });
+    q.oninput=function(){state.q=q.value;keep(renderBrowse);};
     document.getElementById('sort').value = state.sort;
     document.getElementById('sort').onchange = function (e) { state.sort = e.target.value; renderBrowse(); };
     document.getElementById('ftoggle').onclick = function () { state.showFilters = true; keep(renderBrowse); };
@@ -2944,7 +2962,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     h += '<section class="panel hidepanel">' + (isHidden(main)
       ? '<p class="small">Hidden from the Songbook, Bloodlines and counts.</p><button class="btn" id="unhide2">👁 Unhide ' + esc(main.name) + '</button>'
       : '<button class="btn ghost hidebtn" id="hidebtn">🙈 Hide ' + esc(main.name) + (main.variants.length > 1 ? ' (all ' + main.variants.length + ' styles)' : '') + '</button><p class="muted small">Takes it out of the Songbook. Bring it back any time from the bottom of the Tavern.</p>') + '</section>';
-    $app.innerHTML = h;
+    renderHTML(h);
     var hb = document.getElementById('hidebtn');
     if (hb) hb.onclick = function () { user.hidden[main.id] = Date.now(); save(); location.hash = '#/'; };
     ['unhide1','unhide2'].forEach(function (x) { var b = document.getElementById(x); if (b) b.onclick = function () { delete user.hidden[main.id]; save(); keep(renderDrink, id); }; });
@@ -3111,7 +3129,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     h += '<div class="ebar"><button id="esave" class="btn primary">Save</button>' +
       (!isNew && d.mode === 'edit' && user.edits[d.id] ? '<button id="ereset" class="btn ghost">↺ Reset to original</button>' : '') +
       (d.mode === 'custom' ? '<button id="edelete" class="btn danger">Delete recipe</button>' : '') + '</div>';
-    $app.innerHTML = h;
+    renderHTML(h);
     bindEditor(); editorPreview();
   }
   function paintRows() { document.getElementById('erows').innerHTML = draft.rows.map(rowHTML).join(''); bindRows(); editorPreview(); }
@@ -3221,7 +3239,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       h += '<section class="panel tree" style="box-shadow:inset 3px 0 0 ' + ROOT_COLORS[f] + '"><details' + (fam.root || f === 'Old-Fashioned' ? ' open' : '') + '><summary><b>' + esc(root.name) + '</b> <span class="muted">· ' + esc(f) + ' · ' + members.length + ' drinks' + (mineN ? ', ' + mineN + ' yours' : '') + '</span></summary>' +
         '<p class="small">' + link('#/d/' + root.id, 'Open the root spec') + '</p><ul class="treeul">' + tops.map(function (d) { return node(d, f, d.parent ? 1 : 0, seen); }).join('') + '</ul></details></section>';
     });
-    $app.innerHTML = h;
+    renderHTML(h);
     bindLinMode();
     onTap('famroot', function (v) { fam.root = fam.root === v ? '' : v; keep(renderLineage); });
     onTap('fammine', function () { fam.mine = !fam.mine; keep(renderLineage); });
@@ -3286,7 +3304,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     var body = group('prep', '🎻 Andrew’s house prep') +
       group('home', '🏠 Home-feasible technique') + group('equipment', '🔧 Equipment required') +
       user.craft.sections.map(function (sec) { return group(sec.id, sec.icon + ' ' + esc(sec.n), '', true); }).join('');
-    $app.innerHTML = h + (body || '<p class="empty">Nothing matches.</p>');
+    renderHTML(h + (body || '<p class="empty">Nothing matches.</p>'));
     var cq = document.getElementById('cq');
     cq.oninput = function () { craft.q = cq.value; var p = cq.selectionStart; keep(renderTechIndex); var nq = document.getElementById('cq'); nq.focus(); nq.setSelectionRange(p, p); };
     onTap('craftcat', function (v) { craft.cat = craft.cat === v ? '' : v; keep(renderTechIndex); });
@@ -3326,7 +3344,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       '<section class="panel"><label class="field"><span>Recipe / method</span><textarea id="cb" rows="9" placeholder="One step or note per line">' + esc(c.body) + '</textarea></label>' +
       '<label class="field"><span>Equipment (optional, comma-separated)</span><input id="ce" value="' + esc(c.eq) + '" placeholder="Jar, fine strainer, scale"></label></section>' +
       '<div class="ebar"><button id="csave" class="btn primary">Save</button>' + (isNew ? '' : '<button id="cdel" class="btn danger">Delete entry</button>') + '</div>';
-    $app.innerHTML = h;
+    renderHTML(h);
     ['ct:t','cb:body','ce:eq'].forEach(function (p) { var a = p.split(':'), el = document.getElementById(a[0]); el.oninput = function () { c[a[1]] = el.value; }; });
     onTap('csec', function (v) { c.section = v; keep(renderCraftEditor); });
     var csn = document.getElementById('csname'); if (csn) csn.oninput = function () { craft.secName = csn.value; };
@@ -3368,7 +3386,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       ? '<p class="small">Hidden from Bar craft and from links on drink pages.</p><button class="btn" id="cunhide">👁 Unhide ' + esc(t.t) + '</button>'
       : '<button class="btn ghost hidebtn" id="chide">🙈 Hide this page</button><p class="muted small">Takes it out of Bar craft and drink links. Bring it back from the bottom of the Tavern.</p>') + '</section>';
     if (craftHidden(k)) h = h.replace('</header>', '</header><div class="hidbanner">🙈 This page is hidden. <button class="btn small" id="cunhide0">Unhide</button></div>');
-    $app.innerHTML = h; window.scrollTo(0, 0);
+    renderHTML(h); window.scrollTo(0, 0);
     var chb = document.getElementById('chide'); if (chb) chb.onclick = function () { user.hiddenCraft[k] = Date.now(); save(); location.hash = '#/tech'; };
     ['cunhide','cunhide0'].forEach(function (x) { var b = document.getElementById(x); if (b) b.onclick = function () { delete user.hiddenCraft[k]; save(); renderTech(k); }; });
     var tm, ta = document.getElementById('tnotes');
@@ -3418,7 +3436,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
           '<button class="btn small" data-tap="cunhide" data-v="' + esc(k) + '">👁 Unhide</button></li>';
       }).join('') + '</ul><button class="btn ghost small" id="cunhideall">Unhide all</button>'
       : '<p class="muted small">Nothing hidden. Use “🙈 Hide this page” at the bottom of any Bar craft page.</p>') + '</section>';
-    $app.innerHTML = h;
+    renderHTML(h);
     onTap('cunhide', function (v) { delete user.hiddenCraft[v]; save(); keep(renderMore); });
     var cua = document.getElementById('cunhideall'); if (cua) cua.onclick = function () { user.hiddenCraft = {}; save(); keep(renderMore); };
     onTap('unhide', function (v) { delete user.hidden[v]; save(); keep(renderMore); });
@@ -3456,7 +3474,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     h += '<section class="panel"><h2>3 · Automated tests</h2><ul class="tests">' + res.map(function (r) {
       return '<li class="t-' + r.status.toLowerCase() + '"><b>' + r.status + '</b> ' + esc(r.name) + (r.detail ? ' <small>' + esc(r.detail) + '</small>' : '') + '</li>';
     }).join('') + '</ul><p class="muted small">Warnings flag traditional specs outside rough ABV bands. Long, low-proof or amaro-based drinks are expected to trip them.</p></section>';
-    $app.innerHTML = h;
+    renderHTML(h);
     document.getElementById('csave').onclick = function () {
       var c = { shake:[], stir:[] };
       $app.querySelectorAll('.coef input').forEach(function (i) { c[i.dataset.m][+i.dataset.i] = parseFloat(i.value); });
@@ -3518,7 +3536,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
   }
   window.DB = {
     get user() { return user; }, get byId() { return byId; }, save:save, keep:keep, esc:esc, link:link, tiles:tiles, pills:pills, onTap:onTap, card:card,
-    bindLinMode:bindLinMode, isHidden:isHidden, craftOk:craftOk, removedCraft:REMOVED_CRAFT, ROOT_COLORS:ROOT_COLORS, TECH:TECH, ING:ING, DRINKS:DRINKS
+    renderHTML:renderHTML, bindLinMode:bindLinMode, isHidden:isHidden, craftOk:craftOk, removedCraft:REMOVED_CRAFT, ROOT_COLORS:ROOT_COLORS, TECH:TECH, ING:ING, DRINKS:DRINKS
   };
   window.addEventListener('hashchange', route);
   route();

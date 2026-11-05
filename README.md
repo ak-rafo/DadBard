@@ -1,7 +1,9 @@
-# Dad Bard v5.12
+# Dad Bard v5.13
 
-What can I make: possible combinations begin at two distinct matched inputs from any categories, including citrus plus syrup without a spirit. Multiple styles of the same spirit count as one input. Spirit selection is simplified to Rum, Gin, Vodka, Whiskey, Tequila, Mezcal, Brandy, Pisco, Cachaca and Aquavit. All known styles, including infused and overproof, are matched by family. Exact recipe bottles and strengths are retained on recipe pages and in the slushee calculator. Family matches are discovery suggestions, not proof that bottles are interchangeable. Existing stock selections migrate to family selections. Missing ingredients remain listed; hidden songs remain excluded.
+Removed the redundant Songbook results count. Favorites now sits below the style tiles on the left, opposite the sort selector, with mobile spacing and no duplicate Favorites button.
 
-Validation: mobile-sized browser tests confirmed two-input matching, family picker deduplication, citrus-plus-syrup matching, scratch recipe persistence and unchanged lime scaling. 67 built-in checks pass, zero failures, no page errors. Physical iPhone testing not performed.
+Fixed search focus: active search input and its ancestors remain in the DOM while results update, avoiding keyboard dismissal caused by replacing/refocusing the field. Applied to Songbook, Craft and Bloodlines; Apothecary ingredient search remains stable. Clear-search buttons still work.
 
-Update: Export JSON backup in Tavern, then replace app files in your existing repository with the same filenames. Open online once to update offline cache.
+Validation: continuous typing tests at 320, 390 and 1280 pixel widths passed in all four search sections, with zero blur events, retained input identity and no page errors. Favorites and sort controls did not overlap. Physical iPhone keyboard testing not performed.
+
+Update: back up through Tavern > Export JSON. Replace the six app files with the same filenames, then open online once to update offline cache.
