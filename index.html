@@ -1507,6 +1507,11 @@ Object.keys(GROUPS).forEach(function (mid) {
     v.variantOf = mid; main.vars.push(v); DATA.ALIAS[v.id] = mid;
   });
 });
+  ING.coconutrum={n:'Coconut rum (Malibu-style)',abv:.21,sug:.20,t:'spirit'};
+  ING.saline20={n:'Saline solution (1 salt : 4 water by weight)',t:'other'};
+  var surfer={id:'surfer-on-acid',name:'Surfer on Acid',style:'Sweet & Savory',cat:'Modern',fam:'Daiquiri',base:'Rum',m:'shake',glass:'Rocks',ice:'Cubes',garnish:'Pineapple wedge',flav:['tropical','herbal','sweet'],tech:['shake'],spec:[[1,'oz','jager'],[1,'oz','coconutrum'],[1,'oz','pineapple']],prov:{who:'Eric Tecosky (widely credited)',where:'Los Angeles',year:'early 1990s',conf:'medium',note:'Equal-parts recipe: https://www.surfertoday.com/surfing/how-to-make-a-surfer-on-acid-drink . Coconut rum sugar is an estimate; update from your bottle label.'},vlabel:'Equal parts'};
+  surfer.vars=[Object.assign({},surfer,{id:'surfer-on-acid-shot',name:'Surfer on Acid (shot)',vlabel:'Shot',variantOf:surfer.id,parent:surfer.id,glass:'Shot glass',ice:'Up',garnish:'None',spec:[[.5,'oz','jager'],[.5,'oz','coconutrum'],[.5,'oz','pineapple']],prov:{who:'Eric Tecosky (widely credited)',where:'Los Angeles',year:'early 1990s',conf:'medium',note:'Half-ounce equal-parts shot: https://tipsy-app.com/cocktails/surfer-on-acid'}}),Object.assign({},surfer,{id:'surfer-on-acid-punch',name:'Surfer on Acid (Robby Dow)',style:'Sour',vlabel:'Robby Dow',variantOf:surfer.id,parent:surfer.id,cat:'Tiki',ice:'Large cube',garnish:'Freshly grated nutmeg',spec:[[1.5,'oz','pineapple'],[1.25,'oz','whiterum'],[.75,'oz','jager'],[.5,'oz','simple'],[.5,'oz','lime'],[.25,'oz','jamaicanrum'],[.25,'oz','coconutrum'],[1,'dash','saline20']],prov:{who:'Robby Dow',where:'Wilmington, North Carolina',year:'Not specified',conf:'medium',note:'Published riff: https://punchdrink.com/recipes/surfer-on-acid/'}})];
+  if(!byId(surfer.id))D.push(surfer);surfer.vars.forEach(function(v){DATA.ALIAS[v.id]=surfer.id;});
 DATA.ALL = [];
 D.forEach(function (d) { DATA.ALL.push(d); (d.vars || []).forEach(function (v) { DATA.ALL.push(v); }); });
 
@@ -1524,7 +1529,7 @@ DATA.STYLES = [
 ];
 var FIZZ = { cola:1, soda:1, gingerbeer:1, grapefruitsoda:1, champagne:1, prosecco:1 };
 DATA.FIZZ = FIZZ;
-var SS_ING = { espresso:1, coffee:1, hotcoffee:1, tomatojuice:1 };   // coffee & savory drinks
+var SS_ING = { espresso:1, coffee:1, hotcoffee:1, decafespresso:1, tomatojuice:1, clamato:1 };   // coffee & savory drinks
 DATA.SS_ING = SS_ING;
 DATA.styleOf = function (d, spec, m) {
   if (d.style) return d.style === 'Flip' ? 'Sweet & Savory' : d.style;
@@ -1780,7 +1785,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
 function clamp(x,a,b){return Math.min(b,Math.max(a,x));}
 function solve(rows,opt){
  opt=opt||{};var T=Number(opt.volume),b=Number(opt.brix)/100,ab=Number(opt.abv)/100,d=Number(opt.dilution)/100;
- if(!Number.isFinite(T)||T<1000||T>10000||T%250!==0)return {error:'Choose 1–10 L in 250 ml increments.'};
+ if(!Number.isFinite(T)||T<1000||T>10000||T%500!==0)return {error:'Choose 1–10 L in half-liter increments.'};
  if(!Number.isFinite(b)||b<.12||b>.16||!Number.isFinite(ab)||ab<0||ab>.15||!Number.isFinite(d)||d<0||d>3)return {error:'Use Brix 12–16, ABV cap 0–15%, and minimum water 0–300%.'};
  var V=0,M=0,S=0,E=0,C=0;
  if(!rows.length)return {error:'Add at least one liquid ingredient.'};
@@ -1840,7 +1845,7 @@ function slushView(){
  var s=store().slush,rr=recipes(),keys=Object.keys(db().ING).filter(function(k){return db().ING[k].t!=='solid';}).sort(function(a,b){return db().ING[a].n.localeCompare(db().ING[b].n);});
  function load(r){s.rows=[];(r.spec||[]).forEach(function(it){var ml=root.CocktailCalc.itemMl(it);if(ml>0)s.rows.push(ingredientRow(it[2],ml));});s.recipe=r.id;s.recipeVi=r.vi;s.verified='';s.raw='';db().save();}
  if(!s.rows.length && !s.recipe){var da=rr.filter(function(r){return r.id==='daiquiri'&&r.vi===0;})[0];if(da)load(da);}
- var vols=[];for(var v=1000;v<=10000;v+=250)vols.push('<option value="'+v+'"'+(s.volume===v?' selected':'')+'>'+fmt(v/1000)+' L</option>');
+ if(!Number.isFinite(+s.volume))s.volume=1000;s.volume=Math.max(1000,Math.min(10000,Math.round(+s.volume/500)*500));db().save();var vols=[];for(var v=1000;v<=10000;v+=500)vols.push('<option value="'+v+'"'+(s.volume===v?' selected':'')+'>'+fmt(v/1000)+' L</option>');
  var bx=[];for(var b=12;b<=16;b+=.5)bx.push('<option value="'+b+'"'+(+s.brix===b?' selected':'')+'>'+b+' °Bx</option>');
  el('apo-body').innerHTML='<section class="panel"><h2>Slushee batch planner</h2><p class="muted small">Preserves the base recipe ratios, then adds water and simple syrup to reach your sugar target without exceeding the ABV cap. Start with a juice-forward cocktail. Ingredient sugar and density defaults are estimates; replace them with label or measured values.</p><label>Load a Songbook recipe<select id="slrecipe"><option value="scratch"'+(s.recipe==='scratch'?' selected':'')+'>Scratch recipe</option>'+rr.map(function(r,i){return '<option value="'+i+'"'+(s.recipe===r.id&&+(s.recipeVi||0)===r.vi?' selected':'')+'>'+esc(r.name)+'</option>';}).join('')+'</select></label><div class="apo-fields"><label>Batch volume<select id="slvolume">'+vols.join('')+'</select></label><label>Target sugar Brix<select id="slbrix">'+bx.join('')+'</select></label><label>Maximum batch ABV (%)<input id="slabv" type="number" min="0" max="15" step=".5" value="'+s.abv+'"></label><label>Minimum water (% of base volume)<input id="sldilution" type="number" min="0" max="300" step="5" value="'+s.dilution+'"></label><label>Adjustment syrup<select id="slsyrup"><option value="simple"'+(s.syrup==='simple'?' selected':'')+'>1:1 simple (by weight)</option><option value="rich"'+(s.syrup==='rich'?' selected':'')+'>2:1 rich (by weight)</option></select></label><label>Serving size (ml)<input id="slserving" type="number" min="50" step="25" value="'+(s.serving||250)+'"></label></div></section><section class="panel"><h2>Base recipe · before ice dilution</h2><p class="muted small">Amounts below describe one base recipe, not the final batch. No ice melt is automatically added. Remove carbonated mixers or use a flat equivalent for machine batches.</p><div id="slrows"></div><button class="btn" id="sladd">＋ Add ingredient</button><div id="slpicker" hidden></div><details><summary>Measured verification (optional)</summary><label class="field"><span>Verified sugar Brix of base, alcohol-corrected</span><input id="slverified" type="number" min="0" max="100" step=".1" value="'+esc(s.verified||'')+'"></label><p class="muted small">Only enter a true sugar mass fraction from a validated alcohol-corrected method. This overrides the base sugar estimate. An ordinary alcoholic refractometer reading is NOT true sugar Brix.</p><label class="field"><span>Final raw refractometer reading (verification only)</span><input id="slraw" type="number" min="0" max="100" step=".1" value="'+esc(s.raw||'')+'"></label><p class="muted small">Raw readings include alcohol and other dissolved solids. They do not change the mass-balance calculation.</p></details><button class="btn primary" id="slcalculate">Calculate batch</button><div id="slresult" aria-live="polite"></div></section><section class="panel"><h2>Machine check and assumptions</h2><ul class="bul small"><li>12–16 is your selected sugar target range; 14 is the default. Jeffrey Morgenthaler recommends a 13–15 refractometer reading for his machine workflow. These are not interchangeable in alcoholic mixes.</li><li>8% ABV is a conservative planning default, not a universal machine limit. Follow your machine’s alcohol, sugar, fill and temperature limits. A 10 L batch may need multiple loads.</li><li>Pre-chill the mixture. Verify texture in a small batch. No calculation can guarantee freezing without machine temperature and ingredient measurements.</li><li>Volume addition is approximate: ethanol/water contraction, fruit solids, acids, fat and different sugars are not fully modeled. Density is editable. Brix here is grams sugar per 100 grams of liquid, not grams per 100 ml.</li><li>For juice-forward cocktails. Spirit-heavy bases (25% ABV or higher before dilution) get a warning, not a promise of good texture.</li></ul><p class="small"><a href="https://jeffreymorgenthaler.com/how-to-use-a-slushie-machine/" target="_blank" rel="noopener">Morgenthaler’s machine workflow</a> · <a href="https://slushycalc.com/" target="_blank" rel="noopener">Measured-reading calculator</a></p></section>';
  function drawRows(){el('slrows').innerHTML=s.rows.map(function(r,i){return '<div class="slush-row"><div><b>'+esc(r.name)+'</b><small class="muted"> · '+esc(category(r.key))+'</small><div class="numbers">'+[['ml','Base ml'],['abv','ABV %'],['sugar','Sugar g/100ml'],['density','Density g/ml']].map(function(p){return '<label>'+p[1]+'<input data-row="'+i+'" data-prop="'+p[0]+'" type="number" step="'+(p[0]==='density'?'.001':'.1')+'" value="'+r[p[0]]+'"></label>';}).join('')+'</div></div><button class="btn ghost small" data-rowdel="'+i+'" aria-label="Remove ingredient">×</button></div>';}).join('');
@@ -1855,7 +1860,7 @@ function slushView(){
   var warn=r.baseAbv>=25?'<p class="flagbox">Base is '+fmt(r.baseAbv)+'% ABV: spirit-heavy recipes are poor starting points for machine slush. Dilution may weaken flavor.</p>':'';
   el('slresult').innerHTML='<div class="slush-result"><h3>'+fmt(r.volume/1000)+' L batch · '+fmt(r.brix)+' estimated sugar °Bx · '+fmt(r.abv)+'% ABV</h3><ul>'+r.rows.map(function(x){return '<li><b>'+fmt(x.ml)+' ml</b> '+esc(x.name)+'</li>';}).join('')+'<li><b>'+fmt(r.syrupMl)+' ml</b> '+esc(r.syrup)+' (Brix adjustment, additional)</li><li><b>'+fmt(r.water)+' ml</b> chilled water (additional)</li></ul><p class="small">Sugar: '+fmt(r.sugar)+' g · Estimated mass: '+fmt(r.mass)+' g · Pure ethanol: '+fmt(r.ethanol)+' ml · About '+fmt(r.volume/(s.serving||250))+' servings of '+(s.serving||250)+' ml</p><p class="muted small">Base ingredient rows above stay at single-recipe amounts. Final batch amounts below scale every ingredient by '+fmt(r.scale)+'×. Measure the unrounded totals, then top up to '+fmt(r.volume)+' ml after mixing. Recheck sugar and ABV if the actual volume differs.</p>'+warn+(s.raw!==''?'<p class="muted small">Raw refractometer: '+esc(s.raw)+' °Bx (verification only; not alcohol-corrected).</p>':'')+'</div>';
  }
- ['volume','brix','abv','dilution','syrup','serving','verified','raw'].forEach(function(k){el('sl'+k).onchange=function(){s[k]=k==='syrup'||k==='verified'||k==='raw'?this.value:+this.value;db().save();calculate();calculate();};});
+ ['volume','brix','abv','dilution','syrup','serving','verified','raw'].forEach(function(k){el('sl'+k).onchange=function(){s[k]=k==='syrup'||k==='verified'||k==='raw'?this.value:+this.value;db().save();calculate();};});
  el('slrecipe').onchange=function(){if(this.value==='scratch'){s.rows=[];s.recipe='scratch';s.verified='';s.raw='';db().save();}else if(this.value!==''){load(rr[+this.value]);}drawRows();el('slverified').value='';el('slraw').value='';calculate();};
  el('sladd').onclick=addPicker;el('slcalculate').onclick=calculate;drawRows();calculate();
 }
@@ -1863,7 +1868,7 @@ function slushView(){
 function installSearchClear(){
  var rootEl=document.getElementById('app');if(!rootEl)return;
  rootEl.querySelectorAll('input[type="search"],input#stocksearch').forEach(function(input){
-  if(input.dataset.clearReady)return;input.dataset.clearReady='1';
+  input.setAttribute('enterkeyhint','search');if(input.dataset.clearReady)return;input.dataset.clearReady='1';
   var wrap=document.createElement('div');wrap.className='search-clear-wrap';input.parentNode.insertBefore(wrap,input);wrap.appendChild(input);
   var b=document.createElement('button');b.type='button';b.className='search-clear';b.textContent='×';b.setAttribute('aria-label','Clear search');b.title='Clear search';wrap.appendChild(b);
   function sync(){b.hidden=!input.value;}sync();input.addEventListener('input',sync);input.addEventListener('search',sync);
@@ -1871,6 +1876,7 @@ function installSearchClear(){
   b.onclick=function(){var id=input.id;input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));var next=document.getElementById(id)||input;next.focus();sync();};
  });
 }
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.isComposing&&e.target.matches('input[type="search"],#stocksearch')){e.preventDefault();e.target.blur();}});
 function startSearchClear(){var app=document.getElementById('app');if(!app)return;new MutationObserver(installSearchClear).observe(app,{childList:true,subtree:true});installSearchClear();}
 if(typeof document!=='undefined'){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startSearchClear);else startSearchClear();}
 root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,spiritFamily:spiritFamily,stockRequirements:stockRequirements,matchedCount:matchedCount,category:category,ingredientRow:ingredientRow,stockView:stockView,slushView:slushView};
@@ -2503,18 +2509,21 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     DRINKS.length=0;tops.forEach(function(d){DRINKS.push(d);});
   }
   function searchText(x){return String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
+  function variantCard(v,main,vs,vi){return Object.assign({},v,{aBase:Array.from(new Set(vs.map(function(z){return z.base;}))),aFlav:v.flav||[],aTech:Array.from(new Set([].concat.apply([],vs.map(function(z){return z.tech||[];})))),aEquip:Array.from(new Set([].concat.apply([],vs.map(function(z){return (z.tech||[]).map(function(t){return EQUIP[t];}).filter(Boolean);})).concat(/crushed|pebble|cone/i.test(v.ice||'')?['Crushed ice']:[]))),aStatus:v.status,aStyle:Array.from(new Set(vs.map(function(z){return z.style;}))),aStrength:Array.from(new Set(vs.map(function(z){return Calc.strengthLabel(z.stats.finalAbv);}))),pStyle:vs[0].style,stats:vs[0].stats,versions:v.versions,vdef:vi,variants:[v],mainName:main.name,displayVi:vi});}
   function songResults(list){
-    var q=searchText(state.q).trim(),t=q.split(/\s+/).filter(Boolean);if(!q)return list;
-    var out=[];
-    list.forEach(function(main){main.variants.forEach(function(v){
-      if(user.hidden[v.id]||!t.every(function(x){return searchText(v.search+' '+v.name+' '+(v.vlabel||'')).indexOf(x)>=0;}))return;
-      if(state.cat&&v.cat!==state.cat)return;
-      if(state.favorites&&!(user.drinks[v.id]||{}).favorite)return;
-      var d=Object.assign({},v,{aBase:v.baseList,aFlav:v.flav,aTech:v.allTech,aStatus:v.status,aStyle:v.styleList,aStrength:v.strengthList,pStyle:v.versions[v.vdef].style,variants:[v],mainName:main.name});out.push(d);
-    });});
-    return sorted(out);
+    if(!state.q.trim()&&!state.cat&&!state.favorites&&!activeCount())return sorted(list.filter(function(d){return !isHidden(d);}));
+    var out=[],tokens=searchText(state.q).trim().split(/\s+/).filter(Boolean);
+    list.forEach(function(main){if(isHidden(main))return;main.variants.forEach(function(v){
+      if(user.hidden[v.id]||(state.cat&&v.cat!==state.cat)||(state.favorites&&!(user.drinks[v.id]||{}).favorite))return;
+      var vi=-1,vs=v.versions.filter(function(z,i){
+        var hay=searchText([v.name,v.vlabel,v.cat,v.fam,(v.prov||{}).who,(v.prov||{}).where,(v.flav||[]).join(' '),z.base,z.style,z.label].concat(z.spec.map(function(it){return (ING[it[2]]||{}).n+' '+((it[3]||{}).label||'');})).join(' '));
+        if(!tokens.every(function(t){return hay.indexOf(t)>=0;}))return false;
+        var d=variantCard(v,main,[z],i);
+        if(!FILTERS.every(function(g){var sel=Object.keys(state.f[g.k]);return !sel.length||sel.some(function(k){return g.get(d).indexOf(k)>=0;});}))return false;
+        if(vi<0)vi=i;return true;
+      });if(vs.length)out.push(variantCard(v,main,vs,vi));
+    });});return sorted(out);
   }
-
   // variant objects keep their id through restore because ORIG holds it; this guard is for safety only
   function ORIG_VARS_ID(v) { for (var k in ORIG_OBJ) if (ORIG_OBJ[k] === v) return k; }
 
@@ -2698,7 +2707,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       (d.aStatus.indexOf('Needs my check') > -1 ? '<span class="mk flag" title="Needs your check">⚑</span>' : '') +
       (d.custom ? '<span class="mk edit">custom</span>' : d.aStatus.indexOf('My edits & recipes') > -1 ? '<span class="mk edit">edited</span>' : '') +
       (u.rating ? '<span class="mk star">' + '★'.repeat(u.rating) + '</span>' : '');
-    return '<li><a class="card" href="#/d/' + d.id + '" style="--c:' + (st.color || 'transparent') + '"><div class="cmain"><div class="cname">' + esc(d.name) +
+    return '<li><a class="card" href="#/d/' + d.id + '"' + (d.displayVi!=null?' data-recipe-id="'+esc(d.id)+'" data-recipe-vi="'+d.displayVi+'"':'') + ' style="--c:' + (st.color || 'transparent') + '"><div class="cmain"><div class="cname">' + esc(d.name) +
       (u.notes ? ' <span class="dot" title="Has notes"></span>' : '') + (u.verified ? ' <span class="tick" title="Spec verified">✓</span>' : '') + '</div>' +
       (d.mainName && d.mainName !== d.name ? '<div class="csub">Style of ' + esc(d.mainName) + '</div>' : '') + '<div class="csub">' + (st.icon || '') + ' ' + esc(d.pStyle) + ' · ' + esc(d.aBase.length > 1 ? d.aBase.slice(0, 3).join(' / ') : d.versions[d.vdef].base) + ' · ' + METHOD_LABEL[d.versions[d.vdef].m] + '</div>' +
       (marks ? '<div class="marks">' + marks + '</div>' : '') + '</div>' +
@@ -2763,10 +2772,10 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     patch($app,temp);
   }
   function renderBrowse() {
-    var list = songResults(sorted(DRINKS.filter(matches))), ac = activeCount();
+    var list = songResults(DRINKS), ac = activeCount();
     var VIS = DRINKS.filter(function (d) { return !isHidden(d); }), nHid = DRINKS.length - VIS.length;
-    var inCat = VIS.filter(function (d) { return !state.cat || d.variants.some(function(v){return v.cat===state.cat;}); });
-    var counts = {}; VIS.forEach(function(d){var seen={};d.variants.forEach(function(v){if(!seen[v.cat]){counts[v.cat]=(counts[v.cat]||0)+1;seen[v.cat]=1;}});});
+    var inCat=[];VIS.forEach(function(main){main.variants.forEach(function(v){if(!user.hidden[v.id]&&(!state.cat||v.cat===state.cat))inCat.push(variantCard(v,main,v.versions,v.vdef));});});
+    var counts = {}; VIS.forEach(function(d){d.variants.forEach(function(v){if(!user.hidden[v.id])counts[v.cat]=(counts[v.cat]||0)+1;});});
     function vals(g) { var v = {}; inCat.forEach(function (d) { g.get(d).forEach(function (x) { v[x] = (v[x] || 0) + 1; }); }); return v; }
     var sv = vals(FILTERS[0]);
     var h = '<header class="top hero"><div class="brand"><img src="' + LOGO + '" alt="Dad Bard" class="logo"><div><h1>Dad Bard <span class="sym">🪕</span></h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
@@ -2805,6 +2814,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     renderHTML(h);
     var nb = document.querySelector('.sheet-body'); if (nb) nb.scrollTop = sheetY;
     document.body.classList.toggle('noscroll', !!state.showFilters);
+    $app.querySelectorAll('[data-recipe-id]').forEach(function(a){a.onclick=function(){user.vsel[a.dataset.recipeId]=+a.dataset.recipeVi;save();};});
     document.getElementById('favorites').onclick=function(){state.favorites=!state.favorites;keep(renderBrowse);};
     var q = document.getElementById('q');
     q.oninput=function(){state.q=q.value;keep(renderBrowse);};

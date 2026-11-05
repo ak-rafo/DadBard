@@ -1,9 +1,13 @@
-# Dad Bard v5.13
+# Dad Bard v5.14
 
-Removed the redundant Songbook results count. Favorites now sits below the style tiles on the left, opposite the sort selector, with mobile spacing and no duplicate Favorites button.
+Slushee volume: 1 to 10 L in 0.5 L steps only. Saved quarter-liter values round to nearest half-liter. Removed duplicate recalculation.
 
-Fixed search focus: active search input and its ancestors remain in the DOM while results update, avoiding keyboard dismissal caused by replacing/refocusing the field. Applied to Songbook, Craft and Bloodlines; Apothecary ingredient search remains stable. Clear-search buttons still work.
+Search: Enter/Search dismisses focus (and the mobile keyboard) without clearing the query. Typing retains focus. Applied across Songbook, Craft, Bloodlines and ingredient search.
 
-Validation: continuous typing tests at 320, 390 and 1280 pixel widths passed in all four search sections, with zero blur events, retained input identity and no page errors. Favorites and sort controls did not overlap. Physical iPhone keyboard testing not performed.
+Filtering: evaluates each named drink and recipe version independently, showing matching variants rather than unrelated parent cards. Category, style, flavor, base, strength, technique, equipment and favorites apply to the same matching recipe. No filters keeps the grouped family view. Category counts now count individual named drinks. Bloody Mary and tomato/Clamato variants stay in Sweet & Savory, not Highball. Decaf espresso also remains in Sweet & Savory. Filtered cards open the matching recipe version.
 
-Update: back up through Tavern > Export JSON. Replace the six app files with the same filenames, then open online once to update offline cache.
+Added Surfer on Acid equal-parts cocktail, half-ounce equal-parts shot and Robby Dow's PUNCH riff. Sources are recorded in recipe lore. Coconut rum chemistry is an estimate, not a measured brand value. Original and shot use Sweet & Savory; the lime-forward PUNCH riff uses Sour. New recipes participate in ingredient matching and slushee loading.
+
+Validation: 67 built-in checks passed, zero failures, 10 informational plausibility warnings. Browser tests at 320, 390 and 1280 px verified each style and category, individual Bard cards, Bloody variants, continuous search focus, Enter blur, three Surfer search results, and half-liter volume choices. No page errors. Physical iPhone keyboard and machine testing not performed.
+
+Update: Tavern > Export JSON first. Replace existing app files with the same filenames. Open online once to update offline cache.
