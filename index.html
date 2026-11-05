@@ -276,14 +276,28 @@ nav.tabs a.on{color:var(--accent2)}
 .ico{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.15em}
 .sytile i .ico{width:26px;height:26px}
 @media (min-width:700px){ .stats{grid-template-columns:repeat(6,1fr)} }
+
+/* v5.8 viewport anchoring: short results never shrink the layout. */
+html{min-height:100%;height:-webkit-fill-available}
+body{min-height:100vh;min-height:100dvh;position:relative;overflow-x:hidden}
+#app{min-height:calc(100vh - 96px);min-height:calc(100dvh - 96px);padding-bottom:120px}
+nav.tabs{position:fixed!important;bottom:0!important;top:auto!important;transform:none!important;inset-inline:0;z-index:1000;padding-bottom:max(8px,env(safe-area-inset-bottom));box-sizing:border-box}
+.favorite-filter{margin:8px 0;color:var(--accent2)}.favorite-filter.on{background:var(--accent);color:var(--bg)}
+.tools{display:flex;overflow-x:auto;gap:8px;scroll-snap-type:x proximity}.tools .tile{min-width:112px;flex:0 0 112px}
+.apo-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.apo-fields label{display:block;font-size:13px}.apo-fields select,.apo-fields input{width:100%;box-sizing:border-box;margin-top:5px}
+.stockchips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.stockchips button{max-width:100%;white-space:normal}
+.stock-results .panel{margin-top:10px}.stock-results h3{margin:0}.slush-row{display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+.slush-row .numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}.slush-row label{font-size:11px;color:var(--muted)}.slush-row input{width:100%;min-width:0;box-sizing:border-box}
+.slush-row select{width:100%;box-sizing:border-box}.slush-result{border:1px solid var(--accent);border-radius:16px;padding:16px;margin-top:14px}.slush-result ul{padding-left:20px}
+@media(max-width:360px){.apo-fields{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main id="app"><p class="muted">Tuning the lute…</p></main>
 <nav class="tabs">
   <a href="#/" data-t="browse"><i>📜</i>Songbook</a>
-  <a href="#/lineage" data-t="lineage"><i>🌳</i>Bloodlines</a>
   <a href="#/apothecary" data-t="apo"><i>⚖️</i>Apothecary</a>
+  <a href="#/lineage" data-t="lineage"><i>🌳</i>Bloodlines</a>
   <a href="#/tech" data-t="tech"><i>⚗️</i>Craft</a>
   <a href="#/more" data-t="more"><i>🍺</i>Tavern</a>
 </nav>
@@ -523,8 +537,8 @@ add({id:'jungle-bird',name:'Jungle Bird',cat:'Tiki',fam:'Daiquiri',base:'Rum',m:
  spec:[[1.5,'oz','blackstrap'],[0.75,'oz','campari'],[1.5,'oz','pineapple'],[0.5,'oz','lime'],[0.5,'oz','demerarasyrup']],
  flav:['bitter','tropical'],tech:['shake'],
  prov:{who:'Attributed to Jeffrey Ong; modern blackstrap spec popularized by Giuseppe González',where:'Aviary Bar, Kuala Lumpur Hilton',year:'1978',conf:'medium',note:'Original used more pineapple and a darker Jamaican rum.'}});
-add({id:'saturn',name:'Saturn',cat:'Tiki',fam:'Daiquiri',base:'Gin',m:'blend',glass:'Coupe or tiki glass',ice:'Crushed',garnish:'Edible flower, orange twist',
- spec:[[1.25,'oz','gin'],[0.5,'oz','lemon'],[0.5,'oz','passionsyrup'],[0.25,'oz','falernum'],[0.25,'oz','orgeat']],
+add({id:'saturn',name:'Saturn',cat:'Tiki',fam:'Daiquiri',base:'Gin',m:'blend',glass:'Coupe or tiki glass',ice:'Crushed',garnish:'Lemon peel “ring”, cherry',
+ spec:[[1.25,'oz','gin'],[0.5,'oz','lemon'],[0.5,'oz','passionsyrup'],[0.25,'oz','orgeat'],[0.25,'oz','falernum']],
  flav:['tropical','floral','citrusy'],tech:['flash-blend'],
  prov:{who:'J. “Popo” Galsini',where:'California',year:'1967',conf:'medium',note:'A rare gin-based tiki classic; won a 1967 cocktail competition.'}});
 add({id:'painkiller',name:'Painkiller',cat:'Tiki',fam:'Daiquiri',base:'Rum',m:'shake',glass:'Tiki mug or hurricane',ice:'Crushed',garnish:'Fresh nutmeg, orange wheel',
@@ -561,7 +575,7 @@ add({id:'paper-plane',name:'Paper Plane',cat:'Modern',fam:'Sidecar',base:'Whiske
  spec:[[0.75,'oz','bourbon'],[0.75,'oz','aperol'],[0.75,'oz','nonino'],[0.75,'oz','lemon']],
  flav:['bitter','citrusy'],tech:['shake'],parent:'last-word',changed:'Keeps the equal-parts frame; bourbon, Aperol, Amaro Nonino, lemon.',
  prov:{who:'Sam Ross',where:'Created for The Violet Hour, Chicago',year:'2007',conf:'high',note:'Early version used Campari before settling on Aperol.'}});
-add({id:'gold-rush',name:'Gold Rush',cat:'Modern',fam:'Daiquiri',base:'Whiskey',m:'shake',glass:'Rocks',ice:'Large cube',garnish:'Lemon twist',
+add({id:'gold-rush',name:'Gold Rush',cat:'Modern',fam:'Daiquiri',base:'Whiskey',m:'shake',glass:'Rocks',ice:'Large cube',garnish:'None',
  spec:[[2,'oz','bourbon'],[0.75,'oz','lemon'],[0.75,'oz','honey']],
  flav:['citrusy','rich'],tech:['shake'],parent:'whiskey-sour',changed:'Honey syrup replaces simple syrup.',
  prov:{who:'T.J. Siegal',where:'Milk & Honey, NYC',year:'c. 2000',conf:'medium',note:''}});
@@ -1212,9 +1226,7 @@ var NEW = {
   roseslime:{n:'Lime cordial (Rose’s style)',sug:.30,acid:.02,t:'syrup'}, gardenia:{n:'Gardenia mix (butter, honey, spice)',sug:.45,t:'syrup'},
   grapefruitsoda:{n:'Grapefruit soda',sug:.10,acid:.003,t:'mixer'}, tomatojuice:{n:'Tomato juice',sug:.03,acid:.004,t:'juice'},
   hotcoffee:{n:'Hot coffee',t:'juice'}, worcestershire:{n:'Worcestershire sauce',t:'bitters'}, hotsauce:{n:'Hot sauce',t:'bitters'},
-  orangeflower:{n:'Orange flower water',t:'bitters'},
-  appleton12:{n:'Appleton Estate 12 Year rum',abv:.43,t:'spirit'}, xaymaca:{n:'Planteray Xaymaca Special Dry rum',abv:.43,t:'spirit'},
-  barbadosrum:{n:'Aged Barbados rum',abv:.43,t:'spirit'}, onion:{n:'Cocktail onions',t:'solid'}, pepper:{n:'Black pepper',t:'solid'}
+  orangeflower:{n:'Orange flower water',t:'bitters'}, onion:{n:'Cocktail onions',t:'solid'}, pepper:{n:'Black pepper',t:'solid'}
 };
 for (var k in NEW) ING[k] = NEW[k];
 
@@ -1325,14 +1337,6 @@ add({id:'tomato-margarita',name:'50/50 Tomato Margarita',cat:'Modern',fam:'Daiqu
  prov:{who:'Not noted',where:'—',year:'—',conf:'low',note:'Added from your recipe card. Tools: shaker, strainer.'}});
 
 /* ---------- tiki & tropical ---------- */
-add({id:'corn-n-oil',name:'Corn ’n’ Oil',cat:'Tiki',fam:'Old-Fashioned',base:'Rum',m:'build',glass:'Rocks',ice:'Cubes',garnish:'Lime wedge',
- spec:[[2,'oz','blackstrap',{label:'Blackstrap rum (or aged Barbados rum)'}],[0.5,'oz','falernum'],[0.5,'oz','lime'],[3,'dash','angostura']],
- flav:['rich','spicy'],tech:['build'],parentText:'Barbados rum & falernum tradition',changed:'Dark rum with falernum, lime and bitters, built over ice.',
- prov:{who:'Barbados tradition',where:'Barbados',year:'—',conf:'low',note:'Spec from your recipe card.'}});
-add({id:'pina-verde',name:'Piña Verde',cat:'Tiki',fam:'Daiquiri',base:'Amaro & Liqueur',m:'shake',glass:'Double rocks',ice:'Crushed',garnish:'Mint sprig',
- spec:[[1.5,'oz','greenchartreuse'],[1.5,'oz','pineapple'],[0.5,'oz','lime'],[0.75,'oz','creamcoconut',{note:'such as Coco López'}]],
- flav:['herbal','tropical','creamy'],tech:['shake'],parent:'pina-colada',changed:'Green Chartreuse replaces the rum.',
- prov:{who:'Erick Castro',where:'Polite Provisions, San Diego',year:'c. 2010',conf:'medium',note:'Spec from your recipe card.'}});
 add({id:'pina-colada',name:'Piña Colada',cat:'Tiki',fam:'Daiquiri',base:'Rum',m:'blend',glass:'Hurricane',ice:'Crushed',garnish:'Pineapple wedge, cherry',
  spec:[[2,'oz','whiterum'],[1.5,'oz','creamcoconut'],[1.5,'oz','pineapple'],[0.5,'oz','lime']],
  flav:['tropical','creamy','sweet'],tech:['flash-blend'],parentText:'Pineapple–coconut drinks',changed:'Blended with cream of coconut.',
@@ -1376,6 +1380,11 @@ add({id:'singapore-sling',name:'Singapore Sling',cat:'Tiki',fam:'Daiquiri',base:
 
 /* ---------- variation groups ---------- */
 var DEFAULT_PROV = { who:'Traditional variation', where:'—', year:'—', conf:'low', note:'' };
+
+/* v5.8 additions; sourced recipes and explicitly labeled house adaptations. */
+Object.assign(DATA.ING,{"drambuie": {"n": "Drambuie", "abv": 0.4, "sug": 0.3, "t": "liqueur"}, "cola": {"n": "Cola", "sug": 0.106, "t": "mixer"}, "clamato": {"n": "Clamato (tomato and clam juice)", "sug": 0.035, "acid": 0.004, "t": "juice"}, "decafespresso": {"n": "Decaf espresso", "t": "juice"}, "purehoney": {"n": "Honey (undiluted)", "sug": 1.16, "t": "syrup"}, "appleton12": {"n": "Appleton Estate 12 Year rum", "abv": 0.43, "t": "spirit"}, "xaymaca": {"n": "Planteray Xaymaca rum", "abv": 0.43, "t": "spirit"}});
+[{"id": "corn-n-oil", "name": "Corn ’n’ Oil", "spec": [[2, "oz", "blackstrap"], [0.5, "oz", "falernum"], [0.5, "oz", "lime"], [3, "dash", "angostura"]], "cat": "Tiki", "fam": "Old-Fashioned", "base": "Rum", "m": "build", "glass": "Rocks", "ice": "Cubes", "garnish": "Lime wedge", "flav": ["refreshing"], "tech": ["build"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: Your supplied recipe"}, "method": "Build over ice and stir. Blackstrap rum may be replaced with aged Barbados rum."}, {"id": "pina-verde", "name": "Piña Verde", "spec": [[1.5, "oz", "greenchartreuse"], [1.5, "oz", "pineapple"], [0.5, "oz", "lime"], [0.75, "oz", "creamcoconut"]], "cat": "Tiki", "fam": "Daiquiri", "base": "Amaro & Liqueur", "m": "shake", "glass": "Double rocks", "ice": "Crushed", "garnish": "Mint sprig", "flav": ["refreshing"], "tech": ["shake"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: Your supplied recipe; credited to Erick Castro, Polite Provisions"}, "parent": "pina-colada"}, {"id": "bamboo", "name": "Bamboo", "spec": [[1.5, "oz", "fino"], [1.5, "oz", "dryvermouth"], [2, "dash", "orangebitters"], [2, "drop", "angostura"]], "cat": "Classic", "fam": "Martini", "base": "Wine", "m": "stir", "glass": "Nick & Nora", "ice": "Up", "garnish": "Lemon twist", "flav": ["refreshing"], "tech": ["stir"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://imbibemagazine.com/recipe/bamboo-cocktail/"}}, {"id": "adonis", "name": "Adonis", "spec": [[1.5, "oz", "fino"], [1.5, "oz", "sweetvermouth"], [2, "dash", "orangebitters"]], "cat": "Classic", "fam": "Martini", "base": "Wine", "m": "stir", "glass": "Coupe", "ice": "Up", "garnish": "Orange twist", "flav": ["refreshing"], "tech": ["stir"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://dailylibations.com/recipes/adonis-66ae2e8e-b5e2-4eb6-803f-25d1e72a72df"}, "method": "Stir with ice and strain into a chilled coupe. Add orange bitters; this is a house bitters addition to the equal-parts source spec."}, {"id": "sherry-cobbler", "name": "Sherry Cobbler", "spec": [[3.5, "oz", "amontillado"], [0.5, "oz", "simple"]], "cat": "Classic", "fam": "Daiquiri", "base": "Wine", "m": "shake", "glass": "Collins", "ice": "Crushed", "garnish": "Orange slice, mint, seasonal berries", "flav": ["refreshing"], "tech": ["shake"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://www.sidewalkshoes.com/sherry-cobbler/"}, "style": "Sweet & Savory", "method": "Muddle one orange slice with the syrup, add sherry and ice, shake and strain over crushed ice. Fruit extraction is not included in the chemistry estimate."}, {"id": "hot-toddy", "name": "Hot Toddy", "spec": [[2, "oz", "bourbon"], [0.5, "oz", "lemon"], [0.5, "oz", "purehoney"], [6, "oz", "water"]], "cat": "Classic", "fam": "Daiquiri", "base": "Whiskey", "m": "build", "glass": "Heatproof mug", "ice": "None", "garnish": "Lemon wheel, cinnamon stick", "flav": ["refreshing"], "tech": ["build"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://mostlycocktails.com/hot-toddy-recipe-bourbon/"}, "style": "Sweet & Savory", "method": "Warm the mug, dissolve the honey in hot water, add whiskey and lemon, stir and garnish. This uses undiluted honey, not honey syrup."}, {"id": "white-lady", "name": "White Lady", "spec": [[40, "ml", "gin"], [30, "ml", "cointreau"], [20, "ml", "lemon"]], "cat": "Classic", "fam": "Sidecar", "base": "Gin", "m": "shake", "glass": "Coupe", "ice": "Up", "garnish": "None", "flav": ["refreshing"], "tech": ["shake"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://iba-world.com/iba-cocktail/white-lady/"}}, {"id": "brown-derby", "name": "Brown Derby", "spec": [[1.5, "oz", "bourbon"], [1, "oz", "grapefruit"], [0.5, "oz", "honey"]], "cat": "Classic", "fam": "Daiquiri", "base": "Whiskey", "m": "shake", "glass": "Coupe", "ice": "Up", "garnish": "Grapefruit twist", "flav": ["refreshing"], "tech": ["shake"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://kitchenswagger.com/brown-derby-cocktail-recipe/"}, "method": "Shake and strain into a chilled coupe. House adaptation: uses your richer 3:1 honey syrup instead of the source syrup."}, {"id": "el-diablo", "name": "El Diablo", "spec": [[1.5, "oz", "reposado"], [0.5, "oz", "cassis"], [0.75, "oz", "lime"], [2, "top", "gingerbeer"]], "cat": "Classic", "fam": "Highball", "base": "Agave", "m": "shake", "glass": "Collins", "ice": "Cubes", "garnish": "Lime wedge", "flav": ["refreshing"], "tech": ["shake"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://www.diffordsguide.com/cocktails/recipe/700/el-diablo-cocktail"}, "method": "Shake tequila, cassis and lime with ice. Strain over fresh ice and top with ginger beer."}, {"id": "rusty-nail", "name": "Rusty Nail", "spec": [[45, "ml", "scotch"], [25, "ml", "drambuie"]], "cat": "Classic", "fam": "Old-Fashioned", "base": "Whiskey", "m": "stir", "glass": "Rocks", "ice": "Large cube", "garnish": "Lemon zest", "flav": ["refreshing"], "tech": ["stir"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://iba-world.com/iba-cocktail/rusty-nail/"}}, {"id": "godfather", "name": "Godfather", "spec": [[1.5, "oz", "scotch"], [0.5, "oz", "amaretto"]], "cat": "Classic", "fam": "Old-Fashioned", "base": "Whiskey", "m": "stir", "glass": "Rocks", "ice": "Large cube", "garnish": "Lemon peel", "flav": ["refreshing"], "tech": ["stir"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://www.acouplecooks.com/godfather-cocktail/"}}, {"id": "hotel-nacional", "name": "Hotel Nacional Special", "spec": [[2, "oz", "goldrum"], [1, "oz", "pineapple"], [0.5, "oz", "lime"], [0.5, "oz", "simple"], [0.25, "oz", "apricotliqueur"]], "cat": "Classic", "fam": "Daiquiri", "base": "Rum", "m": "shake", "glass": "Coupe", "ice": "Up", "garnish": "Lime wheel", "flav": ["refreshing"], "tech": ["shake"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://timbercreekdistillery.com/cocktails/hotel-nacional-special/"}, "parent": "daiquiri"}, {"id": "mary-pickford", "name": "Mary Pickford", "spec": [[45, "ml", "whiterum"], [45, "ml", "pineapple"], [7.5, "ml", "maraschino"], [5, "ml", "grenadine"]], "cat": "Classic", "fam": "Daiquiri", "base": "Rum", "m": "shake", "glass": "Coupe", "ice": "Up", "garnish": "Cocktail cherry", "flav": ["refreshing"], "tech": ["shake"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://cabinery.com/recipes/mary-pickford/"}}, {"id": "jet-pilot", "name": "Jet Pilot", "spec": [[1, "oz", "smithcross"], [0.75, "oz", "demerara151"], [0.75, "oz", "goldrum"], [0.5, "oz", "falernum"], [0.25, "oz", "cinnamonsyrup"], [0.5, "oz", "grapefruit"], [0.5, "oz", "lime"], [2, "dash", "absinthe"], [1, "dash", "angostura"]], "cat": "Tiki", "fam": "Daiquiri", "base": "Rum", "m": "blend", "glass": "Double rocks", "ice": "Crushed", "garnish": "Cherry", "flav": ["refreshing"], "tech": ["flash-blend"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://www.diffordsguide.com/cocktails/recipe/4963/jet-pilot"}, "method": "Briefly blend with crushed ice and pour into a chilled glass. House rum substitutions: Smith & Cross and 151 Demerara; omit the source’s optional xanthan gum.", "parent": "test-pilot"}, {"id": "cuba-libre", "name": "Cuba Libre", "spec": [[50, "ml", "whiterum"], [10, "ml", "lime"], [120, "ml", "cola", {"post": true}]], "cat": "Classic", "fam": "Highball", "base": "Rum", "m": "build", "glass": "Highball", "ice": "Cubes", "garnish": "Lime wedge", "flav": ["refreshing"], "tech": ["build"], "prov": {"who": "Not specified", "where": "—", "year": "—", "conf": "medium", "note": "Recipe source: https://iba-world.com/iba-cocktail/cuba-libre/"}}].forEach(function(x){if(!byId(x.id))add(x);});
+var gr=byId('gold-rush');if(gr)gr.garnish='Lemon twist';var sat=byId('saturn');if(sat)sat.garnish='Edible flower, orange twist';
 var GROUPS = {
   'martini': { label:'Dry', items:[
     { id:'martini-wet', label:'Wet', name:'Wet Martini', spec:[[2,'oz','gin'],[1,'oz','dryvermouth'],[1,'dash','orangebitters']], changed:'More vermouth: about 2 : 1.',
@@ -1424,13 +1433,7 @@ var GROUPS = {
     { id:'new-york-sour', label:'New York', name:'New York Sour', spec:[[2,'oz','bourbon'],[0.75,'oz','lemon'],[0.75,'oz','simple'],[0.5,'oz','redwine',{post:true,label:'Dry red wine, float'}]], changed:'Red wine floated on top.', tech:['shake','float'],
       prov:{who:'Unknown (first known as the Continental Sour)',where:'Chicago / New York',year:'1880s',conf:'medium',note:''} }
   ]},
-  'mai-tai': { label:'Trader Vic 1944', items:[['monkeypod-mai-tai','Monkeypod'],['bitter-mai-tai','Bitter'],
-    { id:'ultimate-mai-tai', label:'Ultimate', name:'Ultimate Mai Tai',
-      spec:[[1,'oz','lime'],[0.5,'oz','orgeat',{note:'Latitude 29'}],[0.25,'oz','demerarasyrup',{note:'BG Reynolds or Liber'}],[0.5,'oz','curacao',{note:'Ferrand Dry Curaçao or Clément Créole Shrubb'}],
-            [0.5,'oz','appleton12'],[0.5,'oz','smithcross'],[0.5,'oz','oftd'],[0.5,'oz','xaymaca']],
-      changed:'Four-rum blend (Appleton 12, Smith & Cross, O.F.T.D., Xaymaca).',
-      prov:{who:'Kevin Crossman',where:'—',year:'—',conf:'medium',note:'Spec from your recipe card.'} }] },
-  'revolver': { label:'Classic', items:[['ray-gun','Ray Gun']] },
+  'mai-tai': { label:'Trader Vic 1944', items:[['monkeypod-mai-tai','Monkeypod'],['bitter-mai-tai','Bitter']] },
   'gimlet': { label:'Fresh lime', items:[
     { id:'gimlet-cordial', label:'Cordial', name:'Gimlet (cordial)', spec:[[2,'oz','gin'],[0.75,'oz','roseslime']], changed:'Lime cordial instead of fresh lime and sugar: the original style.' }
   ]},
@@ -1476,6 +1479,12 @@ var GROUPS = {
       prov:{who:'Gustave Tops',where:'Hotel Metropole, Brussels',year:'1949',conf:'medium',note:''} }
   ]}
 };
+
+if(!GROUPS["revolver"])GROUPS["revolver"]={label:"Classic",items:[["ray-gun","Ray Gun"]]};
+GROUPS["mai-tai"].items.push({"id": "ultimate-mai-tai", "label": "Ultimate", "name": "Ultimate Mai Tai", "spec": [[1, "oz", "lime"], [0.5, "oz", "orgeat", {"note": "Latitude 29"}], [0.25, "oz", "demerarasyrup", {"note": "BG Reynolds or Liber"}], [0.5, "oz", "curacao", {"note": "Ferrand Dry Curaçao or Clément Créole Shrubb"}], [0.5, "oz", "appleton12"], [0.5, "oz", "smithcross"], [0.5, "oz", "oftd"], [0.5, "oz", "xaymaca"]], "prov": {"who": "Kevin Crossman", "where": "—", "year": "—", "conf": "medium", "note": "Your supplied recipe"}});
+GROUPS['negroni'].items.push(['boulevardier','Boulevardier']);
+[["bloody-mary", "bloody-maria", "Bloody Maria", {"vodka": "blanco", "lemon": "lime"}, "Agave"], ["bloody-mary", "red-snapper", "Red Snapper", {"vodka": "gin"}, "Gin"], ["bloody-mary", "bloody-caesar", "Bloody Caesar", {"tomatojuice": "clamato"}, "Vodka"], ["espresso-martini", "tequila-espresso", "Tequila Espresso Martini", {"vodka": "blanco"}, "Agave"], ["espresso-martini", "decaf-espresso", "Decaf Espresso Martini", {"espresso": "decafespresso"}, "Vodka"], ["white-russian", "rum-white-russian", "Rum White Russian", {"vodka": "goldrum"}, "Rum"], ["caipirinha", "caipiroska", "Caipiroska", {"cachaca": "vodka"}, "Vodka"], ["hot-toddy", "rum-toddy", "Rum Toddy", {"bourbon": "goldrum"}, "Rum"], ["hot-toddy", "brandy-toddy", "Brandy Toddy", {"bourbon": "cognac"}, "Brandy"]].forEach(function(x){var p=byId(x[0]);if(!p)return;var g=GROUPS[x[0]]||(GROUPS[x[0]]={label:'Classic',items:[]});var sp=JSON.parse(JSON.stringify(p.spec));sp.forEach(function(it){if(x[3][it[2]])it[2]=x[3][it[2]];});g.items.push({id:x[1],label:x[2],name:x[2],spec:sp,base:x[4],method:p.method,changed:'Base or mixer substitution; house style of '+p.name,prov:{who:'House adaptation',where:'Dad Bard',year:'—',conf:'own',note:'Derived from parent recipe. Decaf still contains alcohol; Clamato contains shellfish.'}});});
+GROUPS['cuba-libre']={label:'White rum',items:[{id:'cuba-libre-aged',label:'Aged rum',name:'Aged Rum Cuba Libre',spec:[[50,'ml','goldrum'],[10,'ml','lime'],[120,'ml','cola',{post:true}]],changed:'House aged-rum substitution.'}]};
 DATA.ALIAS = {};
 var INHERIT = ['cat','fam','base','m','glass','ice','garnish','flav','tech'];
 Object.keys(GROUPS).forEach(function (mid) {
@@ -1492,6 +1501,7 @@ Object.keys(GROUPS).forEach(function (mid) {
 DATA.ALL = [];
 D.forEach(function (d) { DATA.ALL.push(d); (d.vars || []).forEach(function (v) { DATA.ALL.push(v); }); });
 
+DATA.ALL.forEach(function(d){if(d.cat==='Andrew’s')d.cat='Bard’s';});
 /* ---------- the four styles ----------
    Spirit-forward: stirred drinks, Old Fashioneds, Martinis
    Sour: Daiquiris and Sidecars
@@ -1503,7 +1513,7 @@ DATA.STYLES = [
   { k:'Highball', icon:'🫧', sub:'Soda & sparkling toppers', color:'#74bfa1' },
   { k:'Sweet & Savory', icon:'☕', sub:'Flip · Coffee · Other', color:'#c9a0dc' }
 ];
-var FIZZ = { soda:1, gingerbeer:1, grapefruitsoda:1, champagne:1, prosecco:1 };
+var FIZZ = { cola:1, soda:1, gingerbeer:1, grapefruitsoda:1, champagne:1, prosecco:1 };
 DATA.FIZZ = FIZZ;
 var SS_ING = { espresso:1, coffee:1, hotcoffee:1, tomatojuice:1 };   // coffee & savory drinks
 DATA.SS_ING = SS_ING;
@@ -1589,7 +1599,7 @@ var S = [
     ex:['corpse-reviver-2','french-75','boulevardier','bloody-mary','el-presidente','pegu-club'] },
   { id:'tiki', n:'Tiki', era:'midcentury', year:'1934', type:'tropical', root:'Daiquiri', parent:'punch', also:'sour',
     formula:'Several rums · several citrus · spiced syrups', blurb:'Donn Beach in Hollywood rebuilt punch as escapist theater, and Trader Vic followed. Layered rums, secret syrups and crushed ice.',
-    ex:['corn-n-oil','pina-verde','zombie','mai-tai','navy-grog','three-dots','test-pilot','fog-cutter','saturn','painkiller','jungle-bird','pina-colada','hurricane','scorpion','queens-park-swizzle','suffering-bastard','missionarys-downfall','pearl-diver'] },
+    ex:['zombie','mai-tai','navy-grog','three-dots','test-pilot','fog-cutter','saturn','painkiller','jungle-bird','pina-colada','hurricane','scorpion','queens-park-swizzle','suffering-bastard','missionarys-downfall','pearl-diver'] },
   { id:'frozen', n:'Frozen', era:'midcentury', year:'1930s–50s', type:'frozen', root:'Daiquiri', parent:'sour',
     formula:'Sour · shaved ice · blender', blurb:'Havana’s frozen Daiquiris and the electric blender made slushy drinks a thing. Slushie machines brought them back as a craft move.',
     ex:['slushee','cafe-granita','pina-colada'] },
@@ -1753,6 +1763,86 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
 });
 
 </script>
+<script>/* extras.js */
+/* Dad Bard v5.8: ingredient matching and mass/ethanol-conserving slushee planner.
+   All chemistry defaults are estimates, not lab or brand measurements. */
+(function(root){
+'use strict';
+function clamp(x,a,b){return Math.min(b,Math.max(a,x));}
+function solve(rows,opt){
+ opt=opt||{};var T=Number(opt.volume),b=Number(opt.brix)/100,ab=Number(opt.abv)/100,d=Number(opt.dilution)/100;
+ if(!Number.isFinite(T)||T<1000||T>10000||T%250!==0)return {error:'Choose 1–10 L in 250 ml increments.'};
+ if(!Number.isFinite(b)||b<.12||b>.16||!Number.isFinite(ab)||ab<0||ab>.15||!Number.isFinite(d)||d<0||d>3)return {error:'Use Brix 12–16, ABV cap 0–15%, and minimum water 0–300%.'};
+ var V=0,M=0,S=0,E=0,C=0;
+ if(!rows.length)return {error:'Add at least one liquid ingredient.'};
+ for(var i=0;i<rows.length;i++){
+  var r=rows[i],v=Number(r.ml),rho=Number(r.density),sg=Number(r.sugar)/100,a=Number(r.abv)/100;
+  if(!Number.isFinite(v)||v<=0||!Number.isFinite(rho)||rho<.75||rho>1.6||!Number.isFinite(sg)||sg<0||sg>rho||!Number.isFinite(a)||a<0||a>.96)return {error:'Check ingredient '+(i+1)+': positive ml, ABV 0–96%, density 0.75–1.60 g/ml, and sugar no greater than ingredient mass.'};
+  V+=v;M+=v*rho;S+=v*sg;E+=v*a;C+=v*(r.acid||0);
+ }
+ if(opt.verified!==''&&opt.verified!=null){var vb=Number(opt.verified);if(!Number.isFinite(vb)||vb<0||vb>100)return {error:'Verified sugar Brix must be 0–100.'};S=M*vb/100;}
+ if(E>0&&ab===0)return {error:'A zero-ABV batch cannot retain alcoholic ingredients. Remove or replace them.'};
+ var syrup=opt.syrup==='rich'?{rho:1.326,sugar:.884,n:'Rich simple syrup (2:1 by weight)'}:{rho:1.23,sugar:.615,n:'Simple syrup (1:1 by weight)'};
+ var den=syrup.sugar-b*(syrup.rho-1),K=S-b*(M-V),x=Math.min(T/(V*(1+d)),E?ab*T/E:Infinity);
+ // y = (b*T - x*K)/den; w = T - x*V - y.
+ if(K>0)x=Math.min(x,b*T/K);
+ var A=b*T/den,B=K/den;
+ if(V*(1+d)-B>0)x=Math.min(x,(T-A)/(V*(1+d)-B));
+ var y=(b*T-x*K)/den,w=T-x*V-y;
+ if(!Number.isFinite(x)||x<=0||y<-.001||w<-.001)return {error:'No feasible batch with these inputs. Review sugar, density, ABV cap or dilution.'};
+ y=Math.max(0,y);w=Math.max(0,w);
+ var mass=x*M+y*syrup.rho+w,sugar=x*S+y*syrup.sugar,ethanol=x*E;
+ return {volume:T,scale:x,water:w,syrupMl:y,syrup:syrup.n,mass:mass,sugar:sugar,ethanol:ethanol,brix:100*sugar/mass,abv:100*ethanol/T,acid:100*x*C/T,baseAbv:100*E/V,baseBrix:100*S/M,baseMl:x*V,rows:rows.map(function(r){return {name:r.name,ml:r.ml*x};})};
+}
+function required(spec){var out=[];(spec||[]).forEach(function(it){var o=it[3]||{};if(o.opt||o.side||it[2]==='water'||it[2]==='ice')return;if(out.indexOf(it[2])<0)out.push(it[2]);});return out;}
+function missing(spec,stock){return required(spec).filter(function(k){return !stock[k];});}
+function db(){return root.DB;}function el(id){return document.getElementById(id);}function esc(s){return db().esc(s);}function fmt(x){return (Math.round(x*10)/10).toLocaleString(undefined,{maximumFractionDigits:1});}
+function store(){var u=db().user;u.settings.apo=u.settings.apo||{};var s=u.settings.apo;s.stock=s.stock||{};s.slush=s.slush||{volume:1000,brix:14,abv:8,dilution:20,syrup:'simple',verified:'',raw:'',rows:[]};return s;}
+function recipes(){var out=[];db().DRINKS.forEach(function(p){if(db().isHidden(p))return;(p.variants||[p]).forEach(function(v){(v.versions||[v]).forEach(function(z,vi){out.push({id:v.id,vi:vi,name:(v.name||p.name)+(vi?' · '+(z.label||'alternate version'):''),spec:z.spec||v.spec});});});});return out.sort(function(a,b){return a.name.localeCompare(b.name);});}
+function category(k){var i=db().ING[k];if(/^(lime|lemon|orange|grapefruit)(juice)?$/.test(k)||k==='superlime'||k==='superlemon')return 'Citrus';return {spirit:'Spirit',liqueur:'Liqueur',syrup:'Syrup',juice:'Juice',wine:'Other',mixer:'Other'}[i.t]||'Other';}
+function options(keys,blank){return '<option value="">'+blank+'</option>'+keys.map(function(k){return '<option value="'+esc(k)+'">'+esc(db().ING[k].n)+'</option>';}).join('');}
+var stockQuery='';
+function stockView(){
+ var s=store(),keys=Object.keys(db().ING).sort(function(a,b){return db().ING[a].n.localeCompare(db().ING[b].n);});
+ el('apo-body').innerHTML='<section class="panel"><h2>What can I make?</h2><p class="muted small">Add everything you have. Exact ingredient matches only; water and ice are assumed. Optional ingredients are ignored, but required bitters, cream and muddled fruit count. Hidden drinks are excluded.</p><input id="stocksearch" placeholder="Search ingredients" value="'+esc(stockQuery)+'"><div class="apo-fields" id="stockselects"></div><div class="stockchips" id="stockchips"></div><button class="btn ghost small" id="stockclear">Clear ingredients</button></section><div class="stock-results" id="stockresults"></div>';
+ function selects(){el('stockselects').innerHTML=['Spirit','Liqueur','Syrup','Juice','Citrus','Other'].map(function(c){return '<label>'+c+'<select data-stockcat="'+c+'">'+options(keys.filter(function(k){return category(k)===c&&!s.stock[k]&&db().ING[k].n.toLowerCase().indexOf(stockQuery.toLowerCase())>=0;}),'Add '+c.toLowerCase())+'</select></label>';}).join('');el('stockselects').querySelectorAll('select').forEach(function(e){e.onchange=function(){if(e.value){s.stock[e.value]=true;db().save();selects();results();}};});}
+ function results(){
+  var chosen=Object.keys(s.stock).filter(function(k){return s.stock[k]&&db().ING[k];});el('stockchips').innerHTML=chosen.map(function(k){return '<button class="btn small" data-stockremove="'+esc(k)+'">'+esc(db().ING[k].n)+' ×</button>';}).join('');
+  el('stockchips').querySelectorAll('button').forEach(function(b){b.onclick=function(){delete s.stock[b.dataset.stockremove];db().save();selects();results();};});
+  if(!chosen.length){el('stockresults').innerHTML='<p class="muted">Select ingredients to find drinks in your Songbook.</p>';return;}
+  var ready=[],near=[];recipes().forEach(function(r){var m=missing(r.spec,s.stock);if(!m.length)ready.push(r);else if(m.length===1)near.push({r:r,m:m});});
+  function row(r,m){return '<li><a href="#/d/'+encodeURIComponent(r.id)+'" data-stockrecipe="'+esc(r.id)+'" data-vi="'+r.vi+'">'+esc(r.name)+'</a>'+(m?'<small>Missing: '+esc(db().ING[m[0]]?db().ING[m[0]].n:m[0])+'</small>':'<small>All required ingredients available</small>')+'</li>';}
+  el('stockresults').innerHTML='<section class="panel"><h2>Ready to make · '+ready.length+'</h2>'+(ready.length?'<ul class="hidlist">'+ready.map(function(r){return row(r);}).join('')+'</ul>':'<p class="muted small">No exact matches yet. Add mixers, bitters and other required ingredients.</p>')+'</section><section class="panel"><h2>One ingredient away · '+near.length+'</h2><ul class="hidlist">'+near.map(function(x){return row(x.r,x.m);}).join('')+'</ul></section>';
+  el('stockresults').querySelectorAll('[data-stockrecipe]').forEach(function(a){a.onclick=function(){db().user.vsel[a.dataset.stockrecipe]=+a.dataset.vi;db().save();};});
+ }
+ el('stocksearch').oninput=function(){stockQuery=this.value;selects();};el('stockclear').onclick=function(){s.stock={};db().save();stockView();};selects();results();
+}
+function ingredientRow(k,ml){var i=db().ING[k]||{};var density=i.density||(k==='purehoney'?1.42:Math.max(.8,Math.min(1.5,1+.39*(i.sug||0)-.15*(i.abv||0))));return {key:k,name:i.n||'Custom ingredient',ml:ml,abv:100*(i.abv||0),sugar:100*(i.sug||0),density:Math.round(density*1000)/1000,acid:i.acid||0};}
+function slushView(){
+ var s=store().slush,rr=recipes(),keys=Object.keys(db().ING).filter(function(k){return db().ING[k].t!=='solid';}).sort(function(a,b){return db().ING[a].n.localeCompare(db().ING[b].n);});
+ function load(r){s.rows=[];(r.spec||[]).forEach(function(it){var ml=root.CocktailCalc.itemMl(it);if(ml>0)s.rows.push(ingredientRow(it[2],ml));});s.recipe=r.id;s.verified='';s.raw='';db().save();}
+ if(!s.rows.length){var da=rr.filter(function(r){return r.id==='daiquiri'&&r.vi===0;})[0];if(da)load(da);}
+ var vols=[];for(var v=1000;v<=10000;v+=250)vols.push('<option value="'+v+'"'+(s.volume===v?' selected':'')+'>'+fmt(v/1000)+' L</option>');
+ var bx=[];for(var b=12;b<=16;b+=.5)bx.push('<option value="'+b+'"'+(+s.brix===b?' selected':'')+'>'+b+' °Bx</option>');
+ el('apo-body').innerHTML='<section class="panel"><h2>Slushee batch planner</h2><p class="muted small">Preserves the base recipe ratios, then adds water and simple syrup to reach your sugar target without exceeding the ABV cap. Start with a juice-forward cocktail. Ingredient sugar and density defaults are estimates; replace them with label or measured values.</p><label>Load a Songbook recipe<select id="slrecipe"><option value="">Choose a recipe or edit below</option>'+rr.map(function(r,i){return '<option value="'+i+'">'+esc(r.name)+'</option>';}).join('')+'</select></label><div class="apo-fields"><label>Batch volume<select id="slvolume">'+vols.join('')+'</select></label><label>Target sugar Brix<select id="slbrix">'+bx.join('')+'</select></label><label>Maximum batch ABV (%)<input id="slabv" type="number" min="0" max="15" step=".5" value="'+s.abv+'"></label><label>Minimum water (% of base volume)<input id="sldilution" type="number" min="0" max="300" step="5" value="'+s.dilution+'"></label><label>Adjustment syrup<select id="slsyrup"><option value="simple"'+(s.syrup==='simple'?' selected':'')+'>1:1 simple (by weight)</option><option value="rich"'+(s.syrup==='rich'?' selected':'')+'>2:1 rich (by weight)</option></select></label><label>Serving size (ml)<input id="slserving" type="number" min="50" step="25" value="'+(s.serving||250)+'"></label></div></section><section class="panel"><h2>Base recipe · before ice dilution</h2><p class="muted small">Amounts below describe one base recipe, not the final batch. No ice melt is automatically added. Remove carbonated mixers or use a flat equivalent for machine batches.</p><div id="slrows"></div><button class="btn" id="sladd">＋ Ingredient</button><details><summary>Measured verification (optional)</summary><label class="field"><span>Verified sugar Brix of base, alcohol-corrected</span><input id="slverified" type="number" min="0" max="100" step=".1" value="'+esc(s.verified||'')+'"></label><p class="muted small">Only enter a true sugar mass fraction from a validated alcohol-corrected method. This overrides the base sugar estimate. An ordinary alcoholic refractometer reading is NOT true sugar Brix.</p><label class="field"><span>Final raw refractometer reading (verification only)</span><input id="slraw" type="number" min="0" max="100" step=".1" value="'+esc(s.raw||'')+'"></label><p class="muted small">Raw readings include alcohol and other dissolved solids. They do not change the mass-balance calculation.</p></details><button class="btn primary" id="slcalculate">Calculate batch</button><div id="slresult" aria-live="polite"></div></section><section class="panel"><h2>Machine check and assumptions</h2><ul class="bul small"><li>12–16 is your selected sugar target range; 14 is the default. Jeffrey Morgenthaler recommends a 13–15 refractometer reading for his machine workflow. These are not interchangeable in alcoholic mixes.</li><li>8% ABV is a conservative planning default, not a universal machine limit. Follow your machine’s alcohol, sugar, fill and temperature limits. A 10 L batch may need multiple loads.</li><li>Pre-chill the mixture. Verify texture in a small batch. No calculation can guarantee freezing without machine temperature and ingredient measurements.</li><li>Volume addition is approximate: ethanol/water contraction, fruit solids, acids, fat and different sugars are not fully modeled. Density is editable. Brix here is grams sugar per 100 grams of liquid, not grams per 100 ml.</li><li>For juice-forward cocktails. Spirit-heavy bases (25% ABV or higher before dilution) get a warning, not a promise of good texture.</li></ul><p class="small"><a href="https://jeffreymorgenthaler.com/how-to-use-a-slushie-machine/" target="_blank" rel="noopener">Morgenthaler’s machine workflow</a> · <a href="https://slushycalc.com/" target="_blank" rel="noopener">Measured-reading calculator</a></p></section>';
+ function drawRows(){el('slrows').innerHTML=s.rows.map(function(r,i){return '<div class="slush-row"><div><select data-rowkey="'+i+'">'+options(keys,'Custom ingredient').replace('value="'+r.key+'"','value="'+r.key+'" selected')+'</select><input data-rowname="'+i+'" aria-label="Ingredient name" value="'+esc(r.name)+'"><div class="numbers">'+[['ml','ml'],['abv','ABV %'],['sugar','Sugar g/100ml'],['density','Density g/ml']].map(function(p){return '<label>'+p[1]+'<input data-row="'+i+'" data-prop="'+p[0]+'" type="number" step="'+(p[0]==='density'?'.001':'.1')+'" value="'+r[p[0]]+'"></label>';}).join('')+'</div></div><button class="btn ghost small" data-rowdel="'+i+'" aria-label="Remove ingredient">×</button></div>';}).join('');
+  el('slrows').querySelectorAll('[data-row]').forEach(function(e){e.oninput=function(){s.rows[+e.dataset.row][e.dataset.prop]=this.value===''?NaN:+this.value;db().save();};});
+  el('slrows').querySelectorAll('[data-rowname]').forEach(function(e){e.oninput=function(){s.rows[+e.dataset.rowname].name=this.value;db().save();};});
+  el('slrows').querySelectorAll('[data-rowkey]').forEach(function(e){e.onchange=function(){s.rows[+e.dataset.rowkey]=ingredientRow(this.value,s.rows[+e.dataset.rowkey].ml);db().save();drawRows();};});
+  el('slrows').querySelectorAll('[data-rowdel]').forEach(function(e){e.onclick=function(){s.rows.splice(+e.dataset.rowdel,1);db().save();drawRows();};});
+ }
+ function calculate(){var r=solve(s.rows,s);if(r.error){el('slresult').innerHTML='<p class="flagbox">'+esc(r.error)+'</p>';return;}
+  var warn=r.baseAbv>=25?'<p class="flagbox">Base is '+fmt(r.baseAbv)+'% ABV: spirit-heavy recipes are poor starting points for machine slush. Dilution may weaken flavor.</p>':'';
+  el('slresult').innerHTML='<div class="slush-result"><h3>'+fmt(r.volume/1000)+' L batch · '+fmt(r.brix)+' estimated sugar °Bx · '+fmt(r.abv)+'% ABV</h3><ul>'+r.rows.map(function(x){return '<li><b>'+fmt(x.ml)+' ml</b> '+esc(x.name)+'</li>';}).join('')+'<li><b>'+fmt(r.syrupMl)+' ml</b> '+esc(r.syrup)+' (additional)</li><li><b>'+fmt(r.water)+' ml</b> chilled water (additional)</li></ul><p class="small">Sugar: '+fmt(r.sugar)+' g · Estimated mass: '+fmt(r.mass)+' g · Pure ethanol: '+fmt(r.ethanol)+' ml · About '+fmt(r.volume/(s.serving||250))+' servings of '+(s.serving||250)+' ml</p><p class="muted small">Scale each base ingredient by '+fmt(r.scale)+'×. Measure the unrounded totals, then top up to '+fmt(r.volume)+' ml after mixing. Recheck sugar and ABV if the actual volume differs.</p>'+warn+(s.raw!==''?'<p class="muted small">Raw refractometer: '+esc(s.raw)+' °Bx (verification only; not alcohol-corrected).</p>':'')+'</div>';
+ }
+ ['volume','brix','abv','dilution','syrup','serving','verified','raw'].forEach(function(k){el('sl'+k).onchange=function(){s[k]=k==='syrup'||k==='verified'||k==='raw'?this.value:+this.value;db().save();};});
+ el('slrecipe').onchange=function(){if(this.value!==''){load(rr[+this.value]);drawRows();el('slresult').innerHTML='';}};
+ el('sladd').onclick=function(){s.rows.push(ingredientRow('',30));db().save();drawRows();};el('slcalculate').onclick=calculate;drawRows();calculate();
+}
+root.BardTools={solve:solve,required:required,missing:missing,stockView:stockView,slushView:slushView};
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
 <script>/* tests.js */
 /* Validation suite. Runs in the browser (Tavern > Calculator check) and in Node: node tests.js
    PASS/FAIL = math and data integrity. WARN = plausibility bands (informational). */
@@ -1833,10 +1923,6 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var tmg = find('tomato-margarita');
     check('50/50 Tomato Margarita added', tmg && JSON.stringify(tmg.spec) === JSON.stringify([[1,'oz','mezcal'],[1,'oz','manzanilla'],[0.75,'oz','tomatosyrup'],[0.75,'oz','lime']]) && tmg.glass === 'Double rocks');
     check('Last Word riffs as styles (Final Ward, Ultima Palabra, Closing Argument)', DATA.ALIAS['final-ward'] === 'last-word' && DATA.ALIAS['ultima-palabra'] === 'last-word' && DATA.ALIAS['closing-argument'] === 'last-word');
-    check('Ultimate Mai Tai is a Mai Tai style (Kevin Crossman)', DATA.ALIAS['ultimate-mai-tai'] === 'mai-tai' && find('ultimate-mai-tai').prov.who === 'Kevin Crossman' && find('ultimate-mai-tai').spec.length === 8);
-    check('Ray Gun is a Revolver style', DATA.ALIAS['ray-gun'] === 'revolver');
-    check('Corn n Oil and Piña Verde added', !!find('corn-n-oil') && !!find('pina-verde'));
-    check('Saturn & Gold Rush updated', find('saturn').garnish === 'Edible flower, orange twist' && find('gold-rush').garnish === 'Lemon twist');
     check('Mezcalrita renamed Orange Mezcalrita', find('mezcalrita').name === 'Orange Mezcalrita');
     check('Bijou kept as Anders E’s version', find('bijou').av.by === 'Anders E');
     check('Tropical Coffee Sour: lime, 1¾ + ¼ oz rum', JSON.stringify(find('tropical-coffee-sour').spec).indexOf('[1.75,"oz","agedrum"') > -1 && JSON.stringify(find('tropical-coffee-sour').spec).indexOf('"lime"') > -1);
@@ -1844,7 +1930,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       var leak = TOP.filter(function (d) { return DATA.ALIAS[d.id]; }).map(function (d) { return d.id; });
       check('Variations folded inside their main drink', !leak.length, leak.join(', '));
       var fa = Object.keys(DATA.ALIAS).filter(function (x) { var d = find(x); return d && d.src === 'andrew' && x !== 'ray-gun'; });
-      check('Andrew’s originals are never folded', !fa.length, fa.join(', '));
+      check('Bard originals stay separate except requested Ray Gun style', !fa.length, fa.join(', '));
     }
     // 6. Four styles
     if (DATA.styleOf) {
@@ -1901,6 +1987,25 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       var covered = {}; st.forEach(function (x) { x.ex.forEach(function (e) { covered[e] = 1; }); });
       check('Evolution coverage', true, Object.keys(covered).length + ' drinks placed on the timeline');
     }
+    // v5.8 additions and slushee mass-balance checks.
+    var added=['bamboo','adonis','sherry-cobbler','hot-toddy','white-lady','brown-derby','el-diablo','rusty-nail','godfather','hotel-nacional','mary-pickford','jet-pilot','cuba-libre'];
+    check('All new Songbook recipes exist',added.every(function(k){return !!find(k);}));
+    check('New styles are folded under their parent',DATA.ALIAS['bloody-maria']==='bloody-mary'&&DATA.ALIAS['red-snapper']==='bloody-mary'&&DATA.ALIAS['bloody-caesar']==='bloody-mary'&&DATA.ALIAS['caipiroska']==='caipirinha'&&DATA.ALIAS['rum-toddy']==='hot-toddy'&&DATA.ALIAS['brandy-toddy']==='hot-toddy');
+    check('Bard category migration',DATA.ALL.every(function(d){return d.cat!=='Andrew’s';}));
+    var BT=typeof window!=='undefined'?window.BardTools:globalThis.BardTools;
+    if(BT){
+      var sr=[{name:'Rum',ml:60,abv:40,sugar:0,density:.94},{name:'Lime',ml:22.5,abv:0,sugar:1.7,density:1.01},{name:'Simple',ml:22.5,abv:0,sugar:61.5,density:1.23}];
+      var op={volume:1000,brix:14,abv:8,dilution:20,syrup:'simple'},ss=BT.solve(sr,op);
+      check('Slushee reaches target sugar Brix by mass',!ss.error&&near(ss.brix,14,1e-8));
+      check('Slushee conserves batch volume',near(ss.baseMl+ss.syrupMl+ss.water,1000,1e-8));
+      check('Slushee respects ABV cap and minimum water',ss.abv<=8.000001&&ss.water>=.2*ss.baseMl-1e-8);
+      var ten=BT.solve(sr,Object.assign({},op,{volume:10000}));
+      check('Slushee 1 L to 10 L scaling',near(ten.water,ss.water*10,1e-7)&&near(ten.syrupMl,ss.syrupMl*10,1e-7));
+      check('Slushee rejects invalid volume and zero-ABV alcoholic batch',!!BT.solve(sr,Object.assign({},op,{volume:1100})).error&&!!BT.solve(sr,Object.assign({},op,{abv:0})).error);
+      var rich=BT.solve(sr,Object.assign({},op,{syrup:'rich'}));
+      check('Rich-syrup adjustment reaches same sugar target',!rich.error&&near(rich.brix,14,1e-8));
+      check('Ingredient finder counts required items only',BT.missing([[1,'oz','gin'],[1,'oz','water'],[1,'oz','lime',{opt:true}]],{gin:true}).length===0);
+    }
     // 9. Plausibility bands
     var bands = { stir:[0.18,0.32], shake:[0.11,0.22], dryshake:[0.10,0.20] };
     TOP.forEach(function (d) {
@@ -1914,7 +2019,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     module.exports = runTests;
     if (require.main === module) {
       global.self = global;
-      var Calc = require('./calc.js'); require('./data.js'); require('./andrew.js'); require('./variations.js'); require('./evolution.js');
+      require('./extras.js'); var Calc = require('./calc.js'); require('./data.js'); require('./andrew.js'); require('./variations.js'); require('./evolution.js');
       var res = runTests(Calc, global.CC_DATA), f = 0, w = 0;
       res.forEach(function (r) { if (r.status === 'FAIL') f++; if (r.status === 'WARN') w++; console.log(r.status.padEnd(5), r.name, r.detail ? '— ' + r.detail : ''); });
       console.log('\n' + (res.length - f - w) + ' passed, ' + f + ' failed, ' + w + ' warnings');
@@ -2043,7 +2148,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     a.sy = a.sy || { cat:'', id:'simple', ratio:null, basis:'weight', target:500, mult:1 };
     a.aa = a.aa || { fruit:'orange', target:'lime', vol:1000, unit:'ml', cb:[0.5,0.2] };
     return a; }
-  var TOOLS = [{ v:'super', label:'Super juice', icon:'🍋', sub:'Kevin Kos ratios' }, { v:'syrups', label:'Syrups', icon:'🍯', sub:'Ratios & yield' }, { v:'acid', label:'Acid adjust', icon:'⚗️', sub:'Juice → lime/lemon' }];
+  var TOOLS = [{v:'stock',label:'What can I make?',icon:'🍸',sub:'Your ingredients'},{v:'slush',label:'Slushee',icon:'❄️',sub:'Brix & batch size'},{ v:'super', label:'Super juice', icon:'🍋', sub:'Kevin Kos ratios' }, { v:'syrups', label:'Syrups', icon:'🍯', sub:'Ratios & yield' }, { v:'acid', label:'Acid adjust', icon:'⚗️', sub:'Juice → lime/lemon' }];
   function numIn(id, val, unit, step) {
     return '<div class="numin"><button data-step="-' + step + '" data-for="' + id + '" aria-label="Less">−</button><input id="' + id + '" inputmode="decimal" value="' + val + '"><span class="unit">' + unit + '</span><button data-step="' + step + '" data-for="' + id + '" aria-label="More">+</button></div>';
   }
@@ -2074,7 +2179,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     $app().innerHTML = '<header class="top"><h1>The Apothecary</h1><p class="tagline">Weigh it, pour it, fix it.</p></header>' +
       D.tiles('tool', TOOLS, function (v) { return v === tool; }, 'tools') + '<div id="apo-body"></div>';
     D.onTap('tool', function (v) { location.hash = '#/apothecary/' + v; });
-    ({ super:superView, syrups:syrupView, acid:acidView })[tool]();
+    ({ super:superView, syrups:syrupView, acid:acidView, stock:window.BardTools.stockView, slush:window.BardTools.slushView })[tool]();
   }
   function superView() {
     var D = DB(), st = S().sj, f = A.SUPER[st.fruit];
@@ -2251,7 +2356,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
   var ING = DATA.ING, DRINKS = DATA.DRINKS, TECH = DATA.TECH, STYLES = DATA.STYLES;
   var STORE_KEY = 'dadbard.v1', OLD_KEY = 'specbook.v1';
   var ROOT_ORDER = ['Old-Fashioned', 'Martini', 'Daiquiri', 'Sidecar', 'Highball', 'Flip'];
-  var CATS = ['Andrew’s', 'Modern', 'Classic', 'Tiki'];
+  var CATS = ['Bard’s', 'Modern', 'Classic', 'Tiki'];
   var LOGO = window.DB_LOGO || 'icon-192.png';
   var AV_LABEL = 'Andrew’s version';
   var SOURCES = [
@@ -2271,7 +2376,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
   var FLAV_ICON = { citrusy:'🍋', refreshing:'💧', 'spirit-forward':'🥃', rich:'🍫', bitter:'🖤', herbal:'🌿', fruity:'🍓', tropical:'🍍', floral:'🌸', spicy:'🌶️', smoky:'🔥', nutty:'🌰', creamy:'🥛', coffee:'☕', sweet:'🍬', savory:'🧂' };
   var STATUS_ICON = { 'In my notes':'✍️', 'Has Andrew’s version':'🎻', 'Experimental':'🧪', 'Batch':'🛢️', 'Needs my check':'⚑', 'My edits & recipes':'✏️' };
   var STRENGTH_ICON = { Light:'🪶', Medium:'⚖️', Strong:'🔥' };
-  var CAT_ICON = { 'Andrew’s':'🎻', Modern:'✨', Classic:'🎩', Tiki:'🌺' };
+  var CAT_ICON = { 'Bard’s':'🎻', Modern:'✨', Classic:'🎩', Tiki:'🌺' };
   var STYLE_ICON = {}; STYLES.forEach(function (s) { STYLE_ICON[s.k] = s.icon; });
   var GROUP_ICON = { style:STYLE_ICON, status:STATUS_ICON, base:BASE_ICON, flav:FLAV_ICON, strength:STRENGTH_ICON };
 
@@ -2284,6 +2389,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
   function norm() {
     user.drinks = user.drinks || {}; user.tech = user.tech || {}; user.settings = user.settings || { unit:'oz' }; user.settings.unit = user.settings.unit || 'oz';
     user.vsel = user.vsel || {}; user.edits = user.edits || {}; user.custom = user.custom || []; user.ing = user.ing || {};
+    Object.keys(user.edits).forEach(function(k){if(user.edits[k].cat==='Andrew’s')user.edits[k].cat='Bard’s';});
+    user.custom.forEach(function(d){if(d.cat==='Andrew’s')d.cat='Bard’s';});
     user.hidden = user.hidden || {}; user.hiddenCraft = user.hiddenCraft || {}; user.craft = user.craft || {}; user.craft.sections = user.craft.sections || []; user.craft.items = user.craft.items || {};
   }
   norm();
@@ -2489,7 +2596,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     return out;
   }
   function overlap(id) { var s = (user.drinks[id] || {}).sources || {}; return Object.keys(s).filter(function (k) { return s[k]; }).length; }
-  function catClass(c) { return 'cat-' + (c === 'Andrew’s' ? 'andrew' : String(c).toLowerCase()); }
+  function catClass(c) { return 'cat-' + (c === 'Bard’s' ? 'andrew' : String(c).toLowerCase()); }
   function link(href, html, cls) { return '<a href="' + href + '"' + (cls ? ' class="' + cls + '"' : '') + '>' + html + '</a>'; }
   function confBadge(c) { return c === 'own' ? '<span class="conf conf-own">house recipe</span>' : '<span class="conf conf-' + c + '">' + c + ' confidence</span>'; }
   function flagBox(list) { return list.length ? '<div class="flagbox"><b>⚑ Needs your check</b><ul>' + list.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></div>' : ''; }
@@ -2534,11 +2641,12 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     { k:'strength', n:'Strength', get:function (d) { return d.aStrength; }, order:['Light','Medium','Strong'] },
     { k:'equip', n:'Equipment', get:function (d) { return d.aEquip; } }
   ];
-  var state = { q:'', cat:'', f:{}, sort:'style', showFilters:false };
+  var state = { q:'', cat:'', f:{}, sort:'style', showFilters:false, favorites:false };
   FILTERS.forEach(function (g) { state.f[g.k] = {}; });
   function activeCount() { var c = 0; FILTERS.forEach(function (g) { c += Object.keys(state.f[g.k]).length; }); return c; }
   function matches(d) {
     if (isHidden(d)) return false;
+    if(state.favorites && !d.variants.some(function(v){return !!(user.drinks[v.id]||{}).favorite;}))return false;
     if (state.cat && d.cat !== state.cat) return false;
     if (state.q) { var toks = state.q.toLowerCase().split(/\s+/).filter(Boolean); for (var i = 0; i < toks.length; i++) if (d.aSearch.indexOf(toks[i]) < 0) return false; }
     for (var j = 0; j < FILTERS.length; j++) {
@@ -2572,6 +2680,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var h = '<header class="top hero"><div class="brand"><img src="' + LOGO + '" alt="Dad Bard" class="logo"><div><h1>Dad Bard <span class="sym">🪕</span></h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
       '<div class="searchrow"><input id="q" type="search" placeholder="Search drinks, ingredients, creators" value="' + esc(state.q) + '" autocomplete="off">' +
       '<button id="ftoggle" class="btn filterbtn ' + (ac ? 'on' : '') + '">⚙︎ Filters' + (ac ? ' <b>' + ac + '</b>' : '') + '</button></div>' +
+      '<button class="btn small favorite-filter' + (state.favorites ? ' on' : '') + '" id="favorites" aria-pressed="' + state.favorites + '">★ Favorites</button>' +
       pills('cat', [{ v:'', label:'All', icon:'✦', count:VIS.length }].concat(CATS.map(function (c) { return { v:c, label:c, icon:CAT_ICON[c], count:counts[c] || 0 }; })), function (v) { return v === state.cat; }) +
       '<div class="rail stylegrid">' + STYLES.map(function (s) {
         return '<button class="tile' + (state.f.style[s.k] ? ' on' : '') + '" data-tap="f-style" data-v="' + esc(s.k) + '" style="--c:' + s.color + '"><i>' + s.icon + '</i><span>' + esc(s.k) + '</span><small>' + esc(s.sub) + '</small><b>' + (sv[s.k] || 0) + '</b></button>';
@@ -2588,7 +2697,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       });
     } else h += '<ul class="cards">' + list.map(card).join('') + '</ul>';
     if (!list.length) h += '<p class="empty">No ballad by that name. Try another verse, or clear a filter.</p>';
-    h += '<a class="fab" href="#/new/' + encodeURIComponent(state.cat || 'Andrew’s') + '" aria-label="New recipe" title="New recipe">＋</a>';
+    h += '<a class="fab" href="#/new/' + encodeURIComponent(state.cat || 'Bard’s') + '" aria-label="New recipe" title="New recipe">＋</a>';
     if (state.showFilters) {
       h += '<div class="sheet-bg" id="sheetbg"></div><div class="sheet" id="sheet"><div class="sheet-top"><div class="grab"></div><div class="sheet-head"><b>Filters</b><span class="swipehint">Swipe down to close</span>' + (ac ? '<button id="fclear" class="btn ghost small">Clear all</button>' : '') + '</div></div><div class="sheet-body">';
       FILTERS.forEach(function (g) {
@@ -2605,6 +2714,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     $app.innerHTML = h;
     var nb = document.querySelector('.sheet-body'); if (nb) nb.scrollTop = sheetY;
     document.body.classList.toggle('noscroll', !!state.showFilters);
+    document.getElementById('favorites').onclick=function(){state.favorites=!state.favorites;keep(renderBrowse);};
     var q = document.getElementById('q');
     q.addEventListener('input', function () { state.q = q.value; var pos = q.selectionStart; keep(renderBrowse); var nq = document.getElementById('q'); nq.focus(); nq.setSelectionRange(pos, pos); });
     document.getElementById('sort').value = state.sort;
@@ -2755,7 +2865,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     h += '<section class="panel"><h2>Bard’s notes</h2>' +
       (d.said ? '<div class="said"><span>As written in your notes</span>' + esc(d.said) + '</div>' : '') +
       '<div class="stars">' + [1,2,3,4,5].map(function (r) { return '<button data-r="' + r + '" class="' + (u.rating >= r ? 'on' : '') + '" aria-label="' + r + ' stars">★</button>'; }).join('') + '</div>' +
-      '<div class="toggles"><label><input type="checkbox" id="tried"' + (u.tried ? ' checked' : '') + '> Made it</label>' +
+      '<div class="toggles"><label><input type="checkbox" id="favorite"' + (u.favorite ? ' checked' : '') + '> ★ Favorite</label><label><input type="checkbox" id="tried"' + (u.tried ? ' checked' : '') + '> Made it</label>' +
       '<label><input type="checkbox" id="verified"' + (u.verified ? ' checked' : '') + '> ' + (d.src === 'andrew' || d.custom ? 'Spec is final' : 'Spec verified against my book') + '</label></div>' +
       '<textarea id="notes" rows="5" placeholder="Tweaks, bottles used, what to try next…">' + esc(u.notes) + '</textarea><p class="muted small" id="saved"></p></section>';
     h += '<section class="panel hidepanel">' + (isHidden(main)
@@ -2772,6 +2882,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     document.getElementById('splus').onclick = function () { if (serves < 24) { serves++; keep(renderDrink, id); } };
     $app.querySelectorAll('.src input').forEach(function (c) { c.onchange = function () { u.sources[c.dataset.s] = c.checked; save(); keep(renderDrink, id); }; });
     $app.querySelectorAll('.stars button').forEach(function (b) { b.onclick = function () { var r = +b.dataset.r; u.rating = u.rating === r ? 0 : r; save(); keep(renderDrink, id); }; });
+    document.getElementById('favorite').onchange=function(e){u.favorite=e.target.checked;save();};
     document.getElementById('tried').onchange = function (e) { u.tried = e.target.checked; save(); };
     document.getElementById('verified').onchange = function (e) { u.verified = e.target.checked; save(); };
     var t, nt = document.getElementById('notes');
@@ -2856,7 +2967,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
   }
   function draftNew(cat, of) {
     var main = of && VAR[of] ? VAR[of].main : null;
-    var d = { mode:'new', id:null, vi:0, isVariant:!!main, vlabel:'', name: main ? main.name + ' (my style)' : '', cat: cat || 'Andrew’s', fam: main ? main.fam : 'Daiquiri', style:'auto',
+    var d = { mode:'new', id:null, vi:0, isVariant:!!main, vlabel:'', name: main ? main.name + ' (my style)' : '', cat: cat || 'Bard’s', fam: main ? main.fam : 'Daiquiri', style:'auto',
       base: main ? main.base : 'Gin', m: main ? main.m : 'shake', glass: main ? main.glass || '' : 'Coupe', ice: main ? main.ice || '' : 'Up', garnish:'', flav: main ? (main.flav || []).slice() : [], method:'', note:'',
       rows: main ? rowsFromSpec(main.versions[main.vdef].spec) : [{ amt:'2', unit:'oz', ing:'' }, { amt:'3/4', unit:'oz', ing:'' }, { amt:'3/4', unit:'oz', ing:'' }],
       origTech: main ? (main.tech || []).slice() : [], target:'main', creator:'', mineMain:true, hasAv:false, variantOf: main ? main.id : '' };
@@ -2895,12 +3006,12 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       '<p class="muted small">' + (isNew ? 'Saved on this device. Export a backup in the Tavern.' : d.mineMain ? 'Changes save over this recipe. Reset brings back the original.' : d.target === 'av' ? 'Saving as your version keeps the traditional spec. Reset brings back the original.' : 'Reset brings back the original.') + '</p></header>';
     h += '<section class="panel"><label class="field"><span>Name</span><input id="ename" value="' + esc(d.name) + '" placeholder="Drink name"></label>';
     if (!d.isVariant || isNew) h += '<div class="flabel">Category</div>' + pills('ecat', CATS.map(function (c) { return { v:c, label:c, icon:CAT_ICON[c] }; }), function (v) { return v === d.cat; });
-    if (isNew && d.cat !== 'Andrew’s') {
+    if (isNew && d.cat !== 'Bard’s') {
       h += '<label class="field"><span>Add as a style of… (optional)</span><select id="eof"><option value="">— Stand-alone drink —</option>' +
         DRINKS.filter(function (x) { return x.src !== 'andrew' && !x.custom; }).slice().sort(function (a, b) { return a.name.localeCompare(b.name); }).map(function (x) { return '<option value="' + x.id + '"' + (x.id === d.variantOf ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('') + '</select></label>';
     }
     if (d.isVariant || (isNew && d.variantOf)) h += '<label class="field"><span>Style name (shown on the picker)</span><input id="evlabel" value="' + esc(d.vlabel) + '" placeholder="e.g. Smoky, House, Wet"></label>';
-    if (d.cat !== 'Andrew’s') h += '<label class="field"><span>Creator</span><input id="ecreator" value="' + esc(d.creator) + '" placeholder="Bartender or bar"></label>';
+    if (d.cat !== 'Bard’s') h += '<label class="field"><span>Creator</span><input id="ecreator" value="' + esc(d.creator) + '" placeholder="Bartender or bar"></label>';
     h += '</section>';
     h += '<section class="panel"><div class="flabel">Style</div>' +
       pills('estyle', [{ v:'auto', label:'Auto', icon:'✨' }].concat(STYLES.map(function (s) { return { v:s.k, label:s.k, icon:s.icon, color:s.color }; })), function (v) { return v === d.style; }) +
@@ -2949,7 +3060,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     function val(id, k) { var el = document.getElementById(id); if (el) el.oninput = el.onchange = function () { d[k] = el.value; editorPreview(); }; }
     val('ename', 'name'); val('ebase', 'base'); val('eglass', 'glass'); val('eice', 'ice'); val('egarnish', 'garnish'); val('emethod', 'method'); val('enote', 'note'); val('evlabel', 'vlabel'); val('ecreator', 'creator'); val('efam', 'fam');
     var eof = document.getElementById('eof'); if (eof) eof.onchange = function () { var c = d.cat; draft = draftNew(c, eof.value); draft.cat = c; keep(renderEditor); };
-    onTap('ecat', function (v) { d.cat = v; if (v === 'Andrew’s') d.variantOf = ''; keep(renderEditor); });
+    onTap('ecat', function (v) { d.cat = v; if (v === 'Bard’s') d.variantOf = ''; keep(renderEditor); });
     onTap('estyle', function (v) { d.style = v; keep(renderEditor); });
     onTap('em', function (v) { d.m = v; keep(renderEditor); });
     onTap('etarget', function (v) { d.target = v; keep(renderEditor); });
@@ -2975,9 +3086,9 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       ['method','style','vlabel','variantOf','src'].forEach(function (k) { delete obj[k]; });
       Object.keys(meta).forEach(function (k) { if (meta[k] !== undefined) obj[k] = meta[k]; });
       obj.spec = r.spec; obj.note = d.note.trim() || undefined;
-      if (d.cat === 'Andrew’s') { obj.src = 'andrew'; obj.prov = { who:'Andrew (Dad Bard)', where:'Home bar', year:String(new Date().getFullYear()), conf:'own', note:'' }; }
+      if (d.cat === 'Bard’s') { obj.src = 'andrew'; obj.prov = { who:'Andrew (Dad Bard)', where:'Home bar', year:String(new Date().getFullYear()), conf:'own', note:'' }; }
       else obj.prov = { who:d.creator.trim() || 'Unknown', where:'—', year:'—', conf:'low', note:'Added by you.' };
-      if (d.variantOf && d.cat !== 'Andrew’s') { obj.variantOf = d.variantOf; obj.vlabel = d.vlabel.trim() || d.name.trim(); obj.changed = obj.changed || 'Your style.'; }
+      if (d.variantOf && d.cat !== 'Bard’s') { obj.variantOf = d.variantOf; obj.vlabel = d.vlabel.trim() || d.name.trim(); obj.changed = obj.changed || 'Your style.'; }
       if (d.mode === 'new') user.custom.push(obj);
       id = obj.id;
     } else {
@@ -2985,8 +3096,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       Object.keys(meta).forEach(function (k) { e[k] = meta[k]; });
       if (!meta.method) delete e.method; if (!meta.style) e.style = undefined;
       if (d.isVariant) e.vlabel = d.vlabel.trim() || undefined;
-      if (d.cat === 'Andrew’s') e.src = 'andrew';
-      if (d.cat !== 'Andrew’s' && d.creator.trim() && d.creator.trim() !== ((ORIG[id] || {}).prov || {}).who) e.creator = d.creator.trim();
+      if (d.cat === 'Bard’s') e.src = 'andrew';
+      if (d.cat !== 'Bard’s' && d.creator.trim() && d.creator.trim() !== ((ORIG[id] || {}).prov || {}).who) e.creator = d.creator.trim();
       if (d.mineMain) {
         if (d.target === 'alt') { var o = ORIG_OBJ[id], alts = clone(o.alts); alts[d.vi - 1].spec = r.spec; e.alts = alts; vsel = d.vi; }
         else { e.spec = r.spec; e.note = d.note.trim() || undefined; }
@@ -3203,10 +3314,10 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var h = '<header class="top"><h1>The Tavern</h1><p class="muted small">Ledger, settings and housekeeping.</p></header>' +
       '<section class="panel"><h2>Your tab</h2><div class="stats">' +
       '<div><b>' + tried + '</b><span>Made</span></div><div><b>' + noted + '</b><span>With notes</span></div><div><b>' + ver + '</b><span>Verified / final</span></div></div>' +
-      '<p class="muted small">' + DRINKS.length + ' songs (' + allVariants().length + ' with styles): ' + (cats['Andrew’s'] || 0) + ' yours · ' + (cats.Modern || 0) + ' modern · ' + (cats.Classic || 0) + ' classic · ' + (cats.Tiki || 0) + ' tiki.</p></section>';
+      '<p class="muted small">' + DRINKS.length + ' songs (' + allVariants().length + ' with styles): ' + (cats['Bard’s'] || 0) + ' yours · ' + (cats.Modern || 0) + ' modern · ' + (cats.Classic || 0) + ' classic · ' + (cats.Tiki || 0) + ' tiki.</p></section>';
     h += '<section class="panel mine"><h2>✏️ My recipes & edits · ' + mineList.length + '</h2>' +
       (mineList.length ? '<ul class="todo">' + mineList.map(function (d) { return '<li>' + link('#/d/' + d.id, esc(d.name)) + '<small>' + (d.custom ? 'Custom recipe' : 'Edited') + ' · ' + esc(d.cat) + '</small></li>'; }).join('') + '</ul>' : '<p class="muted small">Nothing yet. Tap ✏️ Edit on any drink, or ＋ on the Songbook to add one.</p>') +
-      '<a class="btn" href="#/new/' + encodeURIComponent('Andrew’s') + '">＋ New recipe</a></section>';
+      '<a class="btn" href="#/new/' + encodeURIComponent('Bard’s') + '">＋ New recipe</a></section>';
     h += '<section class="panel"><h2>Default units</h2><div class="seg"><button data-u="oz" class="' + (user.settings.unit === 'oz' ? 'on' : '') + '">oz</button><button data-u="ml" class="' + (user.settings.unit === 'ml' ? 'on' : '') + '">ml</button></div>' +
       '<p class="muted small">ml uses the bar convention of 30 ml per oz. Specs you wrote in ml stay in ml.</p></section>' +
       '<section class="panel"><h2>Back up your notes & recipes</h2><p class="small">Ratings, notes, edits and new recipes live in this browser only. Export a backup now and then, and import it on a new phone.</p>' +
@@ -3307,7 +3418,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       setTab('browse');
       if (route.lastEdit !== h || !draft) {
         if (parts[0] === 'edit') { var vm = VAR[parts[1]]; if (!vm) { location.hash = '#/'; return; } draft = draftFromDrink(vm.main.variants[vm.i], +(parts[2] || 0)); }
-        else draft = draftNew(CATS.indexOf(parts[1]) > -1 ? parts[1] : 'Andrew’s', parts[2]);
+        else draft = draftNew(CATS.indexOf(parts[1]) > -1 ? parts[1] : 'Bard’s', parts[2]);
         route.lastEdit = h; window.scrollTo(0, 0);
       }
       return renderEditor();
