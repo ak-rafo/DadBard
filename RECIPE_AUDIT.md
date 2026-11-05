@@ -1,0 +1,1 @@
+Recipe-order duplicate checking from v5.19 remains active. Final Ward and Paper Plane now intentionally omit their built-in Bard versions as requested in v5.20. This update does not verify ingredient chemistry or historical specifications.
