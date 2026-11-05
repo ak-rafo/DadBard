@@ -2788,9 +2788,9 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     var h = '<header class="top hero"><div class="brand"><img src="' + LOGO + '" alt="Dad Bard" class="logo"><div><h1>Dad Bard <span class="sym">🪕</span></h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
       '<div class="searchrow"><input id="q" type="search" placeholder="Search drinks, ingredients, creators" value="' + esc(state.q) + '" autocomplete="off">' +
       '<button id="ftoggle" class="btn filterbtn ' + (ac ? 'on' : '') + '">⚙︎ Filters' + (ac ? ' <b>' + ac + '</b>' : '') + '</button></div>' +
-      pills('cat', [{ v:'', label:'All', icon:'✦', count:VIS.length }].concat(CATS.map(function (c) { return { v:c, label:c, icon:CAT_ICON[c], count:counts[c] || 0 }; })), function (v) { return v === state.cat; }) +
+      pills('cat', [{ v:'', label:'All', icon:'✦' }].concat(CATS.map(function (c) { return { v:c, label:c, icon:CAT_ICON[c] }; })), function (v) { return v === state.cat; }) +
       '<div class="rail stylegrid">' + STYLES.map(function (s) {
-        return '<button class="tile' + (state.f.style[s.k] ? ' on' : '') + '" data-tap="f-style" data-v="' + esc(s.k) + '" style="--c:' + s.color + '"><i>' + s.icon + '</i><span>' + esc(s.k) + '</span><small>' + esc(s.sub) + '</small><b>' + (sv[s.k] || 0) + '</b></button>';
+        return '<button class="tile' + (state.f.style[s.k] ? ' on' : '') + '" data-tap="f-style" data-v="' + esc(s.k) + '" style="--c:' + s.color + '"><i>' + s.icon + '</i><span>' + esc(s.k) + '</span><small>' + esc(s.sub) + '</small></button>';
       }).join('') + '</div>';
     var act = [];
     FILTERS.forEach(function (g) { Object.keys(state.f[g.k]).forEach(function (v) { act.push('<button class="achip" data-tap="achip" data-v="' + g.k + '|' + esc(v) + '">' + ((GROUP_ICON[g.k] || {})[v] || '') + ' ' + esc(v) + ' <b>×</b></button>'); }); });
