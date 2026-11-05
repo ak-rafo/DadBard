@@ -1,29 +1,23 @@
-# Dad Bard v5.8
+# Dad Bard v5.9
 
-Upload index.html, sw.js, manifest.webmanifest and the three icons to your existing GitHub repository, replacing the same filenames. Keep the same site URL so local notes and favorites remain available. Before updating, use Tavern > Export JSON as a backup.
+## This update
+- Named variants and riffs, including Bard originals, are grouped under their main cocktail using recorded parent relationships. Main cocktail anchors remain distinct; recipes without a recorded parent remain standalone.
+- Example: browse Old Fashioned, then choose Rosa Maria. Searching Rosa maria (with or without accents) shows Rosa Maria and opens its style directly.
+- Search results show individual matching recipes and the parent cocktail. Browsing without search shows only main cocktails.
+- Bard category and Favorites include main cocktails containing matching styles.
+- Added an accessible X clear button to every existing search field: Songbook, Craft, Bloodlines and Apothecary ingredient search. Clears only search text and preserves other filters.
+- New Bard recipes can be added as a style of a main cocktail in the editor.
+- Recipe IDs, notes, ratings, favorites, versions and provenance are retained.
 
-## Changes
-- Added Bamboo, Adonis, Sherry Cobbler, Hot Toddy, White Lady, Brown Derby, El Diablo, Rusty Nail, Godfather, Hotel Nacional Special, Mary Pickford, Jet Pilot and Cuba Libre.
-- Added Bloody Maria, Red Snapper and Bloody Caesar styles; tequila and decaf Espresso Martini styles; Rum White Russian; Caipiroska; rum and brandy Toddies; aged-rum Cuba Libre. Boulevardier is now a Negroni style.
-- Retained Ultimate Mai Tai, Corn n Oil, Pina Verde and Ray Gun as a Revolver style from the previous update.
-- Renamed Andrew's category to Bard's, migrating saved category values without changing provenance.
-- Favorite checkbox on each recipe/style and a Favorites button in Songbook. Ratings remain separate.
-- Menu: Songbook, Apothecary, Bloodlines, Craft, Tavern. Fixed viewport anchoring and minimum page height for short search results.
-- Apothecary ingredient finder: exact matches and one ingredient away, including styles and recipe versions. Optional ingredients ignored; required mixers, bitters and solids counted. Water/ice assumed. Hidden drinks excluded.
-- Slushee planner: 1–10 L in 250 ml increments; target estimated sugar Brix 12–16; editable ABV cap, minimum water, ingredient sugar, density and volume. 1:1 or 2:1 adjustment syrup. Raw refractometer reading is verification only, not treated as true sugar in alcoholic mixtures.
-
-## Calculation limits
-This is an approximate sugar-mass and ethanol-volume balance, not a universal freezing predictor. Ingredient defaults are estimates, not measured brand specifications. Volume contraction, fat, fruit solids, acids and differing sugar types are not fully modeled. Follow machine limits and verify a small pre-chilled batch. A 10 L recipe may need multiple machine loads. Sources and house adaptations are labeled in recipe notes.
+## Update
+Back up using Tavern > Export JSON. Replace the six app files in your existing GitHub repository with the same filenames. Keep the site URL unchanged. Load online once to update the offline cache.
 
 ## Validation
-67 built-in checks passed, zero failures. 16 broad ABV plausibility warnings remain (including deliberately lower-alcohol recipes); these are not code failures. Phone-sized Chromium interaction tests passed without page errors. 666 combinations of volume, target sugar Brix and adjustment syrup passed mass/volume/ABV checks. No physical iPhone or slush-machine test was performed.
+67 built-in checks pass. Phone-sized browser tests confirm Rosa Maria is not a separate browse card, search opens the Rosa Maria style under Old Fashioned, and X clears search on all four searchable sections. No browser page errors. Physical iPhone testing remains necessary.
 
-## Real-iPhone checklist after upload
-1. Open the site online in Safari, reload, then reopen the Home Screen app.
-2. Search for Bloody Mary and a nonexistent name. With keyboard dismissed, menu stays at the screen bottom for one or zero results.
-3. Confirm menu order in portrait and landscape.
-4. Mark a recipe and a variant Favorite, then use Favorites in Songbook. Reload to check persistence.
-5. In Apothecary, select white rum, lime and simple syrup; Daiquiri should be ready to make. Add cola for Cuba Libre.
-6. Open Slushee, choose 1 L then 10 L, and targets 12, 14 and 16. Check ingredient edits and validation messages.
-7. Reopen offline after first loading online. Notes, favorites and saved Apothecary settings should remain.
-8. Export JSON, then import the backup to confirm notes and settings restore.
+## iPhone checklist
+1. Browse Old Fashioned and select Rosa Maria.
+2. Search Rosa maria without accents; tap the result and verify the selected style.
+3. Clear search with X. Check Bard category and Favorites still work.
+4. Check X in Craft, Bloodlines and Apothecary ingredient search.
+5. Verify your notes and favorites after reloading, and reopen offline after first loading online.

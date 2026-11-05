@@ -290,6 +290,13 @@ nav.tabs{position:fixed!important;bottom:0!important;top:auto!important;transfor
 .slush-row .numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}.slush-row label{font-size:11px;color:var(--muted)}.slush-row input{width:100%;min-width:0;box-sizing:border-box}
 .slush-row select{width:100%;box-sizing:border-box}.slush-result{border:1px solid var(--accent);border-radius:16px;padding:16px;margin-top:14px}.slush-result ul{padding-left:20px}
 @media(max-width:360px){.apo-fields{grid-template-columns:1fr}}
+
+.search-clear-wrap{position:relative;min-width:0;flex:1;width:100%;box-sizing:border-box}
+.search-clear-wrap input{width:100%;box-sizing:border-box;padding-right:42px!important}
+.search-clear-wrap input::-webkit-search-cancel-button{-webkit-appearance:none}
+.search-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font:24px/32px sans-serif;cursor:pointer}
+.search-clear:hover{background:var(--card2);color:var(--text)}.search-clear[hidden]{display:none}
+.selected-style{font-size:20px;color:var(--accent2);margin:4px 0 12px}
 </style>
 </head>
 <body>
@@ -1839,6 +1846,20 @@ function slushView(){
  el('slrecipe').onchange=function(){if(this.value!==''){load(rr[+this.value]);drawRows();el('slresult').innerHTML='';}};
  el('sladd').onclick=function(){s.rows.push(ingredientRow('',30));db().save();drawRows();};el('slcalculate').onclick=calculate;drawRows();calculate();
 }
+
+function installSearchClear(){
+ var rootEl=document.getElementById('app');if(!rootEl)return;
+ rootEl.querySelectorAll('input[type="search"],input#stocksearch').forEach(function(input){
+  if(input.dataset.clearReady)return;input.dataset.clearReady='1';
+  var wrap=document.createElement('div');wrap.className='search-clear-wrap';input.parentNode.insertBefore(wrap,input);wrap.appendChild(input);
+  var b=document.createElement('button');b.type='button';b.className='search-clear';b.textContent='×';b.setAttribute('aria-label','Clear search');b.title='Clear search';wrap.appendChild(b);
+  function sync(){b.hidden=!input.value;}sync();input.addEventListener('input',sync);input.addEventListener('search',sync);
+  b.addEventListener('pointerdown',function(e){e.preventDefault();});
+  b.onclick=function(){var id=input.id;input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));var next=document.getElementById(id)||input;next.focus();sync();};
+ });
+}
+function startSearchClear(){var app=document.getElementById('app');if(!app)return;new MutationObserver(installSearchClear).observe(app,{childList:true,subtree:true});installSearchClear();}
+if(typeof document!=='undefined'){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startSearchClear);else startSearchClear();}
 root.BardTools={solve:solve,required:required,missing:missing,stockView:stockView,slushView:slushView};
 })(typeof window!=='undefined'?window:globalThis);
 
@@ -2439,8 +2460,43 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
       if (main) { main.vars = (main.vars || []).concat(o); main.vlabel = main.vlabel || 'Original'; if (!o.parent) o.parent = main.id; }
       else { delete o.variantOf; DRINKS.push(o); }
     });
+    houseVariants();
     derive();
   }
+
+  /* Group named riffs using recorded parent relationships, including Bard originals.
+     Preserve ids, provenance, versions and local notes; flatten nested styles once. */
+  function houseVariants() {
+    var all=[],map={},owners={},roots={};
+    DRINKS.forEach(function(d){all.push(d);map[d.id]=d;(d.vars||[]).forEach(function(v){all.push(v);map[v.id]=v;owners[v.id]=d.id;});});
+    var anchors={};
+    ['old-fashioned','martini','daiquiri','margarita','mai-tai','negroni','manhattan','whiskey-sour','gimlet','last-word','espresso-martini','white-russian','revolver','bloody-mary','caipirinha','hot-toddy','cuba-libre','pina-colada','spritz','french-75','sazerac','sidecar','paloma','mojito','zombie','test-pilot','army-navy','penicillin','gold-rush','pisco-sour'].forEach(function(k){if(map[k])anchors[k]=1;});
+    function root(id){var seen={},path=[],cur=id;
+      while(map[cur]){if(seen[cur]){return path.slice().sort()[0];}seen[cur]=1;path.push(cur);
+        if(anchors[cur])return cur;
+        var next=owners[cur]||map[cur].variantOf||map[cur].parent;
+        if(!next||!map[next]||next===cur)return cur;cur=next;
+      }return id;
+    }
+    all.forEach(function(d){roots[d.id]=root(d.id);});
+    all.forEach(function(d){delete d.vars;});
+    var tops=[];all.forEach(function(d){var rid=roots[d.id];if(rid===d.id){delete d.variantOf;tops.push(d);}else{var r=map[rid];r.vars=r.vars||[];r.vars.push(d);d.variantOf=rid;d.vlabel=d.vlabel||d.name;}});
+    tops.forEach(function(d){if(d.vars)d.vars.sort(function(a,b){return a.name.localeCompare(b.name);});});
+    DRINKS.length=0;tops.forEach(function(d){DRINKS.push(d);});
+  }
+  function searchText(x){return String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
+  function songResults(list){
+    var q=searchText(state.q).trim(),t=q.split(/\s+/).filter(Boolean);if(!q)return list;
+    var out=[];
+    list.forEach(function(main){main.variants.forEach(function(v){
+      if(user.hidden[v.id]||!t.every(function(x){return searchText(v.search+' '+v.name+' '+(v.vlabel||'')).indexOf(x)>=0;}))return;
+      if(state.cat&&v.cat!==state.cat)return;
+      if(state.favorites&&!(user.drinks[v.id]||{}).favorite)return;
+      var d=Object.assign({},v,{aBase:v.baseList,aFlav:v.flav,aTech:v.allTech,aStatus:v.status,aStyle:v.styleList,aStrength:v.strengthList,pStyle:v.versions[v.vdef].style,variants:[v],mainName:main.name});out.push(d);
+    });});
+    return sorted(out);
+  }
+
   // variant objects keep their id through restore because ORIG holds it; this guard is for safety only
   function ORIG_VARS_ID(v) { for (var k in ORIG_OBJ) if (ORIG_OBJ[k] === v) return k; }
 
@@ -2626,7 +2682,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
       (u.rating ? '<span class="mk star">' + '★'.repeat(u.rating) + '</span>' : '');
     return '<li><a class="card" href="#/d/' + d.id + '" style="--c:' + (st.color || 'transparent') + '"><div class="cmain"><div class="cname">' + esc(d.name) +
       (u.notes ? ' <span class="dot" title="Has notes"></span>' : '') + (u.verified ? ' <span class="tick" title="Spec verified">✓</span>' : '') + '</div>' +
-      '<div class="csub">' + (st.icon || '') + ' ' + esc(d.pStyle) + ' · ' + esc(d.aBase.length > 1 ? d.aBase.slice(0, 3).join(' / ') : d.versions[d.vdef].base) + ' · ' + METHOD_LABEL[d.versions[d.vdef].m] + '</div>' +
+      (d.mainName && d.mainName !== d.name ? '<div class="csub">Style of ' + esc(d.mainName) + '</div>' : '') + '<div class="csub">' + (st.icon || '') + ' ' + esc(d.pStyle) + ' · ' + esc(d.aBase.length > 1 ? d.aBase.slice(0, 3).join(' / ') : d.versions[d.vdef].base) + ' · ' + METHOD_LABEL[d.versions[d.vdef].m] + '</div>' +
       (marks ? '<div class="marks">' + marks + '</div>' : '') + '</div>' +
       '<div class="cside"><span class="pill ' + catClass(d.cat) + '">' + esc(d.cat) + '</span><span class="abv">' + (d.stats.finalMl ? pct(d.stats.finalAbv, 0) : '—') + '</span></div></a></li>';
   }
@@ -2647,8 +2703,8 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
   function matches(d) {
     if (isHidden(d)) return false;
     if(state.favorites && !d.variants.some(function(v){return !!(user.drinks[v.id]||{}).favorite;}))return false;
-    if (state.cat && d.cat !== state.cat) return false;
-    if (state.q) { var toks = state.q.toLowerCase().split(/\s+/).filter(Boolean); for (var i = 0; i < toks.length; i++) if (d.aSearch.indexOf(toks[i]) < 0) return false; }
+    if (state.cat && !d.variants.some(function(v){return v.cat===state.cat;})) return false;
+    if (state.q) { var toks = searchText(state.q).split(/\s+/).filter(Boolean); for (var i = 0; i < toks.length; i++) if (searchText(d.aSearch).indexOf(toks[i]) < 0) return false; }
     for (var j = 0; j < FILTERS.length; j++) {
       var g = FILTERS[j], sel = Object.keys(state.f[g.k]); if (!sel.length) continue;
       var vals = g.get(d); if (!sel.some(function (s) { return vals.indexOf(s) > -1; })) return false;
@@ -2664,17 +2720,17 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
       rated: function (a, b) { return ((user.drinks[b.id] || {}).rating || 0) - ((user.drinks[a.id] || {}).rating || 0) || a.name.localeCompare(b.name); },
       sources: function (a, b) { return overlap(b.id) - overlap(a.id) || a.name.localeCompare(b.name); }
     }[state.sort];
-    var q = state.q.trim().toLowerCase();
+    var q = searchText(state.q).trim();
     if (!q) return list.slice().sort(by);
-    function rank(d) { var n = d.name.toLowerCase(); if (n === q) return 0; if (n.indexOf(q) === 0) return 1; if (n.indexOf(q) > -1) return 2;
-      if (d.variants.some(function (v) { return (v.name + ' ' + (v.vlabel || '')).toLowerCase().indexOf(q) > -1; })) return 3; return 4; }
+    function rank(d) { var n = searchText(d.name); if (n === q) return 0; if (n.indexOf(q) === 0) return 1; if (n.indexOf(q) > -1) return 2;
+      if (d.variants.some(function (v) { return searchText(v.name + ' ' + (v.vlabel || '')).indexOf(q) > -1; })) return 3; return 4; }
     return list.slice().sort(function (a, b) { return rank(a) - rank(b) || by(a, b); });
   }
   function renderBrowse() {
-    var list = sorted(DRINKS.filter(matches)), ac = activeCount();
+    var list = songResults(sorted(DRINKS.filter(matches))), ac = activeCount();
     var VIS = DRINKS.filter(function (d) { return !isHidden(d); }), nHid = DRINKS.length - VIS.length;
-    var inCat = VIS.filter(function (d) { return !state.cat || d.cat === state.cat; });
-    var counts = {}; VIS.forEach(function (d) { counts[d.cat] = (counts[d.cat] || 0) + 1; });
+    var inCat = VIS.filter(function (d) { return !state.cat || d.variants.some(function(v){return v.cat===state.cat;}); });
+    var counts = {}; VIS.forEach(function(d){var seen={};d.variants.forEach(function(v){if(!seen[v.cat]){counts[v.cat]=(counts[v.cat]||0)+1;seen[v.cat]=1;}});});
     function vals(g) { var v = {}; inCat.forEach(function (d) { g.get(d).forEach(function (x) { v[x] = (v[x] || 0) + 1; }); }); return v; }
     var sv = vals(FILTERS[0]);
     var h = '<header class="top hero"><div class="brand"><img src="' + LOGO + '" alt="Dad Bard" class="logo"><div><h1>Dad Bard <span class="sym">🪕</span></h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
@@ -2688,7 +2744,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
     var act = [];
     FILTERS.forEach(function (g) { Object.keys(state.f[g.k]).forEach(function (v) { act.push('<button class="achip" data-tap="achip" data-v="' + g.k + '|' + esc(v) + '">' + ((GROUP_ICON[g.k] || {})[v] || '') + ' ' + esc(v) + ' <b>×</b></button>'); }); });
     if (act.length) h += '<div class="achips">' + act.join('') + '<button class="achip clear" id="fclear2">Clear all</button></div>';
-    h += '<div class="sortrow"><span class="muted">' + list.length + ' of ' + VIS.length + ' songs</span>' +
+    h += '<div class="sortrow"><span class="muted">' + list.length + ' ' + (state.q.trim() ? 'matching recipes' : 'of ' + VIS.length + ' songs') + '</span>' +
       '<select id="sort"><option value="style">By style</option><option value="az">A–Z</option><option value="rated">My rating</option><option value="strong">Strongest</option><option value="light">Lightest</option><option value="sources">Most sources ticked</option></select></div></header>';
     if (state.sort === 'style' && !state.q.trim()) {
       STYLES.forEach(function (s) {
@@ -2788,7 +2844,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
     var v = d.versions[vi], st = v.stats, sty = STYLE_BY[v.style] || {};
     var batchWord = d.batch ? (serves === 1 ? '1 batch' : serves + '× batch') : serves + ' ' + (serves === 1 ? 'serve' : 'serves');
     var h = '<header class="top detail"><div class="dethead"><a href="#/" class="back">‹ Songbook</a><a class="editbtn" href="#/edit/' + encodeURIComponent(d.id) + '/' + vi + '">✏️ Edit</a></div>' +
-      '<h1>' + esc(main.name) + '</h1>' +
+      '<h1>' + esc(main.name) + '</h1>' + (d.id !== main.id ? '<p class="selected-style">' + esc(d.name) + '</p>' : '') +
       (main.variants.length > 1 ? '<div class="varpick"><div class="flabel">Style · ' + main.variants.length + '</div>' +
         pills('variant', main.variants.map(function (x) { return { v:x.id, label:x.vlabel || x.name, icon: x.custom ? '✏️' : x.fromNotes ? '✍️' : '' }; }), function (x) { return x === d.id; }) +
         (vIdx ? '<p class="varname">' + esc(d.name) + (d.changed ? ' · <span class="muted">' + esc(d.changed) + '</span>' : '') + '</p>' : '') +
@@ -3006,9 +3062,9 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
       '<p class="muted small">' + (isNew ? 'Saved on this device. Export a backup in the Tavern.' : d.mineMain ? 'Changes save over this recipe. Reset brings back the original.' : d.target === 'av' ? 'Saving as your version keeps the traditional spec. Reset brings back the original.' : 'Reset brings back the original.') + '</p></header>';
     h += '<section class="panel"><label class="field"><span>Name</span><input id="ename" value="' + esc(d.name) + '" placeholder="Drink name"></label>';
     if (!d.isVariant || isNew) h += '<div class="flabel">Category</div>' + pills('ecat', CATS.map(function (c) { return { v:c, label:c, icon:CAT_ICON[c] }; }), function (v) { return v === d.cat; });
-    if (isNew && d.cat !== 'Bard’s') {
+    if (isNew) {
       h += '<label class="field"><span>Add as a style of… (optional)</span><select id="eof"><option value="">— Stand-alone drink —</option>' +
-        DRINKS.filter(function (x) { return x.src !== 'andrew' && !x.custom; }).slice().sort(function (a, b) { return a.name.localeCompare(b.name); }).map(function (x) { return '<option value="' + x.id + '"' + (x.id === d.variantOf ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('') + '</select></label>';
+        DRINKS.slice().sort(function (a, b) { return a.name.localeCompare(b.name); }).map(function (x) { return '<option value="' + x.id + '"' + (x.id === d.variantOf ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('') + '</select></label>';
     }
     if (d.isVariant || (isNew && d.variantOf)) h += '<label class="field"><span>Style name (shown on the picker)</span><input id="evlabel" value="' + esc(d.vlabel) + '" placeholder="e.g. Smoky, House, Wet"></label>';
     if (d.cat !== 'Bard’s') h += '<label class="field"><span>Creator</span><input id="ecreator" value="' + esc(d.creator) + '" placeholder="Bartender or bar"></label>';
@@ -3060,7 +3116,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
     function val(id, k) { var el = document.getElementById(id); if (el) el.oninput = el.onchange = function () { d[k] = el.value; editorPreview(); }; }
     val('ename', 'name'); val('ebase', 'base'); val('eglass', 'glass'); val('eice', 'ice'); val('egarnish', 'garnish'); val('emethod', 'method'); val('enote', 'note'); val('evlabel', 'vlabel'); val('ecreator', 'creator'); val('efam', 'fam');
     var eof = document.getElementById('eof'); if (eof) eof.onchange = function () { var c = d.cat; draft = draftNew(c, eof.value); draft.cat = c; keep(renderEditor); };
-    onTap('ecat', function (v) { d.cat = v; if (v === 'Bard’s') d.variantOf = ''; keep(renderEditor); });
+    onTap('ecat', function (v) { d.cat = v; keep(renderEditor); });
     onTap('estyle', function (v) { d.style = v; keep(renderEditor); });
     onTap('em', function (v) { d.m = v; keep(renderEditor); });
     onTap('etarget', function (v) { d.target = v; keep(renderEditor); });
@@ -3088,7 +3144,7 @@ root.BardTools={solve:solve,required:required,missing:missing,stockView:stockVie
       obj.spec = r.spec; obj.note = d.note.trim() || undefined;
       if (d.cat === 'Bard’s') { obj.src = 'andrew'; obj.prov = { who:'Andrew (Dad Bard)', where:'Home bar', year:String(new Date().getFullYear()), conf:'own', note:'' }; }
       else obj.prov = { who:d.creator.trim() || 'Unknown', where:'—', year:'—', conf:'low', note:'Added by you.' };
-      if (d.variantOf && d.cat !== 'Bard’s') { obj.variantOf = d.variantOf; obj.vlabel = d.vlabel.trim() || d.name.trim(); obj.changed = obj.changed || 'Your style.'; }
+      if (d.variantOf) { obj.variantOf = d.variantOf; obj.vlabel = d.vlabel.trim() || d.name.trim(); obj.changed = obj.changed || 'Your style.'; }
       if (d.mode === 'new') user.custom.push(obj);
       id = obj.id;
     } else {
