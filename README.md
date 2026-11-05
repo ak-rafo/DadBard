@@ -10,7 +10,7 @@ Open the site once on your iPhone while online so it saves for offline use. Your
 edits and new recipes stay on the phone (back them up in Tavern → Export JSON).
 
 ## What's inside
-- **Songbook**: sorted into four styles (Spirit-forward, Sour, Highball, Flip) plus your Andrew's category.
+- **Songbook**: sorted into four styles (Spirit-forward, Sour, Highball, Sweet & Savory) plus your Andrew's category.
 - **✏️ Edit** any drink, or tap ＋ to create a new recipe in any category (or as a new style of an existing drink).
 - **Bloodlines**: Evolution timeline/tree and the six Codex families (Highball renamed).
 - **Apothecary**: super juice (Kevin Kos), syrups, acid adjusting.

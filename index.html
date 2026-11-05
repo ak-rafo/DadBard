@@ -921,10 +921,10 @@ var NEW = {
   threestars:{n:'Planteray (formerly Plantation) 3 Stars white rum',abv:.41,t:'spirit'},
   oftd:{n:'Planteray (formerly Plantation) O.F.T.D. overproof rum',abv:.69,t:'spirit'},
   plantation5:{n:'Planteray (formerly Plantation) 5 Year rum',abv:.40,t:'spirit'},
-  strawrum:{n:'Strawberry-infused white rum',abv:.38,sug:.01,t:'spirit',prep:'strawberry-rum'},
-  pinerum:{n:'Pineapple rum',abv:.40,sug:.02,t:'spirit',prep:'pineapple-rum'},
-  pineoftd:{n:'Pineapple-soaked O.F.T.D.',abv:.60,sug:.03,t:'spirit',prep:'pineapple-rum'},
-  bacardiinf:{n:'Bacardi, infused',abv:.40,t:'spirit',prep:'infused-bacardi'},
+  strawrum:{n:'Strawberry-infused white rum',abv:.38,sug:.01,t:'spirit'},
+  pinerum:{n:'Pineapple rum',abv:.40,sug:.02,t:'spirit'},
+  pineoftd:{n:'Pineapple-soaked O.F.T.D.',abv:.60,sug:.03,t:'spirit'},
+  bacardiinf:{n:'Bacardi, infused',abv:.40,t:'spirit'},
   sake:{n:'Sake',abv:.15,sug:.02,acid:.002,t:'wine'}, spicedpear:{n:'St. George Spiced Pear liqueur',abv:.20,sug:.20,t:'liqueur'},
   lofi:{n:'Lo-Fi Gentian Amaro',abv:.175,sug:.12,t:'liqueur'}, triplesec:{n:'Triple sec',abv:.30,sug:.28,t:'liqueur'},
   mrblack:{n:'Mr Black coffee liqueur',abv:.25,sug:.25,t:'liqueur'}, licor43:{n:'Licor 43',abv:.31,sug:.33,t:'liqueur'},
@@ -937,9 +937,9 @@ var NEW = {
   raspberrysyrup:{n:'Raspberry syrup',sug:.67,acid:.01,t:'syrup',prep:'raspberry-syrup'},
   cinnamonsyrup:{n:'Cinnamon syrup',sug:.615,t:'syrup',prep:'cinnamon-syrup'},
   greenteasyrup:{n:'Green tea syrup',sug:.615,t:'syrup',prep:'green-tea-syrup'},
-  rosemarysyrup:{n:'Rosemary syrup',sug:.615,t:'syrup',prep:'rosemary-syrup'},
+  rosemarysyrup:{n:'Rosemary syrup',sug:.615,t:'syrup'},
   tomatosyrup:{n:'Salted tomato syrup',sug:.62,acid:.004,t:'syrup',prep:'salted-tomato-syrup'},
-  cherrysyrup:{n:'Cherry syrup',sug:.60,t:'syrup',prep:'cherry-syrup'},
+  cherrysyrup:{n:'Cherry syrup',sug:.60,t:'syrup'},
   bananaoleo:{n:'Banana oleo',sug:.80,t:'syrup',prep:'banana-oleo'}, agavenectar:{n:'Agave nectar',sug:.95,t:'syrup'},
   mojitocordial:{n:'Mojito cordial',sug:.33,acid:.019,t:'syrup',prep:'mojito-cordial'},
   gingercoin:{n:'Fresh ginger coins, muddled',t:'solid'}, fennel:{n:'Ground fennel',t:'solid'},
@@ -1182,10 +1182,6 @@ var P = {
   'basic-foam':{t:'Basic foam',tag:'prep',mine:['2 egg whites, 3 oz cold water, 1 oz simple syrup, 1 oz lemon juice.']},
   'whipped-cream':{t:'Whipped cream',tag:'prep',mine:['4 oz cream to 1 tbsp maple syrup.']}
 };
-[
- ['rosemary-syrup','Rosemary syrup',''],['cherry-syrup','Cherry syrup',''],
- ['strawberry-rum','Strawberry-infused rum',''],['pineapple-rum','Pineapple-infused rum','Covers “pineapple rum” and “pineapple-soaked O.F.T.D.”'],['infused-bacardi','Infused Bacardi (Slushee)','What is it infused with?']
-].forEach(function (x) { P[x[0]] = { t:x[1], tag:'prep', missing:true, mine:[], note:x[2] }; });
 for (var pk in P) { var p = P[pk]; p.eq = p.eq || []; p.body = p.body || []; p.infl = p.infl || '—'; TECH[pk] = p; }
 
 DATA.NORMALIZED = ['“mr back” → Mr Black ✓','“pisco y” → pisco ✓','“Jamaican run” → Jamaican rum ✓','“ango” → Angostura ✓','“AKs” → AK’s ✓',
@@ -1484,18 +1480,20 @@ D.forEach(function (d) { DATA.ALL.push(d); (d.vars || []).forEach(function (v) {
    Spirit-forward: stirred drinks, Old Fashioneds, Martinis
    Sour: Daiquiris and Sidecars
    Highball: anything topped with soda, ginger beer or sparkling wine
-   Flip: egg, cream and rich drinks */
+   Sweet & Savory: flips, coffee drinks (every espresso martini), Bloody Mary and other odd ones */
 DATA.STYLES = [
   { k:'Spirit-forward', icon:'🥃', sub:'Stirred · Old Fashioned · Martini', color:'#d6a24a' },
   { k:'Sour', icon:'🍋', sub:'Daiquiri · Sidecar', color:'#8fc04a' },
   { k:'Highball', icon:'🫧', sub:'Soda & sparkling toppers', color:'#74bfa1' },
-  { k:'Flip', icon:'🥚', sub:'Egg · cream · rich', color:'#c9a0dc' }
+  { k:'Sweet & Savory', icon:'☕', sub:'Flip · Coffee · Other', color:'#c9a0dc' }
 ];
 var FIZZ = { soda:1, gingerbeer:1, grapefruitsoda:1, champagne:1, prosecco:1 };
 DATA.FIZZ = FIZZ;
+var SS_ING = { espresso:1, coffee:1, hotcoffee:1, tomatojuice:1 };   // coffee & savory drinks
+DATA.SS_ING = SS_ING;
 DATA.styleOf = function (d, spec, m) {
-  if (d.style) return d.style;
-  if (d.fam === 'Flip') return 'Flip';
+  if (d.style) return d.style === 'Flip' ? 'Sweet & Savory' : d.style;
+  if (d.fam === 'Flip' || (spec || []).some(function (it) { return SS_ING[it[2]]; })) return 'Sweet & Savory';
   if (d.fam === 'Highball' || (spec || []).some(function (it) { var o = it[3] || {}; return (it[1] === 'top' || it[1] === 'free') && !o.side && FIZZ[it[2]]; })) return 'Highball';
   if (m === 'stir' || d.fam === 'Old-Fashioned' || d.fam === 'Martini') return 'Spirit-forward';
   return 'Sour';
@@ -1691,7 +1689,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     { id:'green-tea', n:'Green tea', cat:'Herbal', icon:'🍵', kind:'scaled', prep:'green-tea-syrup', house:true, unitLabel:'tea bags (or 1 tsp loose-leaf each)',
       items:[{ n:'Water', q:1, unit:'cup' },{ n:'Green tea', q:2, unit:'' },{ n:'Granulated sugar', q:1, unit:'cup' }],
       method:['Heat the water until just off the boil, add the tea and steep a few minutes (longer turns it bitter).','Remove the tea, stir in the sugar until dissolved, cool and bottle.'] },
-    { id:'rosemary', n:'Rosemary', cat:'Herbal', icon:'🌿', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Water', prep:'rosemary-syrup',
+    { id:'rosemary', n:'Rosemary', cat:'Herbal', icon:'🌿', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Water',
       adds:[{ n:'Rosemary sprigs', per500:4, unit:'sprigs' }],
       method:['Make a warm 1:1 syrup, then steep the rosemary off the heat for 20–30 minutes.','Taste and strain. It gets piney fast.'] },
     { id:'orgeat', n:'Orgeat', cat:'Andrew’s', icon:'🌰', kind:'scaled', prep:'orgeat', mine:true,
@@ -1811,6 +1809,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var said = D.filter(function (d) { return d.said; }).length;
     check('Drinks from your notes', said === 44, said + ' of 44 (Slushy Mojito deleted)');
     check('Slushy Mojito deleted', !find('slushy-mojito'));
+    check('Unwritten pages removed', !Object.keys(DATA.TECH).some(function (k) { return DATA.TECH[k].missing; }));
+    check('Flip style replaced by Sweet & Savory', !DATA.STYLES.some(function (s) { return s.k === 'Flip'; }) && DATA.STYLES.some(function (s) { return s.k === 'Sweet & Savory' && s.sub === 'Flip · Coffee · Other'; }));
     var openFlags = D.filter(function (d) { return (d.flags || []).length; }).map(function (d) { return d.id; });
     check('To-do list clear (Rum Runnings confirmed stirred)', !openFlags.length && find('rum-runnings').m === 'stir', openFlags.join(', '));
     check('All name normalizations confirmed', !!DATA.NORMALIZED_CONFIRMED && DATA.NORMALIZED.every(function (x) { return x.indexOf('✓') > -1; }));
@@ -1830,7 +1830,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     if (DATA.styleOf) {
       function sty(id) { var d = find(id); return DATA.styleOf(d, d.spec, d.m); }
       var exp = { 'old-fashioned':'Spirit-forward', 'martini':'Spirit-forward', 'manhattan':'Spirit-forward', 'negroni':'Spirit-forward', 'daiquiri':'Sour', 'sidecar':'Sour', 'margarita':'Sour',
-        'tom-collins':'Highball', 'french-75':'Highball', 'mojito':'Highball', 'whisky-highball':'Highball', 'flip':'Flip', 'irish-coffee':'Flip', 'mai-tai':'Sour' };
+        'tom-collins':'Highball', 'french-75':'Highball', 'mojito':'Highball', 'whisky-highball':'Highball', 'flip':'Sweet & Savory', 'irish-coffee':'Sweet & Savory', 'bloody-mary':'Sweet & Savory', 'espresso-martini':'Sweet & Savory', 'balanced-espresso-martini':'Sweet & Savory', 'amaretto-espresso-martini':'Sweet & Savory', 'fancy-xpressi-martini':'Sweet & Savory', 'mai-tai':'Sour' };
       var wrong = Object.keys(exp).filter(function (id) { return sty(id) !== exp[id]; }).map(function (id) { return id + '→' + sty(id); });
       check('Four styles sort correctly (stirred / sour / soda-topped / flip)', !wrong.length, wrong.join(', '));
       var cnt = {}; TOP.forEach(function (d) { var s = DATA.styleOf(d, d.spec, d.m); cnt[s] = (cnt[s] || 0) + 1; });
@@ -2559,7 +2559,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var act = [];
     FILTERS.forEach(function (g) { Object.keys(state.f[g.k]).forEach(function (v) { act.push('<button class="achip" data-tap="achip" data-v="' + g.k + '|' + esc(v) + '">' + ((GROUP_ICON[g.k] || {})[v] || '') + ' ' + esc(v) + ' <b>×</b></button>'); }); });
     if (act.length) h += '<div class="achips">' + act.join('') + '<button class="achip clear" id="fclear2">Clear all</button></div>';
-    h += '<div class="sortrow"><span class="muted">' + list.length + ' of ' + VIS.length + ' songs' + (nHid ? ' · ' + link('#/more/hidden', '🙈 ' + nHid + ' hidden') : '') + '</span>' +
+    h += '<div class="sortrow"><span class="muted">' + list.length + ' of ' + VIS.length + ' songs</span>' +
       '<select id="sort"><option value="style">By style</option><option value="az">A–Z</option><option value="rated">My rating</option><option value="strong">Strongest</option><option value="light">Lightest</option><option value="sources">Most sources ticked</option></select></div></header>';
     if (state.sort === 'style' && !state.q.trim()) {
       STYLES.forEach(function (s) {
@@ -2884,7 +2884,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     h += '</section>';
     h += '<section class="panel"><div class="flabel">Style</div>' +
       pills('estyle', [{ v:'auto', label:'Auto', icon:'✨' }].concat(STYLES.map(function (s) { return { v:s.k, label:s.k, icon:s.icon, color:s.color }; })), function (v) { return v === d.style; }) +
-      '<p class="muted small">Auto: stirred → Spirit-forward, soda or sparkling topper → Highball, egg/cream family → Flip, otherwise Sour.</p>' +
+      '<p class="muted small">Auto: coffee, espresso, tomato or egg/cream family → Sweet & Savory, soda or sparkling topper → Highball, stirred → Spirit-forward, otherwise Sour.</p>' +
       '<div class="grid2"><label class="field"><span>Codex family</span><select id="efam">' + ROOT_ORDER.map(function (f) { return '<option' + (f === d.fam ? ' selected' : '') + '>' + f + '</option>'; }).join('') + '</select></label>' +
       '<label class="field"><span>Base spirit</span><input id="ebase" list="baselist" value="' + esc(d.base) + '"></label></div>' +
       '<div class="flabel">Method</div>' + pills('em', Object.keys(METHOD_LABEL).map(function (k) { return { v:k, label:METHOD_LABEL[k] }; }), function (v) { return v === d.m; }) +
@@ -3050,7 +3050,6 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var keys = Object.keys(TECH).filter(function (k) { return !craftHidden(k); });
     var CAT = {
       prep: function (k) { return TECH[k].tag === 'prep' && !TECH[k].missing; },
-      unwritten: function (k) { return TECH[k].missing && !user.tech[k]; },
       home: function (k) { return TECH[k].tag === 'home'; },
       equipment: function (k) { return TECH[k].tag === 'equipment'; }
     };
@@ -3058,13 +3057,12 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var cnt = function (f) { return keys.filter(f).length; };
     var h = '<header class="top"><h1>Bar craft</h1><p class="muted small">Techniques in my own words, plus your prep recipes and notes. Influences are credited, not paraphrased.</p>' +
       '<input id="cq" type="search" class="full" placeholder="Search techniques & prep" value="' + esc(craft.q) + '">' +
-      tiles('craftcat', [{ v:'', label:'Everything', icon:'✦', count:keys.length }, { v:'prep', label:'House prep', icon:'🎻', count:cnt(CAT.prep) }, { v:'unwritten', label:'Unwritten', icon:'✍️', count:cnt(CAT.unwritten) },
+      tiles('craftcat', [{ v:'', label:'Everything', icon:'✦', count:keys.length }, { v:'prep', label:'House prep', icon:'🎻', count:cnt(CAT.prep) },
         { v:'home', label:'Home technique', icon:'🏠', count:cnt(CAT.home) }, { v:'equipment', label:'Needs gear', icon:'🔧', count:cnt(CAT.equipment) }].concat(
         user.craft.sections.map(function (sec) { return { v:sec.id, label:sec.n, icon:sec.icon, count:cnt(CAT[sec.id]) }; })), function (v) { return v === craft.cat; }) +
-      '<div class="row craftbtns"><a class="btn" href="#/craft/new/' + (craft.cat && craft.cat !== 'unwritten' ? craft.cat : 'prep') + '">＋ New entry</a><button class="btn' + (craft.addSec ? ' on' : '') + '" id="addsec">＋ New section</button></div>' +
+      '<div class="row craftbtns"><a class="btn" href="#/craft/new/' + (craft.cat || 'prep') + '">＋ New entry</a><button class="btn' + (craft.addSec ? ' on' : '') + '" id="addsec">＋ New section</button></div>' +
       (craft.addSec ? '<section class="panel mine">' + '<h2>New section</h2>' + newSecForm('ns') + '<div class="row"><button class="btn primary" id="nssave">Create section</button><button class="btn ghost" id="nscancel">Cancel</button></div></section>' : '') +
-      '</header>' +
-      '<a class="apocard" href="#/apothecary"><i>⚖️</i><div><b>The Apothecary</b><span>Super juice, syrup and acid-adjust calculators</span></div><em>›</em></a>';
+      '</header>';
     function row(k) {
       var c = usedIn(k).length, t = TECH[k];
       return '<li>' + link('#/t/' + k, esc(t.t)) + (t.customItem ? ' <span class="mk edit">yours</span>' : '') + (t.mine && t.mine.length && t.tag !== 'prep' ? ' <span class="mk av">your notes</span>' : '') + (t.flags ? ' <span class="mk flag">⚑</span>' : '') + (APO_LINK[k] ? ' <span class="mk calc">⚖️ calc</span>' : '') +
@@ -3081,7 +3079,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       return '<section class="panel' + (key === 'prep' || key === 'unwritten' || custom ? ' mine' : '') + '"><h2 class="sechead"><span>' + title + '</span>' + tools + '</h2>' + (sub ? '<p class="muted small">' + sub + '</p>' : '') +
         (ks.length ? '<ul class="tlist">' + ks.map(row).join('') + '</ul>' : '<p class="muted small">Empty. Tap ＋ Add to write the first entry.</p>') + '</section>';
     }
-    var body = group('prep', '🎻 Andrew’s house prep') + group('unwritten', '✍️ Unwritten verses', 'Used in your specs but not written down yet. The Apothecary has starter recipes you can save here.') +
+    var body = group('prep', '🎻 Andrew’s house prep') +
       group('home', '🏠 Home-feasible technique') + group('equipment', '🔧 Equipment required') +
       user.craft.sections.map(function (sec) { return group(sec.id, sec.icon + ' ' + esc(sec.n), '', true); }).join('');
     $app.innerHTML = h + (body || '<p class="empty">Nothing matches.</p>');
