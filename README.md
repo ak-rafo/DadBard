@@ -14,4 +14,4 @@ edits and new recipes stay on the phone (back them up in Tavern → Export JSON)
 - **✏️ Edit** any drink, or tap ＋ to create a new recipe in any category (or as a new style of an existing drink).
 - **Bloodlines**: Evolution timeline/tree and the six Codex families (Highball renamed).
 - **Apothecary**: super juice (Kevin Kos), syrups, acid adjusting.
-- **Tavern**: to-do list, your recipes & edits, backups, calculator check.
+- **Tavern**: your recipes & edits, backups, calculator check, and hidden songs & craft pages.

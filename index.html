@@ -938,7 +938,7 @@ var NEW = {
   cinnamonsyrup:{n:'Cinnamon syrup',sug:.615,t:'syrup',prep:'cinnamon-syrup'},
   greenteasyrup:{n:'Green tea syrup',sug:.615,t:'syrup',prep:'green-tea-syrup'},
   rosemarysyrup:{n:'Rosemary syrup',sug:.615,t:'syrup',prep:'rosemary-syrup'},
-  tomatosyrup:{n:'Salted tomato syrup',sug:.50,acid:.003,t:'syrup',prep:'salted-tomato-syrup'},
+  tomatosyrup:{n:'Salted tomato syrup',sug:.62,acid:.004,t:'syrup',prep:'salted-tomato-syrup'},
   cherrysyrup:{n:'Cherry syrup',sug:.60,t:'syrup',prep:'cherry-syrup'},
   bananaoleo:{n:'Banana oleo',sug:.80,t:'syrup',prep:'banana-oleo'}, agavenectar:{n:'Agave nectar',sug:.95,t:'syrup'},
   mojitocordial:{n:'Mojito cordial',sug:.33,acid:.019,t:'syrup',prep:'mojito-cordial'},
@@ -1174,6 +1174,8 @@ var P = {
   'ginger-syrup':{t:'Ginger syrup',tag:'prep',mine:['Equal parts by volume: rough-chopped ginger (no need to peel), boiling water, and sugar or honey. 1 cup each is a good start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','For the Penicillin, use honey-ginger syrup instead (its own recipe).']},
   'cinnamon-syrup':{t:'Cinnamon syrup',tag:'prep',mine:['1 oz cinnamon sticks per 2 cups water (about 1 oz per 470 g water).','Sugar: equal weight to the water.']},
   'raspberry-syrup':{t:'Raspberry syrup',tag:'prep',mine:['2 cups sugar','1 cup water','1 cup raspberries (fresh or frozen)','Stir the sugar and water over low heat until the sugar has dissolved.','Remove from the heat, add the raspberries, and stir and mash the berries.','Let it cool completely, then strain through a sieve into a bowl, pushing all the liquid through the pulp with a spoon.','Jar it and refrigerate. Keeps up to 2 weeks.']},
+  'green-tea-syrup':{t:'Green tea syrup',tag:'prep',mine:['1 cup water','2 green tea bags or 2 teaspoons loose-leaf green tea','1 cup granulated sugar']},
+  'salted-tomato-syrup':{t:'Salted tomato syrup',tag:'prep',mine:['Add 150 g ripe tomato to 150 g white sugar.','Macerate overnight at room temperature, then strain out the solids.','Add 2% salt by weight (3 g) and stir to combine.']},
   'grenadine':{t:'Grenadine',tag:'prep',infl:'Morgenthaler',mine:['2 cups / 500 ml fresh pomegranate juice','2 cups / 500 g sugar','2 oz / 60 ml pomegranate molasses','1 tsp / 5 ml orange blossom water','Heat the juice slightly, just enough for the rest to dissolve easily. Stir in the remaining ingredients, cool, and bottle.']},
   'coffee-liqueur':{t:'House coffee liqueur',tag:'prep',mine:['50 g ground coffee, 250 ml vodka, 1 g cinnamon stick, 4 g organic orange peel. Sit 24 hours.','Then add 1 tsp vanilla extract, 100 g demerara sugar and 85 ml hot water.']},
   'mojito-cordial':{t:'Mojito cordial',tag:'prep',mine:['Big handful of mint, 100 ml lime juice, 150 ml water, 100 g sugar, 3 g lime peel.']},
@@ -1181,7 +1183,7 @@ var P = {
   'whipped-cream':{t:'Whipped cream',tag:'prep',mine:['4 oz cream to 1 tbsp maple syrup.']}
 };
 [
- ['green-tea-syrup','Green tea syrup',''],['rosemary-syrup','Rosemary syrup',''],['salted-tomato-syrup','Salted tomato syrup',''],['cherry-syrup','Cherry syrup',''],
+ ['rosemary-syrup','Rosemary syrup',''],['cherry-syrup','Cherry syrup',''],
  ['strawberry-rum','Strawberry-infused rum',''],['pineapple-rum','Pineapple-infused rum','Covers “pineapple rum” and “pineapple-soaked O.F.T.D.”'],['infused-bacardi','Infused Bacardi (Slushee)','What is it infused with?']
 ].forEach(function (x) { P[x[0]] = { t:x[1], tag:'prep', missing:true, mine:[], note:x[2] }; });
 for (var pk in P) { var p = P[pk]; p.eq = p.eq || []; p.body = p.body || []; p.infl = p.infl || '—'; TECH[pk] = p; }
@@ -1319,6 +1321,11 @@ add({id:'grasshopper',name:'Grasshopper',cat:'Classic',fam:'Flip',base:'Amaro & 
  flav:['creamy','sweet','herbal'],tech:['shake'],parent:'brandy-alexander',changed:'Crème de menthe and cacao, no spirit.',
  prov:{who:'Philibert Guichet (claimed)',where:'Tujague’s, New Orleans',year:'1918',conf:'medium',note:''}});
 
+add({id:'tomato-margarita',name:'50/50 Tomato Margarita',cat:'Modern',fam:'Daiquiri',base:'Agave',m:'shake',glass:'Double rocks',ice:'Cubes',garnish:'Salt and pepper, cherry tomatoes',
+ spec:[[1,'oz','mezcal'],[1,'oz','manzanilla'],[0.75,'oz','tomatosyrup'],[0.75,'oz','lime']],
+ flav:['savory','smoky','citrusy'],tech:['shake'],parent:'margarita',changed:'Mezcal split 50/50 with manzanilla sherry; salted tomato syrup instead of orange liqueur.',
+ prov:{who:'Not noted',where:'—',year:'—',conf:'low',note:'Added from your recipe card. Tools: shaker, strainer.'}});
+
 /* ---------- tiki & tropical ---------- */
 add({id:'pina-colada',name:'Piña Colada',cat:'Tiki',fam:'Daiquiri',base:'Rum',m:'blend',glass:'Hurricane',ice:'Crushed',garnish:'Pineapple wedge, cherry',
  spec:[[2,'oz','whiterum'],[1.5,'oz','creamcoconut'],[1.5,'oz','pineapple'],[0.5,'oz','lime']],
@@ -1396,6 +1403,17 @@ var GROUPS = {
     ['nuclear-daiquiri','Nuclear']
   ]},
   'margarita': { label:'Classic', items:[['tommys','Tommy’s']] },
+  'last-word': { label:'Classic', items:[
+    ['final-ward','Final Ward'],
+    { id:'ultima-palabra', label:'Ultima Palabra', name:'Ultima Palabra', base:'Agave', garnish:'Thyme sprig',
+      spec:[[0.75,'oz','mezcal'],[0.75,'oz','greenchartreuse'],[0.75,'oz','maraschino'],[0.75,'oz','pineapple'],[0.75,'oz','lime']],
+      changed:'Mezcal for gin, plus an equal part of pineapple.', flav:['smoky','herbal','tropical'],
+      prov:{who:'Simone De Luca',where:'High Road House, Chiswick, London',year:'2000s',conf:'medium',note:'“Ultima palabra” is Spanish for “last word.” Recipe published by Gary Regan.'} },
+    { id:'closing-argument', label:'Closing Argument', name:'Closing Argument', base:'Agave',
+      spec:[[0.75,'oz','mezcal'],[0.75,'oz','greenchartreuse'],[0.75,'oz','maraschino'],[0.75,'oz','lemon']],
+      changed:'Mezcal for gin and lemon for lime: a smoky Final Ward.', flav:['smoky','herbal','citrusy'],
+      prov:{who:'Unverified',where:'—',year:'2010s',conf:'low',note:'Specs and credit vary between sources. Verify before citing.'} }
+  ]},
   'whiskey-sour': { label:'Classic', items:[
     { id:'new-york-sour', label:'New York', name:'New York Sour', spec:[[2,'oz','bourbon'],[0.75,'oz','lemon'],[0.75,'oz','simple'],[0.5,'oz','redwine',{post:true,label:'Dry red wine, float'}]], changed:'Red wine floated on top.', tech:['shake','float'],
       prov:{who:'Unknown (first known as the Continental Sour)',where:'Chicago / New York',year:'1880s',conf:'medium',note:''} }
@@ -1576,10 +1594,10 @@ var S = [
     formula:'Classic frame · swap one or two parts', blurb:'Keep the frame and change a part or two. The Brooklyn-neighborhood Manhattans (Red Hook, Greenpoint, Slope…) are the textbook case.',
     ex:['red-hook','greenpoint','slope','carroll-gardens','cobble-hill','little-italy','enzoni','tommys'] },
   { id:'equal-revival', n:'Equal-parts revival', era:'revival', year:'2004–', type:'sour', root:'Sidecar', parent:'equal-parts',
-    formula:'¾ · ¾ · ¾ · ¾, any four', blurb:'When Seattle revived the Last Word, the four-equal-parts frame became a playground.', ex:['final-ward','paper-plane','naked-famous','division-bell','monte-cassino'] },
+    formula:'¾ · ¾ · ¾ · ¾, any four', blurb:'When Seattle revived the Last Word, the four-equal-parts frame became a playground.', ex:['ultima-palabra','closing-argument','final-ward','paper-plane','naked-famous','division-bell','monte-cassino'] },
   { id:'agave', n:'Agave & mezcal', era:'revival', year:'2007–', type:'spirit', root:'Old-Fashioned', parent:'revival', also:'cocktail',
     formula:'Tequila or mezcal in any template', blurb:'Tequila and mezcal moved past the Margarita into Old Fashioneds, Negronis and tiki.',
-    ex:['oaxaca-of','naked-famous','division-bell','tia-mia','siesta','la-perla','infante','mezcalrita','rosa-maria','fancy-xpressi-martini'] },
+    ex:['tomato-margarita','oaxaca-of','naked-famous','division-bell','tia-mia','siesta','la-perla','infante','mezcalrita','rosa-maria','fancy-xpressi-martini'] },
   { id:'tiki-revival', n:'Tiki revival', era:'revival', year:'2009–', type:'tropical', root:'Daiquiri', parent:'tiki', also:'revival',
     formula:'Vintage tiki · craft precision', blurb:'Jeff Berry’s research and bars like Smuggler’s Cove brought tiki back properly, then bartenders blended it with other styles.',
     ex:['ancient-mariner','tia-mia','bitter-mai-tai','chartreuse-swizzle','nuclear-daiquiri','monkeypod-mai-tai','tropic-blunder','rum-n-stuff','tiki-old-fashioned','fruit-salad-daiquiri'] },
@@ -1667,12 +1685,12 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     { id:'grenadine', n:'Grenadine', cat:'Fruit', icon:'🍷', kind:'scaled', prep:'grenadine', house:true, src:'Jeffrey Morgenthaler',
       items:[{ n:'Fresh pomegranate juice', q:500, unit:'ml' },{ n:'Sugar', q:500, unit:'g' },{ n:'Pomegranate molasses', q:60, unit:'ml' },{ n:'Orange blossom water', q:5, unit:'ml' }],
       method:['Heat the juice slightly, just enough to let the other ingredients dissolve easily.','Stir in the remaining ingredients, let it cool, and bottle.'] },
-    { id:'tomato', n:'Salted tomato', cat:'Fruit', icon:'🍅', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Tomato water or strained juice', prep:'salted-tomato-syrup',
-      adds:[{ n:'Salt', pctTotal:1, unit:'g' }],
-      method:['Blend ripe tomatoes and strain through a cloth for tomato water (or use strained juice).','Stir in sugar and salt cold. Start with salt at about 1% of the total and taste.'] },
-    { id:'green-tea', n:'Green tea', cat:'Herbal', icon:'🍵', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Brewed green tea', prep:'green-tea-syrup',
-      adds:[{ n:'Loose green tea', perLiquid:0.03, unit:'g' }],
-      method:['Brew the tea at about 80 °C (not boiling) for 3–4 minutes and strain. Hotter or longer turns it bitter.','Stir in the sugar while warm.'] },
+    { id:'tomato', n:'Salted tomato', cat:'Fruit', icon:'🍅', kind:'scaled', prep:'salted-tomato-syrup', house:true,
+      items:[{ n:'Ripe tomato', q:150, unit:'g' },{ n:'White sugar', q:150, unit:'g' },{ n:'Salt (2% by weight, after straining)', q:3, unit:'g' }],
+      method:['Add the ripe tomato to the white sugar.','Macerate overnight at room temperature, then strain out the solids.','Add 2% salt by weight (3 g per batch) and stir to combine.'] },
+    { id:'green-tea', n:'Green tea', cat:'Herbal', icon:'🍵', kind:'scaled', prep:'green-tea-syrup', house:true, unitLabel:'tea bags (or 1 tsp loose-leaf each)',
+      items:[{ n:'Water', q:1, unit:'cup' },{ n:'Green tea', q:2, unit:'' },{ n:'Granulated sugar', q:1, unit:'cup' }],
+      method:['Heat the water until just off the boil, add the tea and steep a few minutes (longer turns it bitter).','Remove the tea, stir in the sugar until dissolved, cool and bottle.'] },
     { id:'rosemary', n:'Rosemary', cat:'Herbal', icon:'🌿', kind:'sugar', ratio:1, sugarName:'White sugar', liquid:'Water', prep:'rosemary-syrup',
       adds:[{ n:'Rosemary sprigs', per500:4, unit:'sprigs' }],
       method:['Make a warm 1:1 syrup, then steep the rosemary off the heat for 20–30 minutes.','Taste and strain. It gets piney fast.'] },
@@ -1796,6 +1814,9 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var openFlags = D.filter(function (d) { return (d.flags || []).length; }).map(function (d) { return d.id; });
     check('To-do list clear (Rum Runnings confirmed stirred)', !openFlags.length && find('rum-runnings').m === 'stir', openFlags.join(', '));
     check('All name normalizations confirmed', !!DATA.NORMALIZED_CONFIRMED && DATA.NORMALIZED.every(function (x) { return x.indexOf('✓') > -1; }));
+    var tmg = find('tomato-margarita');
+    check('50/50 Tomato Margarita added', tmg && JSON.stringify(tmg.spec) === JSON.stringify([[1,'oz','mezcal'],[1,'oz','manzanilla'],[0.75,'oz','tomatosyrup'],[0.75,'oz','lime']]) && tmg.glass === 'Double rocks');
+    check('Last Word riffs as styles (Final Ward, Ultima Palabra, Closing Argument)', DATA.ALIAS['final-ward'] === 'last-word' && DATA.ALIAS['ultima-palabra'] === 'last-word' && DATA.ALIAS['closing-argument'] === 'last-word');
     check('Mezcalrita renamed Orange Mezcalrita', find('mezcalrita').name === 'Orange Mezcalrita');
     check('Bijou kept as Anders E’s version', find('bijou').av.by === 'Anders E');
     check('Tropical Coffee Sour: lime, 1¾ + ¼ oz rum', JSON.stringify(find('tropical-coffee-sour').spec).indexOf('[1.75,"oz","agedrum"') > -1 && JSON.stringify(find('tropical-coffee-sour').spec).indexOf('"lime"') > -1);
@@ -1841,6 +1862,9 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       check('Cherry and passion fruit syrups removed', ids2.indexOf('cherry') < 0 && ids2.indexOf('passion') < 0);
       var rs = Ap.syrupById('raspberry');
       check('Raspberry: 2 cups sugar, 1 cup water, 1 cup raspberries', rs.kind === 'scaled' && rs.items.map(function (i) { return i.q + i.unit; }).join() === '2cup,1cup,1cup' && !DATA.TECH['raspberry-syrup'].missing && rs.icon.indexOf('<svg') === 0);
+      var gt = Ap.syrupById('green-tea'), tm = Ap.syrupById('tomato');
+      check('Green tea syrup: 1 cup water, 2 bags, 1 cup sugar', gt.kind === 'scaled' && gt.items.map(function (i) { return i.q; }).join() === '1,2,1' && !DATA.TECH['green-tea-syrup'].missing);
+      check('Salted tomato syrup: 150 g tomato, 150 g sugar, 3 g salt (2%)', tm.items.map(function (i) { return i.q; }).join() === '150,150,3' && !DATA.TECH['salted-tomato-syrup'].missing);
       var gr = Ap.syrupById('grenadine');
       check('Grenadine: 500 ml juice, 500 g sugar, 60 ml molasses, 5 ml orange blossom', gr.items.map(function (i) { return i.q; }).join() === '500,500,60,5');
       var ci = Ap.syrupById('cinnamon');
@@ -1987,7 +2011,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
       return '<li style="--c:' + D.ROOT_COLORS[p.root] + '"' + (p.id === n.id ? ' class="here"' : '') + '>' + (p.id === n.id ? '<b>' + D.esc(p.n) + '</b>' : D.link('#/evo/' + p.id, D.esc(p.n))) + ' <small>' + D.esc(p.year) + '</small></li>';
     }).join('') + '</ol>' + (also ? '<p class="small">Also shaped by ' + D.link('#/evo/' + also.id, D.esc(also.n)) + '.</p>' : '') + '</section>';
     h += '<section class="panel" style="box-shadow:inset 3px 0 0 ' + D.ROOT_COLORS[n.root] + '"><div class="formula big">' + D.esc(n.formula) + '</div><p>' + D.esc(n.blurb) + '</p>' +
-      (n.tech ? '<p>' + D.link('#/t/' + n.tech, 'Technique: ' + D.esc(D.TECH[n.tech].t) + ' →') + '</p>' : '') + '</section>';
+      (n.tech && !D.user.hiddenCraft[n.tech] ? '<p>' + D.link('#/t/' + n.tech, 'Technique: ' + D.esc(D.TECH[n.tech].t) + ' →') + '</p>' : '') + '</section>';
     if (ks.length) h += '<section class="panel"><h2>Branches</h2><ul class="tlist">' + ks.map(function (k) { return '<li>' + D.link('#/evo/' + k.id, D.esc(k.n)) + ' <span class="muted small">' + D.esc(k.year) + ' · ' + D.esc(k.formula) + '</span></li>'; }).join('') + '</ul></section>';
     h += '<section class="panel"><h2>In your songbook · ' + ds.length + '</h2>' + (ds.length ? '<ul class="cards">' + ds.map(D.card).join('') + '</ul>' : '<p class="muted">None yet.</p>') + '</section>';
     $app().innerHTML = h; window.scrollTo(0, 0);
@@ -2076,7 +2100,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     var unwritten = function (s) { return s.prep && D.TECH[s.prep] && D.TECH[s.prep].missing && !D.user.tech[s.prep]; };
     var h = '<section class="panel">' + D.pills('sycat', SY_CATS, function (v) { return v === st.cat; }) +
       '<div class="sygrid">' + list.map(function (s) {
-        return '<button class="sytile' + (s.id === p.id ? ' on' : '') + (s.mine || s.house ? ' mine' : '') + '" data-sy="' + s.id + '"><i>' + s.icon + '</i><span>' + D.esc(s.n) + '</span>' + (unwritten(s) ? '<em title="Not in your notes yet">✍️</em>' : s.house ? '<em title="Your house ratio">🎻</em>' : '') + '</button>';
+        return '<button class="sytile' + (s.id === p.id ? ' on' : '') + (s.mine || s.house ? ' mine' : '') + '" data-sy="' + s.id + '"><i>' + s.icon + '</i><span>' + D.esc(s.n) + '</span></button>';
       }).join('') + '</div></section>';
     h += '<section class="panel' + (p.mine || p.house ? ' mine' : '') + '"><h2>' + p.icon + ' ' + D.esc(p.n) + (p.mine ? ' · your recipe' : p.house ? ' · your house ratio' : '') + '</h2>' +
       (p.src ? '<p class="muted small">Recipe: ' + D.esc(p.src) + '</p>' : '');
@@ -2240,7 +2264,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
   function norm() {
     user.drinks = user.drinks || {}; user.tech = user.tech || {}; user.settings = user.settings || { unit:'oz' }; user.settings.unit = user.settings.unit || 'oz';
     user.vsel = user.vsel || {}; user.edits = user.edits || {}; user.custom = user.custom || []; user.ing = user.ing || {};
-    user.hidden = user.hidden || {}; user.craft = user.craft || {}; user.craft.sections = user.craft.sections || []; user.craft.items = user.craft.items || {};
+    user.hidden = user.hidden || {}; user.hiddenCraft = user.hiddenCraft || {}; user.craft = user.craft || {}; user.craft.sections = user.craft.sections || []; user.craft.items = user.craft.items || {};
   }
   norm();
   function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(user)); } catch (e) {} }
@@ -2295,6 +2319,8 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
 
   var BUILTIN_SEC = { prep:{ n:'House prep', icon:'🎻' }, home:{ n:'Home technique', icon:'🏠' }, equipment:{ n:'Needs gear', icon:'🔧' } };
   function isHidden(d) { return !!user.hidden[d.id]; }
+  function craftHidden(k) { return !!user.hiddenCraft[k]; }
+  function craftOk(k) { return TECH[k] && !craftHidden(k); }
   /* ---------- derived data ---------- */
   var byId = {}, children = {}, VAR = {};
   function isMineMain(d) { return d.src === 'andrew' || d.mineMain || d.custom; }
@@ -2484,7 +2510,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     { k:'status', n:'From my notes', get:function (d) { return d.aStatus; }, order:['In my notes','Has Andrew’s version','My edits & recipes','Experimental','Batch','Needs my check'] },
     { k:'base', n:'Base spirit', get:function (d) { return d.aBase; } },
     { k:'flav', n:'Flavor', get:function (d) { return d.aFlav; } },
-    { k:'tech', n:'Technique', get:function (d) { return d.aTech.map(function (t) { return TECH[t].t; }); } },
+    { k:'tech', n:'Technique', get:function (d) { return d.aTech.filter(craftOk).map(function (t) { return TECH[t].t; }); } },
     { k:'strength', n:'Strength', get:function (d) { return d.aStrength; }, order:['Light','Medium','Strong'] },
     { k:'equip', n:'Equipment', get:function (d) { return d.aEquip; } }
   ];
@@ -2619,7 +2645,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
   var serves = 1;
   function specList(spec, unit, mult) {
     return '<ul class="spec">' + spec.map(function (it) {
-      var f = fmtItem(it, mult, unit), nm = f.prep && TECH[f.prep] ? link('#/t/' + f.prep, esc(f.name), 'preplink') : esc(f.name);
+      var f = fmtItem(it, mult, unit), nm = f.prep && craftOk(f.prep) ? link('#/t/' + f.prep, esc(f.name), 'preplink') : esc(f.name);
       return '<li' + (f.tag === 'optional' ? ' class="opt"' : '') + '><span class="amt">' + esc(f.amt) + '</span><span class="ing">' + nm + (f.tag ? ' <em class="tag">' + f.tag + '</em>' : '') +
         (f.note ? '<small>' + esc(f.note) + '</small>' : '') + '</span></li>';
     }).join('') + '</ul>';
@@ -2666,7 +2692,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     h += '<div class="kv">' + (d.glass ? '<div><span>Glass</span>' + esc(d.glass) + '</div>' : '<div><span>Glass</span><i class="muted">Not noted</i></div>') +
       (d.ice ? '<div><span>Ice</span>' + esc(d.ice) + '</div>' : '') + (d.garnish ? '<div><span>Garnish</span>' + esc(d.garnish) + '</div>' : '') + '</div>' +
       '<h3>Method</h3><p>' + esc(methodText(d, v)) + '</p>' +
-      '<div class="chips static">' + (v.tech || []).filter(function (t) { return TECH[t]; }).map(function (t) { return link('#/t/' + t, esc(TECH[t].t), 'chip'); }).join('') + '</div></section>';
+      '<div class="chips static">' + (v.tech || []).filter(craftOk).map(function (t) { return link('#/t/' + t, esc(TECH[t].t), 'chip'); }).join('') + '</div></section>';
     h += '<section class="panel"><h2>The numbers' + (d.versions.length > 1 ? ' <span class="muted small">· ' + esc(v.label) + '</span>' : '') + '</h2>';
     if (!st.finalMl) h += '<p class="muted">No amounts to calculate. Pour from the heart.</p>';
     else {
@@ -2680,7 +2706,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
         '<p class="muted small">Model: ' + esc(st.model) + '. ' + (st.warn ? esc(st.warn) + ' ' : '') +
         (v.spec.some(function (s) { return s[3] && s[3].to != null; }) ? 'Ranges use the midpoint. ' : '') +
         (v.spec.some(function (s) { return s[3] && s[3].opt; }) ? 'Optional items aren’t counted. ' : '') +
-        link('#/t/dilution-math', 'How this is calculated') + '</p>';
+        (craftOk('dilution-math') ? link('#/t/dilution-math', 'How this is calculated') : '') + '</p>';
     }
     h += '</section>';
     var par = d.parent ? byId[d.parent] : null, kids = vIdx ? [] : (children[main.id] || []).slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
@@ -3021,7 +3047,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     user.craft.sections.push(sec); return sec;
   }
   function renderTechIndex() {
-    var keys = Object.keys(TECH);
+    var keys = Object.keys(TECH).filter(function (k) { return !craftHidden(k); });
     var CAT = {
       prep: function (k) { return TECH[k].tag === 'prep' && !TECH[k].missing; },
       unwritten: function (k) { return TECH[k].missing && !user.tech[k]; },
@@ -3136,7 +3162,13 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     if (k === 'dilution-math') h += '<section class="panel"><p>' + link('#/check', 'Open Calculator check →') + '</p></section>';
     if (used.length) h += '<section class="panel"><h2>Used in</h2><div class="chips static">' + used.map(function (d) { return link('#/d/' + d.id, esc(d.name), 'chip'); }).join('') + '</div></section>';
     h += '<section class="panel"><h2>' + (t.missing ? 'Your recipe' : 'More notes') + '</h2><textarea id="tnotes" rows="6" placeholder="' + (t.missing ? 'Ratio, method, shelf life…' : 'Your method, ratios, timings…') + '">' + esc(note) + '</textarea><p class="muted small" id="saved"></p></section>';
+    h += '<section class="panel hidepanel">' + (craftHidden(k)
+      ? '<p class="small">Hidden from Bar craft and from links on drink pages.</p><button class="btn" id="cunhide">👁 Unhide ' + esc(t.t) + '</button>'
+      : '<button class="btn ghost hidebtn" id="chide">🙈 Hide this page</button><p class="muted small">Takes it out of Bar craft and drink links. Bring it back from the bottom of the Tavern.</p>') + '</section>';
+    if (craftHidden(k)) h = h.replace('</header>', '</header><div class="hidbanner">🙈 This page is hidden. <button class="btn small" id="cunhide0">Unhide</button></div>');
     $app.innerHTML = h; window.scrollTo(0, 0);
+    var chb = document.getElementById('chide'); if (chb) chb.onclick = function () { user.hiddenCraft[k] = Date.now(); save(); location.hash = '#/tech'; };
+    ['cunhide','cunhide0'].forEach(function (x) { var b = document.getElementById(x); if (b) b.onclick = function () { delete user.hiddenCraft[k]; save(); renderTech(k); }; });
     var tm, ta = document.getElementById('tnotes');
     ta.oninput = function () { clearTimeout(tm); tm = setTimeout(function () { user.tech[k] = ta.value; save(); document.getElementById('saved').textContent = 'Inscribed on this device'; }, 400); };
   }
@@ -3157,12 +3189,6 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     h += '<section class="panel mine"><h2>✏️ My recipes & edits · ' + mineList.length + '</h2>' +
       (mineList.length ? '<ul class="todo">' + mineList.map(function (d) { return '<li>' + link('#/d/' + d.id, esc(d.name)) + '<small>' + (d.custom ? 'Custom recipe' : 'Edited') + ' · ' + esc(d.cat) + '</small></li>'; }).join('') + '</ul>' : '<p class="muted small">Nothing yet. Tap ✏️ Edit on any drink, or ＋ on the Songbook to add one.</p>') +
       '<a class="btn" href="#/new/' + encodeURIComponent('Andrew’s') + '">＋ New recipe</a></section>';
-    h += '<section class="panel"><h2>⚑ Bard’s to-do list</h2><p class="muted small">Open questions from your notes.</p><ul class="todo">' +
-      flagged.map(function (d) { return '<li>' + link('#/d/' + d.id, esc(d.name)) + '<small>' + allFlags(d).map(esc).join('<br>') + '</small></li>'; }).join('') +
-      flaggedT.map(function (k) { return '<li>' + link('#/t/' + k, esc(TECH[k].t)) + '<small>' + TECH[k].flags.map(esc).join('<br>') + '</small></li>'; }).join('') +
-      (missing.length ? '<li>Unwritten recipes (' + missing.length + ')<small>' + missing.map(function (k) { return link('#/t/' + k, esc(TECH[k].t)); }).join(' · ') + '</small></li>' : '') +
-      (!flagged.length && !flaggedT.length && !missing.length ? '<li class="muted">All clear. Nice work.</li>' : '') +
-      '</ul><details class="diff"><summary>Name normalizations</summary><ul>' + (DATA.NORMALIZED || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></details></section>';
     h += '<section class="panel"><h2>Default units</h2><div class="seg"><button data-u="oz" class="' + (user.settings.unit === 'oz' ? 'on' : '') + '">oz</button><button data-u="ml" class="' + (user.settings.unit === 'ml' ? 'on' : '') + '">ml</button></div>' +
       '<p class="muted small">ml uses the bar convention of 30 ml per oz. Specs you wrote in ml stay in ml.</p></section>' +
       '<section class="panel"><h2>Back up your notes & recipes</h2><p class="small">Ratings, notes, edits and new recipes live in this browser only. Export a backup now and then, and import it on a new phone.</p>' +
@@ -3183,7 +3209,16 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
           '<button class="btn small" data-tap="unhide" data-v="' + esc(d.id) + '">👁 Unhide</button></li>';
       }).join('') + '</ul><button class="btn ghost small" id="unhideall">Unhide all</button>'
       : '<p class="muted small">Nothing hidden. Use “🙈 Hide” at the bottom of any drink to tuck it away.</p>') + '</section>';
+    var hidC = Object.keys(user.hiddenCraft).filter(function (k) { return TECH[k]; }).sort(function (a, b) { return TECH[a].t.localeCompare(TECH[b].t); });
+    h += '<section class="panel" id="hiddencraft"><h2>🙈 Hidden craft pages · ' + hidC.length + '</h2>' +
+      (hidC.length ? '<ul class="hidlist">' + hidC.map(function (k) {
+        return '<li><div>' + link('#/t/' + k, esc(TECH[k].t)) + '<small>' + esc(TECH[k].tag === 'custom' ? secName(TECH[k].sec) : TECH[k].tag === 'prep' ? 'House prep' : TECH[k].tag === 'home' ? 'Home technique' : 'Needs gear') + '</small></div>' +
+          '<button class="btn small" data-tap="cunhide" data-v="' + esc(k) + '">👁 Unhide</button></li>';
+      }).join('') + '</ul><button class="btn ghost small" id="cunhideall">Unhide all</button>'
+      : '<p class="muted small">Nothing hidden. Use “🙈 Hide this page” at the bottom of any Bar craft page.</p>') + '</section>';
     $app.innerHTML = h;
+    onTap('cunhide', function (v) { delete user.hiddenCraft[v]; save(); keep(renderMore); });
+    var cua = document.getElementById('cunhideall'); if (cua) cua.onclick = function () { user.hiddenCraft = {}; save(); keep(renderMore); };
     onTap('unhide', function (v) { delete user.hidden[v]; save(); keep(renderMore); });
     var ua = document.getElementById('unhideall'); if (ua) ua.onclick = function () { user.hidden = {}; save(); keep(renderMore); };
     if (renderMore.jump) { renderMore.jump = false; var hp = document.getElementById('hiddenpanel'); if (hp) setTimeout(function () { hp.scrollIntoView({ block:'start' }); }, 0); }
