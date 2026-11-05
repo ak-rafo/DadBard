@@ -1193,7 +1193,7 @@ var P = {
     body:['Alcohol and sugar both lower the freezing point. Too much of either and it won’t set; too little and it freezes into a brick. Water in the recipe is how you tune it.',
           'Granita: freeze in a shallow tray and scrape every 30–45 minutes. Slushie: chill the batch first so the machine has less work.']},
   'gelatin':{t:'Gelatin conversion',tag:'prep',mine:['2 sheets = 3 g powder (1 tsp).']},
-  'super-juice':{t:'Super juice',tag:'prep',mine:['Equal parts peel and citric acid by weight. Combine and rest to make an oleo citrate.','After 15 min, add water equal to peel weight × 16.66.','Blend with the fruit’s juice and strain out the solids.'],
+  'super-juice':{t:'Super juice',tag:'prep',mine:['Equal parts peel and citric acid by weight. Combine and rest to make an oleo citrate.','Rest for at least 1 hour before adding water equal to peel weight × 16.66.','Blend with the fruit’s juice and strain out the solids.'],
     note:'Your notes describe the lemon version; Rum n Stuff uses lime.'},
   'acid-adjusted-oj':{t:'Acid-adjusted orange juice',tag:'prep',mine:['1 L orange juice, 20 g malic acid, 32 g citric acid.']},
   'orgeat':{t:'Orgeat',tag:'prep',mine:['2 cups almond milk, 3 cups sugar, ½ tsp almond extract, ½ tsp rose water, 1 tsp orange blossom water.']},
@@ -1675,20 +1675,20 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
 
   /* Super juice (Kevin Kos ratios, × peel weight) */
   var SUPER = {
-    lime:   { n:'Lime',   color:'#8fc04a', citric:0.66, malic:0.33, water:16.66, juiceAcid:0.06, src:'Kevin Kos' },
-    lemon:  { n:'Lemon',  color:'#f2d14b', citric:1.00, malic:0,    water:16.66, juiceAcid:0.06, src:'Kevin Kos', andrew:true },
-    orange: { n:'Orange', color:'#f39a3c', citric:0.90, malic:0.10, water:16.66, juiceAcid:0.009, src:'Kevin Kos (acid-adjusted)' }
-  };
-  function superJuice(fruit, opts) {
-    var f = SUPER[fruit]; opts = opts || {};
-    var peel = opts.mode === 'target' ? (opts.target || 0) / (f.water + (opts.juicePerPeel || 0)) : (opts.peel || 0);
-    var juice = opts.mode === 'target' ? peel * (opts.juicePerPeel || 0) : (opts.juice || 0);
-    var citric = peel * f.citric, malic = peel * f.malic, water = peel * f.water, yieldMl = water + juice;
-    var acidPct = yieldMl ? (citric + malic + juice * f.juiceAcid) / yieldMl * 100 : 0;
-    return { peel:peel, citric:citric, malic:malic, water:water, juice:juice, yieldMl:yieldMl, acidPct:acidPct };
-  }
-
-  /* Acid adjusting */
+      lime:{n:'Lime',color:'#8fc04a',citric:.66,malic:.33,water:16.66,juiceAcid:.06,src:'Kevin Kos'},
+      lemon:{n:'Lemon',color:'#f2d14b',citric:1,malic:0,water:16.66,juiceAcid:.06,src:'Kevin Kos'},
+      orange:{n:'Orange',color:'#f39a3c',citric:23/120,malic:2/120,sugar:70/120,msg:0,water:1000/120,juiceAcid:.009,src:'User-supplied'},
+      grapefruit:{n:'Grapefruit',color:'#e77c8e',citric:.15,malic:.02,sugar:.70,msg:.04,water:10,juiceAcid:.024,src:'User-supplied'}
+    };
+    function superJuice(fruit,opts){
+      var f=SUPER[fruit]||SUPER.lime;opts=opts||{};
+      function positive(x){return Number.isFinite(+x)?Math.max(0,+x):0;}
+      var jp=positive(opts.juicePerPeel),peel=opts.mode==='target'?positive(opts.target)/(f.water+jp):positive(opts.peel);
+      var juice=opts.mode==='target'?peel*jp:positive(opts.juice);
+      var water=peel*f.water,citric=peel*f.citric,malic=peel*f.malic,sugar=peel*(f.sugar||0),msg=peel*(f.msg||0),yieldMl=water+juice;
+      return {peel:peel,water:water,citric:citric,malic:malic,sugar:sugar,msg:msg,juice:juice,yieldMl:yieldMl,acidPct:yieldMl?(citric+malic+juice*f.juiceAcid)/yieldMl*100:0};
+    }
+/* Acid adjusting */
   var TARGETS = { lime:{ n:'Lime strength', citric:4.0, malic:2.0 }, lemon:{ n:'Lemon strength', citric:6.0, malic:0 } };
   var FRUITS = [
     { k:'orange', n:'Orange', icon:'🍊', pub:{ lime:[32,20], lemon:[52,0] }, andrew:'lime' },
@@ -1838,7 +1838,7 @@ function stockOptions(keys,blank){return '<option value="">'+blank+'</option>'+k
 var stockQuery='';
 function stockView(){
  var s=store();s.stock=normalizeStock(s.stock);var keyset={};Object.keys(db().ING).forEach(function(k){keyset[stockToken(k)]=true;});var keys=Object.keys(keyset).sort(function(a,b){return stockName(a).localeCompare(stockName(b));});
- el('apo-body').innerHTML='<section class="panel"><h2>What can I make?</h2><p class="muted small">Add everything you have. Choose at least two ingredients in any categories. Matches start at two shared inputs. Spirits are grouped by family, including flavored, infused and overproof styles; exact bottles may still be needed. Other ingredients match exactly. Water and ice are assumed. Hidden drinks are excluded.</p><input id="stocksearch" placeholder="Search ingredients" value="'+esc(stockQuery)+'"><div class="apo-fields" id="stockselects"></div><div class="stockchips" id="stockchips"></div><button class="btn ghost small" id="stockclear">Clear ingredients</button></section><div class="stock-results" id="stockresults"></div>';
+ el('apo-body').innerHTML='<section class="panel"><h2>What can I make?</h2><p class="muted small">Choose at least two ingredients in any categories. Water and ice are assumed. Hidden drinks are excluded.</p><input id="stocksearch" placeholder="Search ingredients" value="'+esc(stockQuery)+'"><div class="apo-fields" id="stockselects"></div><div class="stockchips" id="stockchips"></div><button class="btn ghost small" id="stockclear">Clear ingredients</button></section><div class="stock-results" id="stockresults"></div>';
  function selects(){el('stockselects').innerHTML=['Spirit','Liqueur','Syrup','Juice','Citrus','Other'].map(function(c){return '<label>'+c+'<select data-stockcat="'+c+'">'+stockOptions(keys.filter(function(k){return (k.indexOf('family:')===0?'Spirit':category(k))===c&&!s.stock[k]&&normText(k+' '+stockName(k)).indexOf(normText(stockQuery))>=0;}),'Add '+c.toLowerCase())+'</select></label>';}).join('');el('stockselects').querySelectorAll('select').forEach(function(e){e.onchange=function(){if(e.value){s.stock[e.value]=true;db().save();selects();results();}};});}
  function results(){
   var chosen=Object.keys(s.stock).filter(function(k){return s.stock[k]&&(k.indexOf('family:')===0||db().ING[k]);});el('stockchips').innerHTML=chosen.map(function(k){return '<button class="btn small" data-stockremove="'+esc(k)+'">'+esc(stockName(k))+' ×</button>';}).join('');
@@ -2241,30 +2241,32 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     var D = DB(), st = S().sj, f = A.SUPER[st.fruit];
     var h = '<section class="panel">' +
       D.tiles('sjfruit', Object.keys(A.SUPER).map(function (k) { var x = A.SUPER[k]; return { v:k, label:x.n, icon:'<span class="fruitdot" style="background:' + x.color + '"></span>', color:x.color }; }), function (v) { return v === st.fruit; }, 'fruits') +
-      '<div class="ratio">' + f.src + ' · ' + (f.citric ? f.citric + '× citric' : '') + (f.malic ? ' · ' + f.malic + '× malic' : '') + ' · ' + f.water + '× water <span class="muted">(× peel weight)</span></div>' +
-      (f.andrew ? '<div class="matchnote">✓ Same as the super juice recipe in your notes</div>' : '') +
+      '<div class="ratio">' + (st.fruit==='orange' ? 'Water = peel × 8.3333; citric = 2.3%, malic = 0.2%, sugar = 7% of water weight' : st.fruit==='grapefruit' ? 'Water = peel × 10; citric = 1.5%, malic = 0.2%, MSG = 0.4%, sugar = 7% of water weight' : f.citric + '× citric' + (f.malic ? ' · '+f.malic+'× malic' : '') + ' · '+f.water+'× water (× peel weight)') + '</div>' +
+      
       D.pills('sjmode', [{ v:'peel', label:'I have peels', icon:'⚖️' }, { v:'target', label:'I need a volume', icon:'🎯' }], function (v) { return v === st.mode; }) +
-      (st.mode === 'peel' ? '<label class="inlabel">Peel weight</label>' + numIn('sjpeel', st.peel, 'g', 10) : '<label class="inlabel">Target yield (before juice)</label>' + numIn('sjtarget', st.target, 'ml', 100)) +
+      (st.mode === 'peel' ? '<label class="inlabel">Peel weight</label>' + numIn('sjpeel', st.peel, 'g', 10) : '<label class="inlabel">Water volume (before fresh juice)</label>' + numIn('sjtarget', st.target, 'ml', 100)) +
       (st.mode === 'peel' ? '<label class="inlabel">Juice of the peeled fruit <span class="muted">(optional)</span></label>' + numIn('sjjuice', st.juice, 'ml', 25) : '') +
       '<div id="sjout"></div></section>' +
       '<section class="panel"><h2>Method</h2><ol class="steps">' +
       '<li>Peel the fruit with a Y-peeler (skip the white pith) and weigh the peels.</li>' +
-      '<li>Toss the peels with the acid' + (f.malic ? 's' : '') + ' in a jar and let them sit up to 2 hours. This makes an oleo citrate.</li>' +
-      '<li>Move everything to a blender, rinse the jar with the measured water, then add the water and the peeled fruit’s juice.</li>' +
-      '<li>Blend about 30 seconds and strain through cheesecloth.</li>' +
+      '<li>Toss the peels with the acid' + (f.malic ? 's' : '') + (f.sugar ? ', sugar' : '') + (f.msg ? ' and MSG' : '') + ' in a jar. Rest for at least 1 hour, or longer, to form the oleo citrate.</li>' +
+      '<li>Move everything to a blender, rinse the jar with the measured water, then add the water.</li>' +
+      '<li>Blend about 30 seconds, then strain through cheesecloth. Strain the peeled fruit’s fresh juice separately, add it to the strained mixture and stir to combine.</li>' +
       '<li>Bottle, label with the date, refrigerate, and use within about a week.</li></ol>' +
-      '<p class="muted small">Ratios: Kevin Kos (adapting Nickle Morris’s super juice with Dave Arnold’s acid numbers).</p></section>';
+      '<p class="muted small">Lime and lemon retain their existing ratios. Orange and grapefruit use your supplied specifications. Water and fresh juice volumes are approximate; dissolved sugar, acids, peel retention and straining affect the final yield.</p></section>';
     document.getElementById('apo-body').innerHTML = h;
     function out() {
       var r = A.superJuice(st.fruit, { mode:st.mode, peel:st.peel, target:st.target, juice: st.mode === 'peel' ? st.juice : 0 });
-      var text = f.n + ' super juice (' + new Date().toLocaleDateString() + '): ' + g(r.peel) + ' g peel, ' + g(r.citric) + ' g citric' + (f.malic ? ', ' + g(r.malic) + ' g malic' : '') + ', ' + r0(r.water) + ' g water' + (r.juice ? ', + ' + r0(r.juice) + ' ml juice' : '') + ' → about ' + r0(r.yieldMl) + ' ml.';
+      var text = f.n + ' super juice (' + new Date().toLocaleDateString() + '): ' + g(r.peel) + ' g peel, ' + g(r.citric) + ' g citric' + (f.malic ? ', ' + g(r.malic) + ' g malic' : '') + (f.sugar ? ', ' + g(r.sugar) + ' g sugar' : '') + (f.msg ? ', ' + g(r.msg) + ' g MSG' : '') + ', ' + r0(r.water) + ' g water' + (r.juice ? ', + ' + r0(r.juice) + ' ml juice' : '') + ' → about ' + r0(r.yieldMl) + ' ml. Rest for at least 1 hour before blending; strain and stir in fresh juice.';
       document.getElementById('sjout').innerHTML = outGrid([
         st.mode === 'target' ? { v:g(r.peel) + ' g', l:'Peels needed', hi:true } : null,
         { v:g(r.citric) + ' g', l:'Citric acid', hi:true },
         f.malic ? { v:g(r.malic) + ' g', l:'Malic acid', hi:true } : null,
+        f.sugar ? {v:g(r.sugar)+' g',l:'Sugar',hi:true} : null,
+        f.msg ? {v:g(r.msg)+' g',l:'MSG',hi:true} : null,
         { v:r0(r.water) + ' g', l:'Water', s:'= ' + r0(r.water) + ' ml · ' + r1(r.water / A.ML_PER_OZ) + ' oz' },
-        { v:r0(r.yieldMl) + ' ml', l:'Yield', s:r1(r.yieldMl / A.ML_PER_OZ) + ' oz · ~' + Math.floor(r.yieldMl / (0.75 * A.ML_PER_OZ)) + ' drinks at ¾ oz' },
-        { v:'≈' + r1(r.acidPct) + '%', l:'Acidity', s: st.fruit === 'orange' ? 'acid-adjusted orange' : 'fresh juice ≈ 6%' }
+        { v:r0(r.yieldMl) + ' ml', l:'Water + fresh juice', s:r1(r.yieldMl / A.ML_PER_OZ) + ' oz · ~' + Math.floor(r.yieldMl / (0.75 * A.ML_PER_OZ)) + ' drinks at ¾ oz' },
+        { v:'≈' + r1(r.acidPct) + '%', l:'Acidity', s:'Estimated acid per water + fresh juice volume' }
       ].filter(Boolean)) + saveBtn('super-juice', text);
       bindSave();
     }
@@ -3378,7 +3380,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       };
       user.craft.sections.forEach(function (sec) { CAT[sec.id] = function (k) { return TECH[k].sec === sec.id; }; });
       var cnt = function (f) { return keys.filter(f).length; };
-      var h = '<header class="top"><h1>Bar craft</h1><p class="muted small">Techniques in my own words, plus your prep recipes and notes. Influences are credited, not paraphrased.</p>' +
+      var h = '<header class="top"><h1>Bar craft</h1>' +
         '<input id="cq" type="search" class="full" placeholder="Search techniques & prep" value="' + esc(craft.q) + '">' +
         tiles('craftcat', [{ v:'', label:'Everything', icon:'✦', count:keys.length }, { v:'prep', label:'Bard’s Favorites', icon:'🎻', count:cnt(CAT.prep) },
           { v:'home', label:'Home Technique’s', icon:'🏠', count:cnt(CAT.home) }, { v:'equipment', label:'Needs gear', icon:'🔧', count:cnt(CAT.equipment) }].concat(

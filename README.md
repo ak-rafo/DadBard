@@ -1,9 +1,9 @@
-# Dad Bard v5.26
+# Dad Bard v5.27
 
-Removed subtitles from the five Apothecary tool buttons: What can I make?, Slushee, Super juice, Syrups and Acid adjust. Buttons use centered icons and names with compact, consistent spacing. The Apothecary heading and tagline are unchanged.
+Applied requested copy cleanup and super juice changes. All four super juices rest for at least 1 hour before blending. Orange: 120 g peel, 23 g citric, 2 g malic, 70 g sugar, 1000 g water. Grapefruit: 100 g peel, 15 g citric, 2 g malic, 4 g MSG, 70 g sugar, 1000 g water. All ingredients scale in peel and target-water modes. Lime/lemon quantities remain unchanged. Fresh juice is added after blending and straining. Water plus fresh juice is a volume estimate, not a guaranteed finished yield. Existing mobile scroll continuity is retained.
 
-Added global horizontal button-row continuity for rails, pill bars and icon pickers. Scrolling position is retained when selections rerender the row or navigate between calculator tabs. The clicked option is kept visible with minimal horizontal adjustment. Applies to Apothecary tool/category rows, Craft categories and other matching horizontal selector rows. Positions are in-memory and do not alter recipe data. Search-focus preservation remains intact.
+Removed Bar craft subtitle, shortened What can I make instructions, removed source prefix and same-as-notes message from super juice. Supplied icons are unchanged.
 
-Validation: 70 built-in checks passed, zero failures, six informational plausibility warnings. Tests at 320, 390 and 1280 px verified subtitle removal, Acid adjust selection retaining the row position and selected-button visibility, syrup-category and Craft-row selection, and search focus/Enter dismissal. No page errors. Physical iPhone/Safari testing not performed.
+Validation: browser tests at 320, 390 and 1280 px passed for all four methods, base quantities, target mode and copy removals. Built-in suite: 70 passed, 0 failed, 6 plausibility warnings. Physical iPhone/Safari testing not performed. Recipes were implemented from user specifications, not externally verified.
 
-Update: Export JSON backup in Tavern first. Replace index.html, sw.js, manifest.webmanifest and the three icons with the same filenames and site URL. Open online once to refresh cache v5.26.0.
+Export a Tavern JSON backup before updating. Replace index.html and sw.js at the same site address. Keep the existing manifest.webmanifest, which was not attached and is not included in this update. Icons and grouping data are included unchanged. Cache version: dadbard-v5.27.0.
