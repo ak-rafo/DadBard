@@ -2789,17 +2789,11 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     function onTap(name, fn) { $app.querySelectorAll('[data-tap="' + name + '"]').forEach(function (b) { b.onclick = function () { fn(b.dataset.v, b); }; }); }
     function card(d) {
       var u = user.drinks[d.id] || {}, st = STYLE_BY[d.pStyle] || {};
-      var marks = (d.variants.length > 1 ? '<span class="mk vars">' + d.variants.length + ' variants</span>' : '') +
-        ((d.exactRecipe?d.bv:d.src==='andrew') ? '<span class="mk av" title="Bard’s version">BV</span>' : '') +
-        (d.exp ? '<span class="mk exp" title="Experimental">exp.</span>' : '') + (d.batch ? '<span class="mk">batch</span>' : '') +
-        (d.aStatus.indexOf('Needs my check') > -1 ? '<span class="mk flag" title="Needs your check">⚑</span>' : '') +
-        (d.custom ? '<span class="mk edit">custom</span>' : d.aStatus.indexOf('My edits & recipes') > -1 ? '<span class="mk edit">edited</span>' : '') +
-        (u.rating ? '<span class="mk star">' + '★'.repeat(u.rating) + '</span>' : '');
+      var marks = '';
       return '<li><a class="card" href="#/d/' + (d.openId||d.id) + (d.displayVi!=null?'/'+d.displayVi:'') + '"' + (d.displayVi!=null?' data-recipe-id="'+esc(d.openId||d.id)+'" data-recipe-vi="'+d.displayVi+'"':'') + ' style="--c:' + (st.color || 'transparent') + '"><div class="cmain"><div class="cname">' + esc(d.name) +
-        (u.notes ? ' <span class="dot" title="Has notes"></span>' : '') + (u.verified ? ' <span class="tick" title="Spec verified">✓</span>' : '') + '</div>' +
-        (d.mainName && d.mainName !== d.name ? '<div class="csub">Variant of ' + esc(d.mainName) + '</div>' : '') + '<div class="csub">' + (st.icon || '') + ' ' + esc(d.pStyle) + ' · ' + esc(d.aBase.length > 1 ? d.aBase.slice(0, 3).join(' / ') : d.versions[d.vdef].base) + ' · ' + METHOD_LABEL[d.versions[d.vdef].m] + '</div>' +
+        '</div><div class="csub">' + esc(METHOD_LABEL[d.versions[d.vdef].m]||d.versions[d.vdef].m) + '</div>' +
         (marks ? '<div class="marks">' + marks + '</div>' : '') + '</div>' +
-        '<div class="cside"><span class="pill ' + catClass(d.cat) + '">' + esc(d.cat) + '</span><span class="abv">' + (d.rd ? 'Unverified' : d.stats.finalMl ? pct(d.stats.finalAbv, 0) + ' ABV' : '—') + '</span></div></a></li>';
+        '<div class="cside"><span class="abv">' + (d.rd ? 'Unverified' : d.stats.finalMl ? pct(d.stats.finalAbv, 0) + ' ABV' : '—') + '</span></div></a></li>';
     }
   
     /* ---------- browse ---------- */
@@ -2886,6 +2880,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       if (state.showFilters) {
         h += '<div class="sheet-bg" id="sheetbg"></div><div class="sheet" id="sheet"><div class="sheet-top"><div class="grab"></div><div class="sheet-head"><b>Filters</b>' + (ac ? '<button id="fclear" class="btn ghost small">Clear all</button>' : '') + '</div></div><div class="sheet-body">';
         FILTERS.forEach(function (g) {
+          if(g.k==='style')return;
           var v = vals(g), keys = g.order ? g.order.filter(function (k) { return v[k]; }) : Object.keys(v).sort();
           if (!keys.length) return;
           h += '<div class="fgroup"><div class="flabel">' + g.n + '</div>';
@@ -2966,7 +2961,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
           (f.note ? '<small>' + esc(f.note) + '</small>' : '') + '</span></li>';
       }).join('') + '</ul>';
     }
-    function variantLabel(main,x,z){x=Object.assign({},x,z.editMeta||{});
+    function variantLabel(main,x,z){if(z.editMeta&&z.editMeta.vlabel)return z.editMeta.vlabel; x=Object.assign({},x,z.editMeta||{});
       var label=x.vlabel||x.name;
       if(x.id==='ginori')return z.label;
       if(x.id==='dirty-martini'&&z.mine)return 'Bard’s';
@@ -3196,12 +3191,12 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         h += '<label class="field"><span>Add as a variant of… (optional)</span><select id="eof"><option value="">— Stand-alone drink —</option>' +
           DRINKS.slice().sort(function (a, b) { return a.name.localeCompare(b.name); }).map(function (x) { return '<option value="' + x.id + '"' + (x.id === d.variantOf ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('') + '</select></label>';
       }
-      if (d.isVariant || (isNew && d.variantOf)) h += '<label class="field"><span>Variant name (shown on the picker)</span><input id="evlabel" value="' + esc(d.vlabel) + '" placeholder="e.g. Smoky, House, Wet"></label>';
+      h += '<label class="field"><span>Variant tag (shown on the recipe picker)</span><input id="evlabel" value="' + esc(d.vlabel) + '" placeholder="e.g. Smoky, House, Wet"></label>';
       if (d.cat !== 'Bard’s') h += '<label class="field"><span>Creator</span><input id="ecreator" value="' + esc(d.creator) + '" placeholder="Bartender or bar"></label>';
       h += '</section>';
-      h += '<section class="panel"><div class="flabel">Variant</div>' +
+      h += '<section class="panel"><div class="flabel">Drink type</div>' +
         pills('estyle', [{ v:'auto', label:'Auto', icon:'✨' }].concat(STYLES.map(function (s) { return { v:s.k, label:s.k, icon:s.icon, color:s.color }; })), function (v) { return v === d.style; }) +
-        '<p class="muted small">Auto: coffee, espresso, tomato or egg/cream family → Sweet & Savory, soda or sparkling topper → Highball, stirred → Spirit-forward, otherwise Sour.</p>' +
+        '<p class="muted small">Auto: coffee, espresso, tomato or egg/cream family → Sweet & Savory, soda or sparkling topper → Highball, stirred → Spirit-forward, otherwise Citrus.</p>' +
         '<div class="grid2"><label class="field"><span>Codex family</span><select id="efam">' + ROOT_ORDER.map(function (f) { return '<option' + (f === d.fam ? ' selected' : '') + '>' + f + '</option>'; }).join('') + '</select></label>' +
         '<label class="field"><span>Base spirit</span><input id="ebase" list="baselist" value="' + esc(d.base) + '"></label></div>' +
         '<div class="flabel">Method</div>' + pills('em', Object.keys(METHOD_LABEL).map(function (k) { return { v:k, label:METHOD_LABEL[k] }; }), function (v) { return v === d.m; }) +
@@ -3281,13 +3276,14 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         if (d.cat === 'Bard’s') { obj.src = 'andrew'; obj.prov = { who:'Bard (Dad Bard)', where:'Home bar', year:String(new Date().getFullYear()), conf:'own', note:'' }; }
         else obj.prov = { who:d.creator.trim() || 'Unknown', where:'—', year:'—', conf:'low', note:'Added by you.' };
         if (d.variantOf) { obj.variantOf = d.variantOf; obj.vlabel = d.vlabel.trim() || d.name.trim(); obj.changed = obj.changed || 'Your variant.'; }
+        if(d.vlabel.trim())obj.vlabel=d.vlabel.trim();
         if (d.mode === 'new') user.custom.push(obj);
         id = obj.id;
       } else {
         var e = user.edits[id] = user.edits[id] || {};
         Object.keys(meta).forEach(function (k) { e[k] = meta[k]; });
         if (!meta.method) delete e.method; if (!meta.style) e.style = undefined;
-        if (d.isVariant) e.vlabel = d.vlabel.trim() || undefined;
+        e.vlabel = d.vlabel.trim() || undefined;
         if (d.cat === 'Bard’s') e.src = 'andrew';
         if (d.cat !== 'Bard’s' && d.creator.trim() && d.creator.trim() !== ((ORIG[id] || {}).prov || {}).who) e.creator = d.creator.trim();
         if (d.mineMain) {
