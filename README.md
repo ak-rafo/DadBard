@@ -1,3 +1,2 @@
-Dad Bard v6.11
-Sweet & Savory now uses the garnished-drink emoji. Removed custom emblem styling so it matches the other category buttons. All other v6.9 changes retained. Replace supplied repository files.
-Chromium mobile/desktop-width checks and JavaScript syntax passed. Physical iPhone not tested.
+Dad Bard v6.12
+Mobile fruit grids centered and fitted; Apothecary scroller inset. Logic unchanged. Syntax checked; browser and physical iPhone not tested.

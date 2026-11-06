@@ -1,17 +1,1 @@
-{
-  "version": "6.10",
-  "syntaxPassed": true,
-  "browserChecks": [
-    {
-      "width": 390,
-      "iconAndFilterPassed": true,
-      "runtimeErrors": []
-    },
-    {
-      "width": 1280,
-      "iconAndFilterPassed": true,
-      "runtimeErrors": []
-    }
-  ],
-  "physicalIphoneTested": false
-}
+{"version": "6.12", "syntaxPassed": true, "physicalIphoneTested": false, "browserChecks": []}
