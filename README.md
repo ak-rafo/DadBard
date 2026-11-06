@@ -1,3 +1,2 @@
-Dad Bard v6.5
-Full illustrated badge is the home-screen icon. Simplified text-free coupe-and-hat mark is embedded in the page header. Existing title and tagline unchanged.
-Replace supplied files. Existing installed home-screen icons may retain their old artwork.
+Dad Bard v6.6
+Home-screen badge updated: tagline removed and composition enlarged. Simplified in-app header logo unchanged. Replace supplied files. Physical iPhone not tested.
