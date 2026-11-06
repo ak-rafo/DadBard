@@ -2789,9 +2789,13 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     function onTap(name, fn) { $app.querySelectorAll('[data-tap="' + name + '"]').forEach(function (b) { b.onclick = function () { fn(b.dataset.v, b); }; }); }
     function card(d) {
       var u = user.drinks[d.id] || {}, st = STYLE_BY[d.pStyle] || {};
+      var shown=d.versions[d.vdef], declared=(shown.editMeta||{}).base||shown.base||d.base||'';
+      var primary=declared.split(/\s*(?:\/|&|\+|,|\band\b)\s*/i)[0].trim();
+      if(primary==='Agave'){var spirit=shown.spec.map(function(it){return ING[it[2]];}).filter(function(i){return i&&i.t==='spirit';})[0];if(spirit)primary=/mezcal/i.test(spirit.n)?'Mezcal':'Tequila';}
+
       var marks = '';
       return '<li><a class="card" href="#/d/' + (d.openId||d.id) + (d.displayVi!=null?'/'+d.displayVi:'') + '"' + (d.displayVi!=null?' data-recipe-id="'+esc(d.openId||d.id)+'" data-recipe-vi="'+d.displayVi+'"':'') + ' style="--c:' + (st.color || 'transparent') + '"><div class="cmain"><div class="cname">' + esc(d.name) +
-        '</div><div class="csub">' + esc(METHOD_LABEL[d.versions[d.vdef].m]||d.versions[d.vdef].m) + '</div>' +
+        '</div><div class="csub">' + (st.icon ? '<span class="drink-icon" aria-hidden="true">'+st.icon+'</span> ' : '') + (primary ? esc(primary)+' · ' : '') + esc(METHOD_LABEL[shown.m]||shown.m) + '</div>' +
         (marks ? '<div class="marks">' + marks + '</div>' : '') + '</div>' +
         '<div class="cside"><span class="abv">' + (d.rd ? 'Unverified' : d.stats.finalMl ? pct(d.stats.finalAbv, 0) + ' ABV' : '—') + '</span></div></a></li>';
     }

@@ -1,1 +1,1 @@
-{"version": "6.1", "inlineScriptsSyntaxPassed": true, "browserInteractionTested": true, "physicalIphoneTested": false}
+{"version": "6.4", "syntaxPassed": true, "browserChecks": [{"width": 390, "passed": true}, {"width": 1280, "passed": true}], "physicalIphoneTested": false}
