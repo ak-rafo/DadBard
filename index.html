@@ -2343,8 +2343,9 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
   var UNIT = { ml:1, oz:A.ML_PER_OZ, L:1000 };
   function acidView() {
     var D = DB(), st = S().aa, f = A.fruit(st.fruit);
-    var h = '<section class="panel"><div class="flabel">Juice you have</div>' +
-      D.tiles('aafruit', A.FRUITS.map(function (x) { return { v:x.k, label:x.n, icon:x.icon, sub: x.pub ? 'published' : x.k === 'custom' ? 'your numbers' : 'estimate' }; }), function (v) { return v === st.fruit; }, 'fruits') +
+    if (!f || (!f.pub && f.k !== 'custom')) { st.fruit = 'orange'; f = A.fruit(st.fruit); D.save(); }
+    var h = '<section class="panel">' +
+      D.tiles('aafruit', A.FRUITS.filter(function (x) { return x.pub || x.k === 'custom'; }).map(function (x) { return { v:x.k, label:x.n, icon:x.icon }; }), function (v) { return v === st.fruit; }, 'fruits') +
       '<div class="flabel">Make it as sour as</div>' +
       D.pills('aatarget', [{ v:'lime', label:'Lime · 4% citric + 2% malic', icon:'🟢' }, { v:'lemon', label:'Lemon · 6% citric', icon:'🍋' }], function (v) { return v === st.target; }) +
       (st.fruit === 'custom' ? '<div class="flabel">Your juice’s acidity (%)</div><div class="duo"><label>Citric ' + numIn('aacc', st.cb[0], '%', 0.1) + '</label><label>Malic ' + numIn('aacm', st.cb[1], '%', 0.1) + '</label></div>' : '') +
@@ -2352,11 +2353,11 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       D.pills('aaunit', ['ml','oz','L'].map(function (u) { return { v:u, label:u }; }), function (v) { return v === st.unit; }) +
       '<div id="aaout"></div></section>' +
       '<section class="panel"><h2>How to</h2><ol class="steps"><li>Measure the juice first, then weigh the acids. Use a 0.01 g scale for small batches.</li><li>Stir until the powder fully dissolves (a minute or two).</li><li>Taste. Sweeter juices may need a little less syrup in the drink.</li></ol>' +
-      '<p class="muted small">Orange, grapefruit and pineapple use the widely published per-liter ratios. Others are estimated from typical fruit acidity: lime ≈ 4% citric + 2% malic, lemon ≈ 6% citric. Fruit varies, so treat estimates as a starting point.</p></section>';
+      '<p class="muted small">Orange, grapefruit and pineapple use the widely published per-liter ratios. Custom uses the acidity values you enter. Fruit varies, so taste and adjust.</p></section>';
     document.getElementById('apo-body').innerHTML = h;
     function out() {
       var ml = st.vol * UNIT[st.unit], r = A.acidAdjust(st.fruit, st.target, ml, st.cb);
-      var badge = r.how === 'published' ? '<span class="conf conf-high">published ratio</span>' : r.how === 'estimate' ? '<span class="conf conf-medium">estimate · taste and adjust</span>' : '<span class="conf conf-own">your numbers</span>';
+      var badge = r.how === 'published' ? '<span class="conf conf-high">published ratio</span>' : r.how === 'estimate' ? '<span class="conf conf-medium">estimate · taste and adjust</span>' : '';
       var matches = f.andrew === st.target ? '<div class="matchnote">✓ Matches your acid-adjusted OJ note (1 L: 32 g citric, 20 g malic)</div>' : '';
       var tiny = (r.citric > 0 && r.citric < 1) || (r.malic > 0 && r.malic < 1);
       document.getElementById('aaout').innerHTML = '<div class="badgeline">' + badge + '</div>' + matches + outGrid([
