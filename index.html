@@ -984,7 +984,7 @@ var NEW = {
 };
 for (var k in NEW) ING[k] = NEW[k];
 ING.honey.prep = 'honey-syrup'; ING.orgeat.prep = 'orgeat'; ING.simple.prep = 'simple-syrup'; ING.coffeeliqueur.prep = 'coffee-liqueur';
-ING.rich.prep = 'rich-syrup'; ING.demerarasyrup.prep = 'rich-syrup'; ING.agave.prep = 'agave-syrup'; ING.honeyginger.prep = 'honey-ginger-syrup'; ING.grenadine.prep = 'grenadine';
+ING.rich.prep = 'rich-syrup'; ING.demerarasyrup.prep = 'rich-syrup'; ING.agave.prep = 'agave-syrup'; delete ING.honeyginger.prep; ING.grenadine.prep = 'grenadine';
 
 /* ---------- Bard's versions of traditional drinks ---------- */
 var BV = {
@@ -1205,9 +1205,8 @@ var P = {
   'simple-syrup':{t:'Simple syrup (1:1)',tag:'prep',mine:['Equal parts by weight: sugar (any kind) and water.','Rule of thumb: 1 oz simple syrup is about 15 g sugar. (Weighed 1:1 it works out nearer 18 g per oz.)']},
   'rich-syrup':{t:'Rich simple syrup (2:1)',tag:'prep',mine:['Two parts sugar (any kind) to one part water, by weight.']},
   'honey-syrup':{t:'Honey syrup (3:1)',tag:'prep',mine:['3 parts honey to 1 part water, by volume.','Stir with warm water until smooth. Cool and refrigerate.']},
-  'honey-ginger-syrup':{t:'Honey-ginger syrup',tag:'prep',mine:['Equal parts by volume: honey syrup (3:1) and rough-chopped ginger (no need to peel).','Blend until smooth, then strain through a fine strainer or cheesecloth.','Used in the Penicillin.']},
   'agave-syrup':{t:'Agave syrup',tag:'prep',mine:['Agave syrup by weight, plus water = agave weight × 0.64.','Watered down for the best results in cocktails.']},
-  'ginger-syrup':{t:'Ginger syrup',tag:'prep',mine:['Equal parts by volume: rough-chopped ginger (no need to peel), boiling water, and sugar or honey. 1 cup each is a good start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','For the Penicillin, use honey-ginger syrup instead (its own recipe).']},
+  'ginger-syrup':{t:'Ginger syrup',tag:'prep',mine:["Combine equal volumes of rough-chopped ginger, boiling water and honey: ¼ cup each for a 1× batch.", "Purée until smooth, then strain through a fine strainer or cheesecloth.", "Stir an additional ½ cup honey into the strained product for a 1× batch.", "This uses 3 parts total honey to 1 part added water by volume. Finished concentration is approximate because ginger adds moisture and straining removes some liquid."]},
   'cinnamon-syrup':{t:'Cinnamon syrup',tag:'prep',mine:['1 oz cinnamon sticks per 2 cups water (about 1 oz per 470 g water).','Sugar: equal weight to the water.']},
   'raspberry-syrup':{t:'Raspberry syrup',tag:'prep',mine:['2 cups sugar','1 cup water','1 cup raspberries (fresh or frozen)','Stir the sugar and water over low heat until the sugar has dissolved.','Remove from the heat, add the raspberries, and stir and mash the berries.','Let it cool completely, then strain through a sieve into a bowl, pushing all the liquid through the pulp with a spoon.','Jar it and refrigerate. Keeps up to 2 weeks.']},
   'green-tea-syrup':{t:'Green tea syrup',tag:'prep',mine:['1 cup water','2 green tea bags or 2 teaspoons loose-leaf green tea','1 cup granulated sugar']},
@@ -1727,12 +1726,7 @@ root.CC_DATA.EVO = { ERAS: ERAS, TYPES: TYPES, STYLES: S };
     { id:'cinnamon', n:'Cinnamon', cat:'Spiced', icon:'🪵', kind:'weight', parts:1, sweetName:'Sugar (equal weight to water)', liquid:'Water', prep:'cinnamon-syrup', house:true,
       adds:[{ n:'Cinnamon sticks', perLiquid:28.35 / 473, unit:'g', note:'1 oz per 2 cups water' }],
       method:['Simmer the cinnamon sticks in the water (1 oz per 2 cups, about 1 oz per 470 g).','Stir in an equal weight of sugar off the heat, steep to taste, then strain.'] },
-    { id:'ginger', n:'Ginger', cat:'Spiced', icon:'🫚', kind:'scaled', prep:'ginger-syrup', house:true,
-      items:[{ n:'Rough-chopped ginger (no need to peel)', q:1, unit:'cup' },{ n:'Boiling water', q:1, unit:'cup' },{ n:'Sugar or honey', q:1, unit:'cup' }],
-      method:['Equal parts by volume. 1 cup each is a good place to start.','Purée in a blender until smooth, then strain through a fine strainer or cheesecloth.','Want it with honey? See Honey-ginger.'] },
-    { id:'honey-ginger', n:'Honey-ginger', cat:'Spiced', icon:'🐝', kind:'scaled', prep:'honey-ginger-syrup', house:true,
-      items:[{ n:'Honey syrup (3:1)', q:1, unit:'cup', sub:'¾ cup honey + ¼ cup water' },{ n:'Rough-chopped ginger (no need to peel)', q:1, unit:'cup' }],
-      method:['Make the honey syrup first: 3 parts honey to 1 part water, by volume.','Combine equal volumes of honey syrup and rough-chopped ginger in a blender.','Blend until smooth, then strain through a fine strainer or cheesecloth.','Used in the Penicillin.'] },
+    { id:'ginger', n:'Ginger', cat:'Spiced', icon:'🫚', kind:'scaled', prep:'ginger-syrup', house:true, items:[{"n": "Rough-chopped ginger (no need to peel)", "q": 0.25, "unit": "cup"}, {"n": "Boiling water", "q": 0.25, "unit": "cup"}, {"n": "Honey (before blending)", "q": 0.25, "unit": "cup"}, {"n": "Honey (add after straining)", "q": 0.5, "unit": "cup"}], method:["Combine equal volumes of rough-chopped ginger, boiling water and honey: ¼ cup each for a 1× batch.", "Purée until smooth, then strain through a fine strainer or cheesecloth.", "Stir an additional ½ cup honey into the strained product for a 1× batch.", "This uses 3 parts total honey to 1 part added water by volume. Finished concentration is approximate because ginger adds moisture and straining removes some liquid."] },
     { id:'raspberry', n:'Raspberry', cat:'Fruit', icon:'<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 7c-1.6-3-4.8-4-7.5-2.6 2 .4 3.6 1.6 4.4 3.4z M16 7c1.6-3 4.8-4 7.5-2.6-2 .4-3.6 1.6-4.4 3.4z" fill="#5fa84a"/><rect x="15" y="3" width="2" height="5" rx="1" fill="#4a8a3a"/><circle cx="11" cy="11" r="3.3" fill="#c2185b"/><circle cx="16" cy="10.5" r="3.3" fill="#d81b60"/><circle cx="21" cy="11" r="3.3" fill="#c2185b"/><circle cx="8.5" cy="15.5" r="3.3" fill="#ad1457"/><circle cx="13.5" cy="15" r="3.3" fill="#e91e63"/><circle cx="18.5" cy="15" r="3.3" fill="#d81b60"/><circle cx="23.5" cy="15.5" r="3.3" fill="#ad1457"/><circle cx="10.5" cy="20" r="3.3" fill="#c2185b"/><circle cx="16" cy="19.5" r="3.3" fill="#e91e63"/><circle cx="21.5" cy="20" r="3.3" fill="#c2185b"/><circle cx="13" cy="24.5" r="3.3" fill="#ad1457"/><circle cx="19" cy="24.5" r="3.3" fill="#ad1457"/><circle cx="16" cy="28" r="3.3" fill="#880e4f"/><circle cx="15" cy="9.5" r="0.9" fill="#fff" opacity=".45"/><circle cx="12.5" cy="14" r="0.9" fill="#fff" opacity=".45"/><circle cx="15" cy="18.5" r="0.9" fill="#fff" opacity=".45"/><circle cx="20" cy="10" r="0.9" fill="#fff" opacity=".45"/></svg>', kind:'scaled', prep:'raspberry-syrup', house:true,
       items:[{ n:'Sugar', q:2, unit:'cup' },{ n:'Water', q:1, unit:'cup' },{ n:'Raspberries (fresh or frozen)', q:1, unit:'cup', gPerCup:125 }],
       method:['Stir the sugar and water over low heat until the sugar has dissolved.','Remove from the heat, add the raspberries, and stir and mash the berries.','Let it cool completely, then strain through a sieve into a bowl, pushing all the liquid through the pulp with a spoon.','Jar it and refrigerate. Keeps up to 2 weeks.'] },
@@ -2017,9 +2011,10 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       check('Rich: 2 parts sugar : 1 water by weight', near(s2.sweetG, 2 * s2.liquidMl) && near(s2.yieldMl, 500));
       var hs = Ap.volSyrup('honey', 3, 500);
       check('Honey: 3 parts honey to 1 part water, by volume', near(hs.sweetMl, 375) && near(hs.liquidMl, 125), Math.round(hs.sweetG) + ' g honey');
-      var hg = Ap.syrupById('honey-ginger');
-      check('Honey-ginger: equal volume honey syrup (3:1) and chopped ginger', hg.items.length === 2 && hg.items[0].q === hg.items[1].q && /3:1/.test(hg.items[0].n) && DATA.ING.honeyginger.prep === 'honey-ginger-syrup');
-      var ag = Ap.multSyrup('agave', 0.64, 500);
+      var gs=Ap.syrupById('ginger');
+ check('Honey-ginger calculator removed', !Ap.syrupById('honey-ginger'));
+ check('Ginger honey-only quantities', gs.items.map(function(i){return i.q;}).join()==='0.25,0.25,0.25,0.5');
+ var ag = Ap.multSyrup('agave', 0.64, 500);
       check('Agave: water = agave weight × 0.64', near(ag.liquidMl, ag.sweetG * 0.64) && near(ag.yieldMl, 500));
       var ids2 = Ap.SYRUPS.map(function (x) { return x.id; });
       check('Cherry and passion fruit syrups removed', ids2.indexOf('cherry') < 0 && ids2.indexOf('passion') < 0);
@@ -2138,16 +2133,6 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       (ds.length ? drinkChips(ds, 6) : '<p class="muted small">No drinks of this style in your songbook yet.</p>') +
       (mineN ? '<div class="mine-count">🎻 ' + mineN + ' from your notes</div>' : '') + '</article>';
   }
-  function evoFilters() {
-    var D=DB(),Ev=E();evo.open=evo.open||{};
-    function fold(k,title,body,n){return '<details class="compact-filter" data-evofold="'+k+'"'+(evo.open[k]?' open':'')+'><summary>'+title+(n?' · '+n+' selected':'')+'</summary><div class="fold-body">'+body+'</div></details>';}
-    return fold('search','Search','<input id="evoq" type="search" class="full" placeholder="Search" value="'+D.esc(evo.q)+'">',evo.q?1:0)+
-      fold('era','Era',D.tiles('era',Ev.ERAS.map(function(e){return {v:e.k,label:e.n,icon:e.icon,sub:e.span};}),function(v){return evo.era[v];},'wide'),Object.keys(evo.era).length)+
-      fold('style','Style',D.pills('etype',Ev.TYPES.map(function(t){return {v:t.k,label:t.n,icon:t.icon};}),function(v){return evo.type[v];}),Object.keys(evo.type).length)+
-      fold('family','Codex family',D.pills('eroot',Object.keys(D.ROOT_COLORS).map(function(r){return {v:r,label:r,color:D.ROOT_COLORS[r]};}),function(v){return evo.root[v];}),Object.keys(evo.root).length)+
-      '<div class="row tight">'+D.pills('emine',[{v:'mine',label:'Only styles with my drinks',icon:'🎻'}],function(){return evo.mine;})+
-      (Object.keys(evo.era).length+Object.keys(evo.type).length+Object.keys(evo.root).length+(evo.mine?1:0)+(evo.q?1:0)?'<button id="evoclear" class="btn ghost small">Clear</button>':'')+'</div>';
-  }
   function treeLi(n) {
     var D = DB(), on = evoMatch(n), ks = kids(n.id), e = eraOf(n.era), ds = drinksOf(n);
     return '<li class="' + (on ? '' : 'dim') + (n.trunk ? ' trunk' : '') + '" style="--c:' + D.ROOT_COLORS[n.root] + '"><a href="#/evo/' + n.id + '" class="tnode"><i class="dotc"></i>' +
@@ -2159,10 +2144,9 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     var D = DB(), Ev = E();
     var h = header + '<section class="callout">The Old Fashioned is the original “cocktail” (spirit, sugar, water, bitters), the trunk of the tree. Punch and the flip are even older cousins.</section>';
     h += D.pills('evoview', [{ v:'timeline', label:'Timeline', icon:'🕰️' }, { v:'tree', label:'Tree', icon:'🌳' }], function (v) { return evo.view === v; });
-    h += '<section class="panel filterpanel">' + evoFilters() + '</section>';
     var shown = Ev.STYLES.filter(evoMatch);
     if (evo.view === 'tree') {
-      h += '<section class="panel"><p class="muted small">Tap a style to see its path from the roots. Faded styles don’t match your filters. Numbers are drinks in your songbook.</p><ul class="evotree">' + ['sling','punch','flip-style'].map(node).map(treeLi).join('') + '</ul></section>';
+      h += '<section class="panel"><p class="muted small">Tap a style to see its path from the roots. Numbers are drinks in your songbook.</p><ul class="evotree">' + ['sling','punch','flip-style'].map(node).map(treeLi).join('') + '</ul></section>';
     } else {
       h += '<div class="timeline">';
       Ev.ERAS.forEach(function (e) {
@@ -2173,16 +2157,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
       h += '</div>';
     }
     DB().renderHTML(h);
-    document.querySelectorAll('[data-evofold]').forEach(function(d){d.addEventListener('toggle',function(){evo.open[d.dataset.evofold]=d.open;});});
-    var q = document.getElementById('evoq');
-    q.oninput = function () { evo.q = q.value; var p = q.selectionStart; D.keep(function () { evolution(header); }); var nq = document.getElementById('evoq'); nq.focus(); nq.setSelectionRange(p, p); };
-    function tog(map, v) { if (map[v]) delete map[v]; else map[v] = 1; D.keep(function () { evolution(header); }); }
-    D.onTap('era', function (v) { tog(evo.era, v); });
-    D.onTap('etype', function (v) { tog(evo.type, v); });
-    D.onTap('eroot', function (v) { tog(evo.root, v); });
-    D.onTap('emine', function () { evo.mine = !evo.mine; D.keep(function () { evolution(header); }); });
     D.onTap('evoview', function (v) { evo.view = v; D.keep(function () { evolution(header); }); });
-    var c = document.getElementById('evoclear'); if (c) c.onclick = function () { evo.era = {}; evo.type = {}; evo.root = {}; evo.mine = false; evo.q = ''; evolution(header); };
     D.bindLinMode();
   }
   function evoNode(id) {
@@ -2205,6 +2180,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
   function S() { var u = DB().user; u.settings.apo = u.settings.apo || {}; var a = u.settings.apo;
     a.sj = a.sj || { fruit:'lime', mode:'peel', peel:100, target:1000, juice:0 };
     if(a.sy&&a.sy.cat==='Bard’s')a.sy.cat='Bard’s';
+    if(a.sy && a.sy.id==='honey-ginger'){a.sy.id='ginger';a.sy.mult=1;}
     a.sy = a.sy || { cat:'', id:'simple', ratio:null, basis:'weight', target:500, mult:1 };
     a.aa = a.aa || { fruit:'orange', target:'lime', vol:1000, unit:'ml', cb:[0.5,0.2] };
     return a; }
@@ -2280,7 +2256,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
     out();
   }
   var SY_CATS = [{ v:'', label:'All', icon:'✦' }, { v:'Basic', label:'Basic', icon:'🧂' }, { v:'Spiced', label:'Spiced', icon:'🪵' }, { v:'Fruit', label:'Fruit', icon:'🍓' }, { v:'Herbal', label:'Herbal & tea', icon:'🌿' }, { v:'Bard’s', label:'Bard’s', icon:'🎻' }];
-  function cups(x) { var q = Math.round(x * 4) / 4, w = Math.floor(q), fr = { 0:'', 0.25:'¼', 0.5:'½', 0.75:'¾' }[q - w]; return (w || !fr ? w : '') + (fr || '') + ' cup' + (q > 1 ? 's' : ''); }
+  function cups(x) { var q=Math.round(x*8)/8,w=Math.floor(q),fr={0:'',0.125:'⅛',0.25:'¼',0.375:'⅜',0.5:'½',0.625:'⅝',0.75:'¾',0.875:'⅞'}[q-w];return (w||!fr?w:'')+(fr||'')+' cup'+(q>1?'s':''); }
   function syrupView() {
     var D = DB(), st = S().sy, p = A.syrupById(st.id) || A.SYRUPS[0];
     var list = A.SYRUPS.filter(function (s) { return !st.cat || s.cat === st.cat; });
@@ -2306,7 +2282,7 @@ root.BardTools={solve:solve,required:required,missing:missing,recipes:recipes,sp
         D.pills('syquick', [250,500,750,1000].map(function (x) { return { v:String(x), label: x < 1000 ? x + ' ml' : '1 L' }; }), function (v) { return +v === st.target; });
     }
     h += '<div id="syout"></div></section>';
-    h += '<section class="panel"><h2>Method</h2><ol class="steps">' + p.method.map(function (m) { return '<li>' + D.esc(m) + '</li>'; }).join('') + '</ol>' +
+    h += '<section class="panel"><h2>Method</h2><ol class="steps">' + p.method.map(function (m) { if(p.id==='ginger'){m=m.replace('¼ cup each for a 1× batch',cups(0.25*st.mult)+' each for this batch').replace('½ cup honey into the strained product for a 1× batch',cups(0.5*st.mult)+' honey into the strained product for this batch');} return '<li>' + D.esc(m) + '</li>'; }).join('') + '</ol>' +
       (p.kind === 'sugar' && !p.mine && !p.house ? '<p class="muted small">Starter recipe in my wording. Tweak it, then save your version to your prep page.</p>' : '') + '</section>';
     document.getElementById('apo-body').innerHTML = h;
     function out() {
