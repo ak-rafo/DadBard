@@ -1124,10 +1124,7 @@ own({id:'ray-gun',name:'Ray Gun',exp:true,fam:'Old-Fashioned',base:'Whiskey',m:'
  spec:[[1.5,'oz','bourbon'],[0.5,'oz','mrblack'],[0.25,'oz','licor43'],[1,'dash','angostura'],[1,'dash','chocbitters'],[1,'dash','orangebitters']],
  flav:['coffee','rich','spirit-forward'],tech:['stir'],parent:'revolver',changed:'Mr Black and Licor 43, plus a three-bitters stack.',
  said:'1.5 bourbon; 1/2 Mr Black; 1/4 Licor 43; 1 dash Angostura; 1 dash chocolate bitters; 1 dash orange bitters'});
-own({id:'amaretto-espresso-martini',name:'Amaretto Espresso Martini',fam:'Martini',base:'Brandy',m:'shake',glass:'Coupe',ice:'Up',
- spec:[[1,'oz','cognac'],[1,'oz','mrblack'],[1.5,'oz','espresso'],[0.25,'oz','montenegro'],[0.25,'oz','honey'],[0.5,'oz','amaretto']],
- flav:['coffee','nutty','rich'],tech:['shake'],parent:'espresso-martini',changed:'Cognac base and amaretto, built on your rum version’s frame.',
- said:'1oz cognac; 1oz Mr Black; 1.5oz espresso; 1/4oz Montenegro; 1/4oz honey syrup; 1/2oz amaretto'});
+
 own({id:'balanced-espresso-martini',name:'Balanced Espresso Martini',fam:'Martini',base:'Rum',m:'shake',glass:'Coupe',ice:'Up',garnish:'Drizzle of cherry syrup',
  spec:[[0.5,'oz','smithcross'],[1.5,'oz','threestars'],[1,'oz','coffeeliqueur'],[0.5,'oz','allspice'],[1,'oz','espresso',{label:'Espresso (1 shot)'}],[1,'piece','orangepeel'],[1,'dash','cherrysyrup',{label:'Cherry syrup, drizzled'}],[1,'pinch','salt']],
  flav:['coffee','spicy','tropical'],tech:['shake'],parent:'espresso-martini',changed:'Two rums, allspice dram, salt and a cherry drizzle.',
@@ -2405,6 +2402,9 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
   /* Dad Bard 🪕 app logic (vanilla JS, no build step needed) */
   (function () {
     'use strict';
+    (function(){var ds=window.CC_DATA.DRINKS;
+      function clean(list){for(var i=list.length-1;i>=0;i--){var d=list[i];if(d.id==='amaretto-espresso-martini'){list.splice(i,1);continue;}if(d.vars)clean(d.vars);if(d.id==='rd-espresso-martini'){d.name='Espresso Martini (Handshake)';d.vlabel=d.name;}}}clean(ds);
+    })();
     var DATA = window.CC_DATA, Calc = window.CocktailCalc;
     var ING = DATA.ING, DRINKS = DATA.DRINKS, TECH = DATA.TECH, STYLES = DATA.STYLES;
     var STORE_KEY = 'dadbard.v1', OLD_KEY = 'specbook.v1';
@@ -2484,7 +2484,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       ORIG_VARS[d.id].forEach(function (v) { ORIG[v.id] = snap(v); ORIG_OBJ[v.id] = v; });
     });
     function restoreObj(o, id) { Object.keys(o).forEach(function (k) { delete o[k]; }); Object.assign(o, clone(ORIG[id])); }
-    var EDIT_KEYS = ['name','cat','fam','base','m','glass','ice','garnish','flav','tech','method','style','vlabel','src','alts','note'];
+    var EDIT_KEYS = ['name','cat','fam','base','m','glass','ice','garnish','flav','tech','method','style','vlabel','src','alts','note','recipes'];
     function applyEdit(o, e) {
       EDIT_KEYS.forEach(function (k) { if (e[k] !== undefined) o[k] = clone(e[k]); });
       if (e.spec) o.spec = clone(e.spec);
@@ -2548,10 +2548,10 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       var anchors={};
       ['old-fashioned','martini','daiquiri','margarita','mai-tai','negroni','manhattan','whiskey-sour','gimlet','last-word','espresso-martini','white-russian','revolver','bloody-mary','caipirinha','hot-toddy','cuba-libre','pina-colada','spritz','french-75','sazerac','sidecar','paloma','mojito','zombie','test-pilot','army-navy','penicillin','pisco-sour'].forEach(function(k){if(map[k])anchors[k]=1;});
       function root(id){var seen={},path=[],cur=id;
-        while(map[cur]){if(seen[cur]){return path.slice().sort()[0];}seen[cur]=1;path.push(cur);
+        while(map[cur]){if(map[cur].rd||map[cur].cat==='R&D')return cur;if(seen[cur]){return path.slice().sort()[0];}seen[cur]=1;path.push(cur);
           if(anchors[cur]&&!NAVIGATION_HOMES[cur])return cur;
           var next=NAVIGATION_HOMES[cur]||owners[cur]||map[cur].variantOf||map[cur].parent;
-          if(!next||!map[next]||next===cur)return cur;cur=next;
+          if(!next||!map[next]||next===cur||map[next].rd||map[next].cat==='R&D')return cur;cur=next;
         }return id;
       }
       all.forEach(function(d){roots[d.id]=root(d.id);});
@@ -2561,11 +2561,12 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       DRINKS.length=0;tops.forEach(function(d){DRINKS.push(d);});
     }
     function searchText(x){return String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
-    function variantCard(v,main,vs,vi){return Object.assign({},v,{cat:v.rd?'R&D':vs[0].mine||vs[0].sharedWithBard||v.fromNotes&&!v.av?'Bard’s':v.cat,aStatus:(v.status||[]).filter(function(x){return x!=='Has Bard’s version'||vs.some(function(z){return z.mine||z.sharedWithBard;});}),aBase:Array.from(new Set(vs.map(function(z){return z.base;}))),aFlav:v.flav||[],aTech:Array.from(new Set([].concat.apply([],vs.map(function(z){return z.tech||[];})))),aEquip:Array.from(new Set([].concat.apply([],vs.map(function(z){return (z.tech||[]).map(function(t){return EQUIP[t];}).filter(Boolean);})).concat(/crushed|pebble|cone/i.test(v.ice||'')?['Crushed ice']:[]))),aStyle:Array.from(new Set(vs.map(function(z){return z.style;}))),aStrength:Array.from(new Set(vs.map(function(z){return Calc.strengthLabel(z.stats.finalAbv);}))),pStyle:vs[0].style,stats:vs[0].stats,versions:v.versions,vdef:vi,variants:[v],mainName:main.name,displayVi:vs[0].sourceIndex});}
+    function variantCard(v,main,vs,vi){v=Object.assign({},v,vs[0].editMeta||{});return Object.assign({},v,{cat:v.rd?'R&D':vs[0].mine||vs[0].sharedWithBard||v.fromNotes&&!v.av?'Bard’s':v.cat,aStatus:(v.status||[]).filter(function(x){return x!=='Has Bard’s version'||vs.some(function(z){return z.mine||z.sharedWithBard;});}),aBase:Array.from(new Set(vs.map(function(z){return z.base;}))),aFlav:v.flav||[],aTech:Array.from(new Set([].concat.apply([],vs.map(function(z){return z.tech||[];})))),aEquip:Array.from(new Set([].concat.apply([],vs.map(function(z){return (z.tech||[]).map(function(t){return EQUIP[t];}).filter(Boolean);})).concat(/crushed|pebble|cone/i.test(v.ice||'')?['Crushed ice']:[]))),aStyle:Array.from(new Set(vs.map(function(z){return z.style;}))),aStrength:Array.from(new Set(vs.map(function(z){return Calc.strengthLabel(z.stats.finalAbv);}))),pStyle:vs[0].style,stats:vs[0].stats,versions:v.versions,vdef:vi,variants:[v],mainName:main.name,displayVi:vs[0].sourceIndex});}
     function songResults(list){
+      list=list.filter(function(d){return state.cat==='R&D'?(d.rd||d.cat==='R&D'):!(d.rd||d.cat==='R&D');});
       if(state.sort!=='az'&&!state.q.trim()&&!state.cat&&!state.favorites&&!activeCount())return sorted(list.filter(function(d){return !isHidden(d);}).map(function(main){var visible=[];main.variants.forEach(function(x){x.versions.forEach(function(z){if(!recipeHidden(x,z))visible.push({d:x,z:z});});});var r=visible[0];return Object.assign({},main,{openId:r.d.id,displayVi:r.z.sourceIndex});}));
       var out=[],tokens=searchText(state.q).trim().split(/\s+/).filter(Boolean);
-      list.forEach(function(main){if(isHidden(main))return;main.variants.forEach(function(v){
+      list.forEach(function(main){if(isHidden(main))return;main.variants.forEach(function(v){if((v.rd||v.cat==='R&D')&&state.cat!=='R&D')return;
         
         var vi=-1,vs=v.versions.filter(function(z,i){if(recipeHidden(v,z)||(state.favorites&&!recipeFavorite(v,z)))return false;
           var hay=searchText([v.name,v.vlabel,v.cat,v.fam,(v.prov||{}).who,(v.prov||{}).where,(v.flav||[]).join(' '),z.base,z.style,z.label].concat(z.spec.map(function(it){return (ING[it[2]]||{}).n+' '+((it[3]||{}).label||'');})).join(' '));
@@ -2601,7 +2602,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     function isHidden(d){return (d.variants||[d]).every(function(x){return x.versions.every(function(z){return recipeHidden(x,z);});});}
     function migrateRecipeState(){user.recipeFavorites=user.recipeFavorites||{};user.hiddenRecipes=user.hiddenRecipes||{};
       allVariants().forEach(function(d){var u=user.drinks[d.id]||{};if(u.favorite){var i=d.versionMap[user.vsel[d.id]];if(i==null)i=d.vdef;user.recipeFavorites[recipeKey(d,d.versions[i])]=true;delete u.favorite;}if(user.hidden[d.id]){var i=d.versionMap[user.vsel[d.id]];if(i==null)i=d.vdef;user.hiddenRecipes[recipeKey(d,d.versions[i])]=user.hidden[d.id];delete user.hidden[d.id];}});save();}
-    function recipeName(d,z){return d.name+(z.mine||z.label==='Classic'?'':d.versions.length>1?' · '+z.label:'');}
+    function recipeName(d,z){return ((z.editMeta||{}).name||d.name)+(z.mine||z.label==='Classic'?'':d.versions.length>1?' · '+z.label:'');}
     function craftHidden(k) { return !!user.hiddenCraft[k]; }
     function craftOk(k) { return TECH[k] && !REMOVED_CRAFT[k] && !craftHidden(k); }
     /* ---------- derived data ---------- */
@@ -2636,6 +2637,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         if (d.av) vs.push(mkVersion(d, d.av, d.av.label || (d.av.by ? d.av.by + '’s version' : AV_LABEL), d.av.by ? 'guest' : 'mine'));
         d.vdef = 0;
       }
+      vs=vs.map(function(v,i){var e=d.recipes&&d.recipes[i];if(!e)return v;var z=mkVersion(Object.assign({},d,e.meta),Object.assign({},v,e.meta,{spec:e.spec,note:e.note}),v.label,v.kind);z.editMeta=e.meta;return z;});
       vs=uniqueVersions(d,vs);d.versions = vs;
       d.stats = vs[d.vdef].stats;
       d.strength = d.stats.finalMl ? Calc.strengthLabel(d.stats.finalAbv) : '—';
@@ -2964,7 +2966,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
           (f.note ? '<small>' + esc(f.note) + '</small>' : '') + '</span></li>';
       }).join('') + '</ul>';
     }
-    function variantLabel(main,x,z){
+    function variantLabel(main,x,z){x=Object.assign({},x,z.editMeta||{});
       var label=x.vlabel||x.name;
       if(x.id==='ginori')return z.label;
       if(x.id==='dirty-martini'&&z.mine)return 'Bard’s';
@@ -2978,7 +2980,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       var main = vm.main, vIdx = vm.i, d = main.variants[vIdx];
       var u = ud(id), unit = user.settings.unit;
       var sourceVi=requestedVi!=null?+requestedVi:user.vsel[id];var vi=sourceVi!=null&&d.versionMap[sourceVi]!=null?d.versionMap[sourceVi]:d.vdef;
-      var v = d.versions[vi];user.vsel[id]=v.sourceIndex;var st = v.stats, sty = STYLE_BY[v.style] || {};
+      var v = d.versions[vi];d=Object.assign({},d,v.editMeta||{});user.vsel[id]=v.sourceIndex;var st = v.stats, sty = STYLE_BY[v.style] || {};
       var batchWord = d.batch ? (serves === 1 ? '1 batch' : serves + '× batch') : serves + ' ' + (serves === 1 ? 'serve' : 'serves');
       if(d.batchServings)batchWord += ' · '+(d.batchServings*serves)+' servings';
         var h = '<header class="top detail"><div class="dethead"><a href="#/" class="back">‹ Songbook</a><a class="editbtn" href="#/edit/' + encodeURIComponent(d.id) + '/' + v.sourceIndex + '">✏️ Edit</a></div>' +
@@ -3143,7 +3145,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     var draft = null;
     function draftFromDrink(d, vi) {
       var v = d.versions[d.versionMap[vi]!=null?d.versionMap[vi]:0] || d.versions[0], mineMain = isMineMain(d);
-      var target = mineMain ? (vi > 0 && d.alts ? 'alt' : 'main') : (v.kind === 'trad' ? 'av' : 'av');
+      d=Object.assign({},d,v.editMeta||{});vi=v.sourceIndex;var target='selected';
       return { mode: d.custom ? 'custom' : 'edit', id:d.id, vi:vi, isVariant: !!VAR[d.id].i, vlabel:d.vlabel || '', name:d.name, cat:d.cat, fam:d.fam, style:d.style || 'auto',
         base:v.base, m:v.m, glass:d.glass || '', ice:d.ice || '', garnish:d.garnish || '', flav:(d.flav || []).slice(), method:d.method || '', note:v.note || '',
         rows:rowsFromSpec(v.spec), origTech:(v.tech || []).slice(), viewing: mineMain ? 'main' : v.kind, target:target, creator:(d.prov || {}).who || '',
@@ -3206,7 +3208,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         '<div class="grid2"><label class="field"><span>Glass</span><input id="eglass" list="glasslist" value="' + esc(d.glass) + '"></label><label class="field"><span>Ice</span><input id="eice" list="icelist" value="' + esc(d.ice) + '"></label></div>' +
         '<label class="field"><span>Garnish</span><input id="egarnish" value="' + esc(d.garnish) + '"></label></section>';
       h += '<section class="panel' + (d.target !== 'main' || d.mineMain ? ' mine' : '') + '"><h2>Spec' + (!d.mineMain ? ' · ' + (d.target === 'av' ? '🎻 your version' : 'traditional') : '') + '</h2>' +
-        (d.mode === 'edit' && !d.mineMain && d.viewing === 'trad' ? pills('etarget', [{ v:'av', label: d.hasAv ? 'Update my version' : 'Save as my version', icon:'🎻' }, { v:'main', label:'Replace the traditional spec', icon:'📝' }], function (v) { return v === d.target; }) : '') +
+        '' +
         '<div id="erows">' + d.rows.map(rowHTML).join('') + '</div>' +
         '<button id="eadd" class="btn">＋ Add ingredient</button>' +
         '<p class="muted small">Amounts: 2, 3/4, 1 1/2, ¾ or ranges like 2-4. Unknown ingredients get a type and ABV so the numbers still work.</p>' +
@@ -3265,6 +3267,12 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       var meta = { name:d.name.trim(), cat:d.cat, fam:d.fam, base:d.base.trim() || 'Other', m:d.m, glass:d.glass.trim(), ice:d.ice.trim(), garnish:d.garnish.trim(), flav:d.flav.slice(),
         tech:techFor(r.spec, d.m, d.origTech), method:d.method.trim() || undefined, style:d.style === 'auto' ? undefined : d.style };
       var id = d.id, vsel = 0;
+      if(d.mode==='edit'||d.mode==='custom'){
+        var e=d.mode==='custom'?user.custom.filter(function(c){return c.id===id;})[0]:(user.edits[id]=user.edits[id]||{});e.recipes=e.recipes||{};
+        meta.vlabel=d.vlabel.trim();meta.method=d.method.trim();meta.style=d.style==='auto'?null:d.style;
+        e.recipes[d.vi]={meta:meta,spec:r.spec,note:d.note.trim()};
+        user.vsel[id]=d.vi;save();applyUser();draft=null;location.hash='#/d/'+id+'/'+d.vi;return;
+      }
       if (d.mode === 'new' || d.mode === 'custom') {
         var obj = d.mode === 'custom' ? user.custom.filter(function (c) { return c.id === d.id; })[0] : { id:'u-' + slug(d.name) + '-' + Date.now().toString(36) };
         ['method','style','vlabel','variantOf','src'].forEach(function (k) { delete obj[k]; });
