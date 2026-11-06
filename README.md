@@ -1,2 +1,2 @@
-Dad Bard v6.7
-Replaced header banjo emoji with custom lute/cocktail/botanical artwork embedded in index.html. Home-screen icons and left header logo unchanged. Replace supplied files. Physical iPhone not tested.
+Dad Bard v6.8
+Variant badges restored. Use Show as separate song to detach a named variation or recipe version; Return to cocktail variants reverses it. Saved locally and included in backups. Replace supplied files. Desktop Chromium tests passed; physical iPhone not tested.

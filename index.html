@@ -2548,7 +2548,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       var anchors={};
       ['old-fashioned','martini','daiquiri','margarita','mai-tai','negroni','manhattan','whiskey-sour','gimlet','last-word','espresso-martini','white-russian','revolver','bloody-mary','caipirinha','hot-toddy','cuba-libre','pina-colada','spritz','french-75','sazerac','sidecar','paloma','mojito','zombie','test-pilot','army-navy','penicillin','pisco-sour'].forEach(function(k){if(map[k])anchors[k]=1;});
       function root(id){var seen={},path=[],cur=id;
-        while(map[cur]){if(map[cur].rd||map[cur].cat==='R&D')return cur;if(seen[cur]){return path.slice().sort()[0];}seen[cur]=1;path.push(cur);
+        while(map[cur]){if((user.detachedSongs||{})[cur])return cur;if(map[cur].rd||map[cur].cat==='R&D')return cur;if(seen[cur]){return path.slice().sort()[0];}seen[cur]=1;path.push(cur);
           if(anchors[cur]&&!NAVIGATION_HOMES[cur])return cur;
           var next=NAVIGATION_HOMES[cur]||owners[cur]||map[cur].variantOf||map[cur].parent;
           if(!next||!map[next]||next===cur||map[next].rd||map[next].cat==='R&D')return cur;cur=next;
@@ -2562,13 +2562,18 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     }
     function searchText(x){return String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
     function variantCard(v,main,vs,vi){v=Object.assign({},v,vs[0].editMeta||{});return Object.assign({},v,{cat:v.rd?'R&D':vs[0].mine||vs[0].sharedWithBard||v.fromNotes&&!v.av?'Bard’s':v.cat,aStatus:(v.status||[]).filter(function(x){return x!=='Has Bard’s version'||vs.some(function(z){return z.mine||z.sharedWithBard;});}),aBase:Array.from(new Set(vs.map(function(z){return z.base;}))),aFlav:v.flav||[],aTech:Array.from(new Set([].concat.apply([],vs.map(function(z){return z.tech||[];})))),aEquip:Array.from(new Set([].concat.apply([],vs.map(function(z){return (z.tech||[]).map(function(t){return EQUIP[t];}).filter(Boolean);})).concat(/crushed|pebble|cone/i.test(v.ice||'')?['Crushed ice']:[]))),aStyle:Array.from(new Set(vs.map(function(z){return z.style;}))),aStrength:Array.from(new Set(vs.map(function(z){return Calc.strengthLabel(z.stats.finalAbv);}))),pStyle:vs[0].style,stats:vs[0].stats,versions:v.versions,vdef:vi,variants:[v],mainName:main.name,displayVi:vs[0].sourceIndex});}
-    function songResults(list){
+    function separateRecipe(d,z){return !!(user.separateRecipes||{})[recipeKey(d,z)];}
+    function songResults(list){var out=rawSongResults(list),tokens=searchText(state.q).trim().split(/\s+/).filter(Boolean);
+      list.forEach(function(main){main.variants.forEach(function(d){d.versions.forEach(function(z,i){if(!separateRecipe(d,z)||recipeHidden(d,z)||(state.favorites&&!recipeFavorite(d,z)))return;var c=variantCard(d,main,[z],i);if(state.cat==='R&D'?!(d.rd||d.cat==='R&D'):(d.rd||d.cat==='R&D'))return;if(state.cat&&c.cat!==state.cat)return;if(!FILTERS.every(function(g){var sel=Object.keys(state.f[g.k]);return !sel.length||sel.some(function(k){return g.get(c).indexOf(k)>=0;});}))return;var text=searchText([recipeName(d,z),z.label,z.base,z.spec.map(function(it){return ING[it[2]]?ING[it[2]].n:it[2];}).join(' ')].join(' '));if(tokens.some(function(t){return text.indexOf(t)<0;}))return;c.name=recipeName(d,z)+(z.mine?' · BV':'');c.separate=true;c.isVariant=false;out.push(c);});});});return sorted(out);}
+    function rawSongResults(list){
       list=list.filter(function(d){return state.cat==='R&D'?(d.rd||d.cat==='R&D'):!(d.rd||d.cat==='R&D');});
-      if(state.sort!=='az'&&!state.q.trim()&&!state.cat&&!state.favorites&&!activeCount())return sorted(list.filter(function(d){return !isHidden(d);}).map(function(main){var visible=[];main.variants.forEach(function(x){x.versions.forEach(function(z){if(!recipeHidden(x,z))visible.push({d:x,z:z});});});var r=visible[0];return Object.assign({},main,{openId:r.d.id,displayVi:r.z.sourceIndex});}));
+      if(state.sort!=='az'&&!state.q.trim()&&!state.cat&&!state.favorites&&!activeCount()){
+        var cards=[];list.forEach(function(main){var visible=[];main.variants.forEach(function(x){x.versions.forEach(function(z){if(!recipeHidden(x,z)&&!separateRecipe(x,z))visible.push({d:x,z:z});});});if(visible.length){var q=visible[0];cards.push(Object.assign({},main,{openId:q.d.id,displayVi:q.z.sourceIndex}));}});return sorted(cards);
+      }
       var out=[],tokens=searchText(state.q).trim().split(/\s+/).filter(Boolean);
       list.forEach(function(main){if(isHidden(main))return;main.variants.forEach(function(v){if((v.rd||v.cat==='R&D')&&state.cat!=='R&D')return;
         
-        var vi=-1,vs=v.versions.filter(function(z,i){if(recipeHidden(v,z)||(state.favorites&&!recipeFavorite(v,z)))return false;
+        var vi=-1,vs=v.versions.filter(function(z,i){if(separateRecipe(v,z)||recipeHidden(v,z)||(state.favorites&&!recipeFavorite(v,z)))return false;
           var hay=searchText([v.name,v.vlabel,v.cat,v.fam,(v.prov||{}).who,(v.prov||{}).where,(v.flav||[]).join(' '),z.base,z.style,z.label].concat(z.spec.map(function(it){return (ING[it[2]]||{}).n+' '+((it[3]||{}).label||'');})).join(' '));
           if(!tokens.every(function(t){return hay.indexOf(t)>=0;}))return false;
           var d=variantCard(v,main,[z],i);if(state.cat&&d.cat!==state.cat)return false;
@@ -2793,7 +2798,9 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       var primary=declared.split(/\s*(?:\/|&|\+|,|\band\b)\s*/i)[0].trim();
       if(primary==='Agave'){var spirit=shown.spec.map(function(it){return ING[it[2]];}).filter(function(i){return i&&i.t==='spirit';})[0];if(spirit)primary=/mezcal/i.test(spirit.n)?'Mezcal':'Tequila';}
 
-      var marks = '';
+      var parent=byId[d.mainId||d.id]||d,choices=0;
+      (d.isVariant||d.separate?[d]:(parent.variants||[parent])).forEach(function(x){x.versions.forEach(function(z){if(!recipeHidden(x,z)&&!separateRecipe(x,z))choices++;});});
+      var marks = choices>1&&!d.separate ? '<span class="mk vars">'+choices+' variants</span>' : '';
       return '<li><a class="card" href="#/d/' + (d.openId||d.id) + (d.displayVi!=null?'/'+d.displayVi:'') + '"' + (d.displayVi!=null?' data-recipe-id="'+esc(d.openId||d.id)+'" data-recipe-vi="'+d.displayVi+'"':'') + ' style="--c:' + (st.color || 'transparent') + '"><div class="cmain"><div class="cname">' + esc(d.name) +
         '</div><div class="csub">' + (st.icon ? '<span class="drink-icon" aria-hidden="true">'+st.icon+'</span> ' : '') + (primary ? esc(primary)+' · ' : '') + esc(METHOD_LABEL[shown.m]||shown.m) + '</div>' +
         (marks ? '<div class="marks">' + marks + '</div>' : '') + '</div>' +
@@ -2985,7 +2992,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         var h = '<header class="top detail"><div class="dethead"><a href="#/" class="back">‹ Songbook</a><a class="editbtn" href="#/edit/' + encodeURIComponent(d.id) + '/' + v.sourceIndex + '">✏️ Edit</a></div>' +
         '<h1>' + esc(d.name) + '</h1>' + (d.id !== main.id ? '<p class="selected-style">Variant of ' + esc(main.name) + '</p>' : '') +
         '<div class="varpick"><div class="flabel">Variant</div>' +
-          pills('variant', main.variants.reduce(function(out,x){x.versions.forEach(function(z,i){if(!recipeHidden(x,z)||x.id===d.id&&z.sourceIndex===v.sourceIndex)out.push({v:x.id+'|'+z.sourceIndex,label:variantLabel(main,x,z),icon:z.mine?'🎻':x.custom?'✏️':''});});return out;},[]),function(x){return x===d.id+'|'+v.sourceIndex;}) +
+          pills('variant', main.variants.reduce(function(out,x){x.versions.forEach(function(z,i){if(separateRecipe(d,v)?!(x.id===d.id&&z.sourceIndex===v.sourceIndex):separateRecipe(x,z))return;if(!recipeHidden(x,z)||x.id===d.id&&z.sourceIndex===v.sourceIndex)out.push({v:x.id+'|'+z.sourceIndex,label:variantLabel(main,x,z),icon:z.mine?'🎻':x.custom?'✏️':''});});return out;},[]),function(x){return x===d.id+'|'+v.sourceIndex;}) +
           '<a class="addstyle" href="#/new/'+encodeURIComponent(main.cat)+'/'+encodeURIComponent(main.id)+'">＋ Add a variant</a></div>' +
         '<div class="badges"><span class="pill ' + catClass(v.mine?'Bard’s':d.cat) + '">' + esc(v.mine?'Bard’s':d.cat) + '</span>' +
         '<span class="pill" style="color:' + sty.color + ';border-color:' + sty.color + '">' + (sty.icon || '') + ' ' + esc(v.style) + '</span>' +
@@ -3058,7 +3065,10 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         '<label><input type="checkbox" id="verified"' + (u.verified ? ' checked' : '') + '> ' + (d.src === 'andrew' || d.custom ? 'Spec is final' : 'Spec verified against my book') + '</label></div>' +
         '<textarea id="notes" rows="5" placeholder="Tweaks, bottles used, what to try next…">' + esc(u.notes) + '</textarea><p class="muted small" id="saved"></p></section>';
       h += '<section class="panel hidepanel"><button class="btn ghost hidebtn" id="hidebtn">'+(recipeHidden(d,v)?'👁 Unhide ':'🙈 Hide ')+esc(recipeName(d,v))+(v.mine?' · BV':'')+'</button><p class="muted small">Only this recipe variant is affected. Other versions remain available.</p></section>';
+      var detached=!!(user.detachedSongs||{})[id],split=separateRecipe(d,v);
+      if(d.id!==main.id||detached||d.versions.length>1||split){h+='<section class="panel"><button class="btn ghost" id="separatesong">'+(detached||split?'↩ Return to cocktail variants':'↗ Show as separate song')+'</button><p class="muted small">Changes browsing placement only. Your recipe, favorites and edits stay intact.</p></section>';}
       renderHTML(h);
+      var move=document.getElementById('separatesong');if(move)move.onclick=function(){user.detachedSongs=user.detachedSongs||{};user.separateRecipes=user.separateRecipes||{};var k=recipeKey(d,v);if(detached)delete user.detachedSongs[id];else if(split)delete user.separateRecipes[k];else if(d.id!==main.id)user.detachedSongs[id]=true;else user.separateRecipes[k]=true;save();applyUser();renderDrink(id,v.sourceIndex);};
       document.getElementById('hidebtn').onclick=function(){var k=recipeKey(d,v);if(user.hiddenRecipes[k]){delete user.hiddenRecipes[k];save();renderDrink(id,v.sourceIndex);}else{user.hiddenRecipes[k]=Date.now();save();location.hash='#/';}};
       $app.querySelectorAll('.seg button').forEach(function (b) { b.onclick = function () { user.settings.unit = b.dataset.u; save(); keep(renderDrink, id); }; });
       $app.querySelectorAll('.vtabs button').forEach(function (b) { b.onclick = function () { user.vsel[id] = +b.dataset.v; save(); keep(renderDrink, id); }; });
