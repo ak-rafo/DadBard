@@ -1,1 +1,17 @@
-{"version": "6.9", "syntax": true, "chromiumStartup": true, "physicalIphoneTested": false}
+{
+  "version": "6.10",
+  "syntaxPassed": true,
+  "browserChecks": [
+    {
+      "width": 390,
+      "iconAndFilterPassed": true,
+      "runtimeErrors": []
+    },
+    {
+      "width": 1280,
+      "iconAndFilterPassed": true,
+      "runtimeErrors": []
+    }
+  ],
+  "physicalIphoneTested": false
+}
