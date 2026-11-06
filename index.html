@@ -313,7 +313,7 @@ nav.tabs{position:fixed!important;bottom:0!important;top:auto!important;transfor
 
 .varpick button{max-width:100%;white-space:normal;overflow-wrap:anywhere}.varpick .pillbar{min-width:0;max-width:100%}
 </style>
-</head>
+<style>body.noscroll > nav.tabs,body.noscroll .tabs{visibility:hidden}</style></head>
 <body>
 <main id="app"><p class="muted">Tuning the lute…</p></main>
 <nav class="tabs">
@@ -1466,10 +1466,7 @@ var GROUPS = {
     { id:'corpse-reviver-1', label:'No. 1', name:'Corpse Reviver No. 1', base:'Brandy', m:'stir', tech:['stir'], spec:[[1.5,'oz','cognac'],[0.75,'oz','calvados'],[0.75,'oz','sweetvermouth']], changed:'Stirred brandy, calvados and sweet vermouth.', flav:['rich','spirit-forward'], garnish:'None',
       prov:{who:'Harry Craddock (published)',where:'The Savoy, London',year:'1930',conf:'high',note:''} }
   ]},
-  'painkiller': { label:'No. 2', items:[
-    { id:'painkiller-3', label:'No. 3', name:'Painkiller No. 3', spec:[[3,'oz','navyrum'],[4,'oz','pineapple'],[1,'oz','orange'],[1,'oz','creamcoconut']], changed:'3 oz rum.' },
-    { id:'painkiller-4', label:'No. 4', name:'Painkiller No. 4', spec:[[4,'oz','navyrum'],[4,'oz','pineapple'],[1,'oz','orange'],[1,'oz','creamcoconut']], changed:'4 oz rum.' }
-  ]},
+  'painkiller': { label:'Classic', items:[] },
   'pisco-sour': { label:'Peruvian', items:[
     { id:'pisco-sour-chile', label:'Chilean', name:'Pisco Sour (Chilean)', m:'shake', tech:['shake'], garnish:'None', spec:[[2,'oz','pisco'],[0.75,'oz','lemon'],[0.75,'oz','simple']], changed:'Lemon; often no egg or bitters.',
       prov:{who:'Chilean tradition',where:'Chile',year:'—',conf:'low',note:'Chile and Peru both claim the pisco sour.'} }
@@ -1829,7 +1826,7 @@ function matchedCount(spec,stock){return stockRequirements(spec).length-missing(
 function stockName(k){return k.indexOf('family:')===0?k.slice(7):(db().ING[k]?db().ING[k].n:k);}
 function db(){return root.DB;}function el(id){return document.getElementById(id);}function esc(s){return db().esc(s);}function fmt(x){return (Math.round(x*10)/10).toLocaleString(undefined,{maximumFractionDigits:1});}
 function store(){var u=db().user;u.settings.apo=u.settings.apo||{};var s=u.settings.apo;s.stock=s.stock||{};s.slush=s.slush||{volume:1000,brix:14,abv:8,dilution:20,syrup:'simple',verified:'',raw:'',rows:[]};return s;}
-function recipes(){var out=[],seen={};db().DRINKS.forEach(function(p){if(db().isHidden(p))return;(p.variants||[p]).forEach(function(v){if(db().user.hidden[v.id])return;(v.versions||[v]).forEach(function(z,vi){var sp=z.spec||v.spec,key=v.id+JSON.stringify(sp);if(seen[key])return;seen[key]=1;out.push({id:v.id,vi:z.sourceIndex!=null?z.sourceIndex:vi,name:(v.name||p.name)+(v.versions&&v.versions.length>1?' · '+(z.label||'version'):''),spec:sp,rd:!!v.rd});});});});return out.sort(function(a,b){return a.name.localeCompare(b.name);});}
+function recipes(){var out=[],seen={};db().DRINKS.forEach(function(p){if(db().isHidden(p))return;(p.variants||[p]).forEach(function(v){(v.versions||[v]).forEach(function(z,vi){if(db().recipeHidden(v,z))return;var sp=z.spec||v.spec,key=v.id+JSON.stringify(sp);if(seen[key])return;seen[key]=1;out.push({id:v.id,vi:z.sourceIndex!=null?z.sourceIndex:vi,name:(v.name||p.name)+(v.versions&&v.versions.length>1?' · '+(z.label||'version'):''),spec:sp,rd:!!v.rd});});});});return out.sort(function(a,b){return a.name.localeCompare(b.name);});}
 function category(k){var i=db().ING[k]||{};if(/^(lime|lemon|orange|grapefruit)(juice)?$/.test(k)||k==='superlime'||k==='superlemon')return 'Citrus';return {spirit:'Spirit',liqueur:'Liqueur',syrup:'Syrup',juice:'Juice',wine:'Other',mixer:'Other'}[i.t]||'Other';}
 function options(keys,blank){return '<option value="">'+blank+'</option>'+keys.map(function(k){return '<option value="'+esc(k)+'">'+esc(db().ING[k].n)+'</option>';}).join('');}
 function stockOptions(keys,blank){return '<option value="">'+blank+'</option>'+keys.map(function(k){return '<option value="'+esc(k)+'">'+esc(stockName(k))+'</option>';}).join('');}
@@ -2524,9 +2521,10 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         if(d.id==='final-ward'||d.id==='paper-plane'){delete d.av;d.fromNotes=false;d.match=false;d.mineMain=false;d.cat='Modern';}
       });});
     // v5.21 requested collection cleanup, after local overlays.
-    var removedIds={'u-caipirinha-my-style-mw2p8oyp':true,'decaf-espresso':true};
+    var removedIds={'painkiller-3':true,'painkiller-4':true,'u-caipirinha-my-style-mw2p8oyp':true,'decaf-espresso':true};
     for(var ri=DRINKS.length-1;ri>=0;ri--){if(removedIds[DRINKS[ri].id])DRINKS.splice(ri,1);else if(DRINKS[ri].vars)DRINKS[ri].vars=DRINKS[ri].vars.filter(function(v){return !removedIds[v.id];});}
     DRINKS.forEach(function(p){[p].concat(p.vars||[]).forEach(function(d){
+      if(d.id==='painkiller'){d.vlabel='Classic';d.mainLabel='Classic';}
       if(d.id==='fall-old-fashioned')d.vlabel='Fall OF';
       if(d.id==='tiki-old-fashioned')d.vlabel='Tiki OF';
       if(d.id==='ak-improved-daiquiri'){d.name='So you think you can daiquiri';d.vlabel='so you think';}
@@ -2538,7 +2536,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       NAVIGATION_HOMES={"bijou": "martini", "hanky-panky": "manhattan", "el-presidente": "martini", "bamboo": "martini", "adonis": "martini", "downhill-daring": "manhattan", "godfather": "old-fashioned", "rusty-nail": "old-fashioned", "corn-n-oil": "old-fashioned", "white-lady": "sidecar", "breakfast-martini": "gimlet", "penicillin": "whiskey-sour", "fitzgerald": "gimlet", "amaretto-sour": "whiskey-sour", "business": "gimlet", "gin-gin-mule": "moscow-mule", "el-diablo": "moscow-mule", "lost-lake": "jungle-bird", "dark-n-stormy": "moscow-mule", "kentucky-buck": "moscow-mule", "suffering-bastard": "moscow-mule", "pantheon": "whiskey-sour", "bramble": "gimlet", "london-calling": "gimlet", "mary-pickford": "daiquiri"};
     DRINKS.forEach(function(p){[p].concat(p.vars||[]).forEach(function(d){if(NAVIGATION_HOMES[d.id]){d.parent=NAVIGATION_HOMES[d.id];d.variantOf=NAVIGATION_HOMES[d.id];}});});
     houseVariants();
-      derive();
+      derive();migrateRecipeState();
     }
   
     /* Group named riffs using recorded parent relationships, including Bard originals.
@@ -2565,17 +2563,17 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     function searchText(x){return String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
     function variantCard(v,main,vs,vi){return Object.assign({},v,{cat:v.rd?'R&D':vs[0].mine||vs[0].sharedWithBard||v.fromNotes&&!v.av?'Bard’s':v.cat,aStatus:(v.status||[]).filter(function(x){return x!=='Has Bard’s version'||vs.some(function(z){return z.mine||z.sharedWithBard;});}),aBase:Array.from(new Set(vs.map(function(z){return z.base;}))),aFlav:v.flav||[],aTech:Array.from(new Set([].concat.apply([],vs.map(function(z){return z.tech||[];})))),aEquip:Array.from(new Set([].concat.apply([],vs.map(function(z){return (z.tech||[]).map(function(t){return EQUIP[t];}).filter(Boolean);})).concat(/crushed|pebble|cone/i.test(v.ice||'')?['Crushed ice']:[]))),aStyle:Array.from(new Set(vs.map(function(z){return z.style;}))),aStrength:Array.from(new Set(vs.map(function(z){return Calc.strengthLabel(z.stats.finalAbv);}))),pStyle:vs[0].style,stats:vs[0].stats,versions:v.versions,vdef:vi,variants:[v],mainName:main.name,displayVi:vs[0].sourceIndex});}
     function songResults(list){
-      if(state.sort!=='az'&&!state.q.trim()&&!state.cat&&!state.favorites&&!activeCount())return sorted(list.filter(function(d){return !isHidden(d);}));
+      if(state.sort!=='az'&&!state.q.trim()&&!state.cat&&!state.favorites&&!activeCount())return sorted(list.filter(function(d){return !isHidden(d);}).map(function(main){var visible=[];main.variants.forEach(function(x){x.versions.forEach(function(z){if(!recipeHidden(x,z))visible.push({d:x,z:z});});});var r=visible[0];return Object.assign({},main,{openId:r.d.id,displayVi:r.z.sourceIndex});}));
       var out=[],tokens=searchText(state.q).trim().split(/\s+/).filter(Boolean);
       list.forEach(function(main){if(isHidden(main))return;main.variants.forEach(function(v){
-        if(user.hidden[v.id]||(state.favorites&&!(user.drinks[v.id]||{}).favorite))return;
-        var vi=-1,vs=v.versions.filter(function(z,i){
+        
+        var vi=-1,vs=v.versions.filter(function(z,i){if(recipeHidden(v,z)||(state.favorites&&!recipeFavorite(v,z)))return false;
           var hay=searchText([v.name,v.vlabel,v.cat,v.fam,(v.prov||{}).who,(v.prov||{}).where,(v.flav||[]).join(' '),z.base,z.style,z.label].concat(z.spec.map(function(it){return (ING[it[2]]||{}).n+' '+((it[3]||{}).label||'');})).join(' '));
           if(!tokens.every(function(t){return hay.indexOf(t)>=0;}))return false;
-          var d=variantCard(v,main,[z],i);if(state.cat&&d.cat!==state.cat)return false;if(state.f.status&&Object.keys(state.f.status).length&&d.cat!=='Bard’s')return false;
+          var d=variantCard(v,main,[z],i);if(state.cat&&d.cat!==state.cat)return false;
           if(!FILTERS.every(function(g){var sel=Object.keys(state.f[g.k]);return !sel.length||sel.some(function(k){return g.get(d).indexOf(k)>=0;});}))return false;
           if(vi<0)vi=i;return true;
-        });if(vs.length)out.push(variantCard(v,main,vs,vi));
+        });if(state.favorites){vs.forEach(function(z){var c=variantCard(v,main,[z],v.versions.indexOf(z));c.name=recipeName(v,z);c.bv=z.mine;c.exactRecipe=true;out.push(c);});}else if(vs.length)out.push(variantCard(v,main,vs,vi));
       });});
       // A-Z and search are explicit discovery views. Type-only browsing stays compact.
       var typeBrowsing=state.sort!=='az'&&!state.q.trim()&&!state.cat&&!state.favorites&&Object.keys(state.f.style).length>0&&FILTERS.every(function(g){return g.k==='style'||Object.keys(state.f[g.k]).length===0;});
@@ -2597,7 +2595,13 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     function ORIG_VARS_ID(v) { for (var k in ORIG_OBJ) if (ORIG_OBJ[k] === v) return k; }
   
     var BUILTIN_SEC = { prep:{ n:'Bard’s Favorites', icon:'🎻' }, home:{ n:'Home Techniques', icon:'🏠' }, equipment:{ n:'Needs gear', icon:'🔧' }, rd:{ n:'R&D Prep', icon:'🧪' } };
-    function isHidden(d) { return !!user.hidden[d.id]; }
+    function recipeKey(d,z){return d.id+'|'+z.sourceIndex;}
+    function recipeHidden(d,z){return !!(user.hiddenRecipes||{})[recipeKey(d,z)];}
+    function recipeFavorite(d,z){return !!(user.recipeFavorites||{})[recipeKey(d,z)];}
+    function isHidden(d){return (d.variants||[d]).every(function(x){return x.versions.every(function(z){return recipeHidden(x,z);});});}
+    function migrateRecipeState(){user.recipeFavorites=user.recipeFavorites||{};user.hiddenRecipes=user.hiddenRecipes||{};
+      allVariants().forEach(function(d){var u=user.drinks[d.id]||{};if(u.favorite){var i=d.versionMap[user.vsel[d.id]];if(i==null)i=d.vdef;user.recipeFavorites[recipeKey(d,d.versions[i])]=true;delete u.favorite;}if(user.hidden[d.id]){var i=d.versionMap[user.vsel[d.id]];if(i==null)i=d.vdef;user.hiddenRecipes[recipeKey(d,d.versions[i])]=user.hidden[d.id];delete user.hidden[d.id];}});save();}
+    function recipeName(d,z){return d.name+(z.mine||z.label==='Classic'?'':d.versions.length>1?' · '+z.label:'');}
     function craftHidden(k) { return !!user.hiddenCraft[k]; }
     function craftOk(k) { return TECH[k] && !REMOVED_CRAFT[k] && !craftHidden(k); }
     /* ---------- derived data ---------- */
@@ -2784,7 +2788,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     function card(d) {
       var u = user.drinks[d.id] || {}, st = STYLE_BY[d.pStyle] || {};
       var marks = (d.variants.length > 1 ? '<span class="mk vars">' + d.variants.length + ' variants</span>' : '') +
-        (d.src==='andrew' ? '<span class="mk av" title="Bard’s version">BV</span>' : '') +
+        ((d.exactRecipe?d.bv:d.src==='andrew') ? '<span class="mk av" title="Bard’s version">BV</span>' : '') +
         (d.exp ? '<span class="mk exp" title="Experimental">exp.</span>' : '') + (d.batch ? '<span class="mk">batch</span>' : '') +
         (d.aStatus.indexOf('Needs my check') > -1 ? '<span class="mk flag" title="Needs your check">⚑</span>' : '') +
         (d.custom ? '<span class="mk edit">custom</span>' : d.aStatus.indexOf('My edits & recipes') > -1 ? '<span class="mk edit">edited</span>' : '') +
@@ -2799,7 +2803,6 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     /* ---------- browse ---------- */
     var FILTERS = [
       { k:'style', n:'Variant', get:function (d) { return d.aStyle; }, order:STYLES.map(function (s) { return s.k; }) },
-      { k:'status', n:'Bard’s notes', get:function (d) { return d.aStatus; }, order:['Has Bard’s version','My edits & recipes','Experimental','Batch','Needs my check'] },
       { k:'base', n:'Base spirit', get:function (d) { return d.aBase; } },
       { k:'flav', n:'Flavor', get:function (d) { return d.aFlav; } },
       
@@ -2854,8 +2857,8 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     function renderBrowse() {
       var list = songResults(DRINKS), ac = activeCount();
       var VIS = DRINKS.filter(function (d) { return !isHidden(d); }), nHid = DRINKS.length - VIS.length;
-      var inCat=[];VIS.forEach(function(main){main.variants.forEach(function(v){if(!user.hidden[v.id])v.versions.forEach(function(z,i){var c=variantCard(v,main,[z],i);if(!state.cat||c.cat===state.cat)inCat.push(c);});});});
-      var counts = {}; VIS.forEach(function(d){d.variants.forEach(function(v){if(!user.hidden[v.id])counts[v.cat]=(counts[v.cat]||0)+1;});});
+      var inCat=[];VIS.forEach(function(main){main.variants.forEach(function(v){v.versions.forEach(function(z,i){if(recipeHidden(v,z))return;var c=variantCard(v,main,[z],i);if(!state.cat||c.cat===state.cat)inCat.push(c);});});});
+      var counts = {}; VIS.forEach(function(d){d.variants.forEach(function(v){if(!isHidden(v))counts[v.cat]=(counts[v.cat]||0)+1;});});
       function vals(g) { var v = {}; inCat.forEach(function (d) { g.get(d).forEach(function (x) { v[x] = (v[x] || 0) + 1; }); }); return v; }
       var sv = vals(FILTERS[0]);
       var h = '<header class="top hero"><div class="brand"><img src="' + LOGO + '" alt="Dad Bard" class="logo"><div><h1>Dad Bard <span class="sym">🪕</span></h1><p class="tagline">Songs of the home bar, sung slightly off-key</p></div></div>' +
@@ -2975,13 +2978,13 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       var main = vm.main, vIdx = vm.i, d = main.variants[vIdx];
       var u = ud(id), unit = user.settings.unit;
       var sourceVi=requestedVi!=null?+requestedVi:user.vsel[id];var vi=sourceVi!=null&&d.versionMap[sourceVi]!=null?d.versionMap[sourceVi]:d.vdef;
-      var v = d.versions[vi], st = v.stats, sty = STYLE_BY[v.style] || {};
+      var v = d.versions[vi];user.vsel[id]=v.sourceIndex;var st = v.stats, sty = STYLE_BY[v.style] || {};
       var batchWord = d.batch ? (serves === 1 ? '1 batch' : serves + '× batch') : serves + ' ' + (serves === 1 ? 'serve' : 'serves');
       if(d.batchServings)batchWord += ' · '+(d.batchServings*serves)+' servings';
         var h = '<header class="top detail"><div class="dethead"><a href="#/" class="back">‹ Songbook</a><a class="editbtn" href="#/edit/' + encodeURIComponent(d.id) + '/' + v.sourceIndex + '">✏️ Edit</a></div>' +
         '<h1>' + esc(d.name) + '</h1>' + (d.id !== main.id ? '<p class="selected-style">Variant of ' + esc(main.name) + '</p>' : '') +
         '<div class="varpick"><div class="flabel">Variant</div>' +
-          pills('variant', main.variants.reduce(function(out,x){x.versions.forEach(function(z,i){out.push({v:x.id+'|'+z.sourceIndex,label:variantLabel(main,x,z),icon:z.mine?'🎻':x.custom?'✏️':''});});return out;},[]),function(x){return x===d.id+'|'+v.sourceIndex;}) +
+          pills('variant', main.variants.reduce(function(out,x){x.versions.forEach(function(z,i){if(!recipeHidden(x,z)||x.id===d.id&&z.sourceIndex===v.sourceIndex)out.push({v:x.id+'|'+z.sourceIndex,label:variantLabel(main,x,z),icon:z.mine?'🎻':x.custom?'✏️':''});});return out;},[]),function(x){return x===d.id+'|'+v.sourceIndex;}) +
           '<a class="addstyle" href="#/new/'+encodeURIComponent(main.cat)+'/'+encodeURIComponent(main.id)+'">＋ Add a variant</a></div>' +
         '<div class="badges"><span class="pill ' + catClass(v.mine?'Bard’s':d.cat) + '">' + esc(v.mine?'Bard’s':d.cat) + '</span>' +
         '<span class="pill" style="color:' + sty.color + ';border-color:' + sty.color + '">' + (sty.icon || '') + ' ' + esc(v.style) + '</span>' +
@@ -2989,7 +2992,6 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         (d.custom ? '<span class="pill edit">✏️ Custom</span>' : d.edited ? '<span class="pill edit">✏️ Edited</span>' : '') +
         '<span class="pill">' + esc(d.fam) + ' family</span><span class="pill">' + esc(v.base) + '</span>' + (st.finalMl ? '<span class="pill">' + (d.rd?'Unverified':Calc.strengthLabel(st.finalAbv)) + '</span>' : '') + '</div>' +
         (d.famNote ? '<p class="muted small">' + esc(d.famNote) + '</p>' : '') + '</header>';
-      if (isHidden(main)) h += '<div class="hidbanner">🙈 <b>' + esc(main.name) + '</b> is hidden from your Songbook. <button class="btn small" id="unhide1">Unhide</button></div>';
       h += flagBox(allFlags(d));
         if(d.rd)h += '<div class="flagbox"><b>🧪 R&D · Proceed with caution</b><p>Handshake-inspired reconstruction from your notes. Ratios and recipes are best guesses, not verified official specifications.</p></div>';
       h += '<section class="panel controls"><div class="seg"><button data-u="oz" class="' + (unit === 'oz' ? 'on' : '') + '">oz</button><button data-u="ml" class="' + (unit === 'ml' ? 'on' : '') + '">ml</button></div>' +
@@ -3051,16 +3053,12 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       h += '<section class="panel"><h2>Bard’s notes</h2>' +
         (d.said ? '<div class="said"><span>As written in your notes</span>' + esc(d.said) + '</div>' : '') +
         '<div class="stars">' + [1,2,3,4,5].map(function (r) { return '<button data-r="' + r + '" class="' + (u.rating >= r ? 'on' : '') + '" aria-label="' + r + ' stars">★</button>'; }).join('') + '</div>' +
-        '<div class="toggles"><label><input type="checkbox" id="favorite"' + (u.favorite ? ' checked' : '') + '> ★ Favorite</label><label><input type="checkbox" id="tried"' + (u.tried ? ' checked' : '') + '> Made it</label>' +
+        '<div class="toggles"><label><input type="checkbox" id="favorite"' + (recipeFavorite(d,v) ? ' checked' : '') + '> ★ Favorite</label><label><input type="checkbox" id="tried"' + (u.tried ? ' checked' : '') + '> Made it</label>' +
         '<label><input type="checkbox" id="verified"' + (u.verified ? ' checked' : '') + '> ' + (d.src === 'andrew' || d.custom ? 'Spec is final' : 'Spec verified against my book') + '</label></div>' +
         '<textarea id="notes" rows="5" placeholder="Tweaks, bottles used, what to try next…">' + esc(u.notes) + '</textarea><p class="muted small" id="saved"></p></section>';
-      h += '<section class="panel hidepanel">' + (isHidden(main)
-        ? '<p class="small">Hidden from the Songbook, Bloodlines and counts.</p><button class="btn" id="unhide2">👁 Unhide ' + esc(main.name) + '</button>'
-        : '<button class="btn ghost hidebtn" id="hidebtn">🙈 Hide ' + esc(main.name) + (main.variants.length > 1 ? ' (all ' + main.variants.length + ' variants)' : '') + '</button><p class="muted small">Takes it out of the Songbook. Bring it back any time from the bottom of the Tavern.</p>') + '</section>';
+      h += '<section class="panel hidepanel"><button class="btn ghost hidebtn" id="hidebtn">'+(recipeHidden(d,v)?'👁 Unhide ':'🙈 Hide ')+esc(recipeName(d,v))+(v.mine?' · BV':'')+'</button><p class="muted small">Only this recipe variant is affected. Other versions remain available.</p></section>';
       renderHTML(h);
-      var hb = document.getElementById('hidebtn');
-      if (hb) hb.onclick = function () { user.hidden[main.id] = Date.now(); save(); location.hash = '#/'; };
-      ['unhide1','unhide2'].forEach(function (x) { var b = document.getElementById(x); if (b) b.onclick = function () { delete user.hidden[main.id]; save(); keep(renderDrink, id); }; });
+      document.getElementById('hidebtn').onclick=function(){var k=recipeKey(d,v);if(user.hiddenRecipes[k]){delete user.hiddenRecipes[k];save();renderDrink(id,v.sourceIndex);}else{user.hiddenRecipes[k]=Date.now();save();location.hash='#/';}};
       $app.querySelectorAll('.seg button').forEach(function (b) { b.onclick = function () { user.settings.unit = b.dataset.u; save(); keep(renderDrink, id); }; });
       $app.querySelectorAll('.vtabs button').forEach(function (b) { b.onclick = function () { user.vsel[id] = +b.dataset.v; save(); keep(renderDrink, id); }; });
       onTap('variant',function(x){var p=x.split('|');user.vsel[p[0]]=+p[1];save();location.hash='#/d/'+encodeURIComponent(p[0])+'/'+p[1];});
@@ -3068,7 +3066,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       document.getElementById('splus').onclick = function () { if (serves < 24) { serves++; keep(renderDrink, id); } };
       $app.querySelectorAll('.src input').forEach(function (c) { c.onchange = function () { u.sources[c.dataset.s] = c.checked; save(); keep(renderDrink, id); }; });
       $app.querySelectorAll('.stars button').forEach(function (b) { b.onclick = function () { var r = +b.dataset.r; u.rating = u.rating === r ? 0 : r; save(); keep(renderDrink, id); }; });
-      document.getElementById('favorite').onchange=function(e){u.favorite=e.target.checked;save();};
+      document.getElementById('favorite').onchange=function(e){if(e.target.checked)user.recipeFavorites[recipeKey(d,v)]=true;else delete user.recipeFavorites[recipeKey(d,v)];save();};
       document.getElementById('tried').onchange = function (e) { u.tried = e.target.checked; save(); };
       document.getElementById('verified').onchange = function (e) { u.verified = e.target.checked; save(); };
       var t, nt = document.getElementById('notes');
@@ -3518,13 +3516,8 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
         '<li><b>History:</b> The Oxford Companion to Spirits and Cocktails</li>' +
         '<li><b>Online cross-checks:</b> Liquor.com, Difford’s Guide, Imbibe (link-outs only)</li>' +
         '<li><b>Technique influences:</b> Dave Arnold, Jeffrey Morgenthaler, Sam Ross</li></ul></section>';
-      var hid = DRINKS.filter(isHidden).sort(function (a, b) { return a.name.localeCompare(b.name); });
-      h += '<section class="panel" id="hiddenpanel"><h2>🙈 Hidden songs · ' + hid.length + '</h2>' +
-        (hid.length ? '<ul class="hidlist">' + hid.map(function (d) {
-          return '<li><div>' + link('#/d/' + d.id, esc(d.name)) + '<small>' + esc(d.cat) + ' · ' + esc(d.pStyle) + (d.variants.length > 1 ? ' · ' + d.variants.length + ' variants' : '') + '</small></div>' +
-            '<button class="btn small" data-tap="unhide" data-v="' + esc(d.id) + '">👁 Unhide</button></li>';
-        }).join('') + '</ul><button class="btn ghost small" id="unhideall">Unhide all</button>'
-        : '<p class="muted small">Nothing hidden. Use “🙈 Hide” at the bottom of any drink to tuck it away.</p>') + '</section>';
+      var hid=[];allVariants().forEach(function(d){d.versions.forEach(function(z){if(recipeHidden(d,z))hid.push({d:d,z:z,key:recipeKey(d,z)});});});
+      h += '<section class="panel" id="hiddenpanel"><h2>🙈 Hidden variants · '+hid.length+'</h2>'+(hid.length?'<ul class="hidlist">'+hid.map(function(x){return '<li><div>'+link('#/d/'+x.d.id+'/'+x.z.sourceIndex,esc(recipeName(x.d,x.z))+(x.z.mine?' · BV':''))+'</div><button class="btn small" data-tap="unhide" data-v="'+esc(x.key)+'">👁 Unhide</button></li>';}).join('')+'</ul><button class="btn ghost small" id="unhideall">Unhide all</button>':'<p class="muted small">Nothing hidden.</p>')+'</section>';
       var hidC = Object.keys(user.hiddenCraft).filter(function (k) { return TECH[k] && !REMOVED_CRAFT[k]; }).sort(function (a, b) { return TECH[a].t.localeCompare(TECH[b].t); });
       h += '<section class="panel" id="hiddencraft"><h2>🙈 Hidden craft pages · ' + hidC.length + '</h2>' +
         (hidC.length ? '<ul class="hidlist">' + hidC.map(function (k) {
@@ -3535,8 +3528,8 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       renderHTML(h);
       onTap('cunhide', function (v) { delete user.hiddenCraft[v]; save(); keep(renderMore); });
       var cua = document.getElementById('cunhideall'); if (cua) cua.onclick = function () { user.hiddenCraft = {}; save(); keep(renderMore); };
-      onTap('unhide', function (v) { delete user.hidden[v]; save(); keep(renderMore); });
-      var ua = document.getElementById('unhideall'); if (ua) ua.onclick = function () { user.hidden = {}; save(); keep(renderMore); };
+      onTap('unhide', function (v) { delete user.hiddenRecipes[v]; save(); keep(renderMore); });
+      var ua = document.getElementById('unhideall'); if (ua) ua.onclick = function () { user.hiddenRecipes = {};user.hidden={}; save(); keep(renderMore); };
       if (renderMore.jump) { renderMore.jump = false; var hp = document.getElementById('hiddenpanel'); if (hp) setTimeout(function () { hp.scrollIntoView({ block:'start' }); }, 0); }
       $app.querySelectorAll('.seg button').forEach(function (b) { b.onclick = function () { user.settings.unit = b.dataset.u; save(); keep(renderMore); }; });
       document.getElementById('exp').onclick = function () {
@@ -3632,7 +3625,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
     }
     window.DB = {
       get user() { return user; }, get byId() { return byId; }, save:save, keep:keep, esc:esc, link:link, tiles:tiles, pills:pills, onTap:onTap, card:card,
-      recipeAudit:function(){return RECIPE_AUDIT;}, specSignature:specSignature, renderHTML:renderHTML, bindLinMode:bindLinMode, isHidden:isHidden, craftOk:craftOk, removedCraft:REMOVED_CRAFT, ROOT_COLORS:ROOT_COLORS, TECH:TECH, ING:ING, DRINKS:DRINKS
+      recipeHidden:recipeHidden,recipeFavorite:recipeFavorite,recipeKey:recipeKey,recipeAudit:function(){return RECIPE_AUDIT;}, specSignature:specSignature, renderHTML:renderHTML, bindLinMode:bindLinMode, isHidden:isHidden, craftOk:craftOk, removedCraft:REMOVED_CRAFT, ROOT_COLORS:ROOT_COLORS, TECH:TECH, ING:ING, DRINKS:DRINKS
     };
     window.addEventListener('hashchange', route);
     route();
