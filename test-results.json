@@ -1,1 +1,1 @@
-{"version": "6.4", "syntaxPassed": true, "browserChecks": [{"width": 390, "passed": true}, {"width": 1280, "passed": true}], "physicalIphoneTested": false}
+{"version": "6.5", "iconSizesVerified": [180, 192, 512], "headerLogoEmbedded": true, "physicalIphoneTested": false}
