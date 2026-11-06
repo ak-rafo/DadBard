@@ -1,2 +1,5 @@
-Dad Bard v6.8
-Variant badges restored. Use Show as separate song to detach a named variation or recipe version; Return to cocktail variants reverses it. Saved locally and included in backups. Replace supplied files. Desktop Chromium tests passed; physical iPhone not tested.
+Dad Bard v6.9
+
+Uploaded JSON edits integrated into the build. Super juice formula text removed for all four fruits; calculation logic unchanged. Syrup category navigation removed. Sweet & Savory uses a gold and burgundy cocktail emblem. Offline cache version updated.
+
+Replace the repository files with these files. No JSON import required. JavaScript syntax and Chromium startup tested. Physical iPhone not tested.
