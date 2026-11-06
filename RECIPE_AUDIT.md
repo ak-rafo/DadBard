@@ -4,3 +4,6 @@ Version 5.21 adds naming and collection cleanup, without changing retained recip
 
 
 v5.27: browser tests at 320, 390 and 1280 px passed for all four methods, base quantities, target mode and copy removals. Built-in suite: 70 passed, 0 failed, 6 plausibility warnings. Physical iPhone/Safari testing not performed. Recipes were implemented from user specifications, not externally verified.
+
+## v5.29 R&D additions
+The 15 R&D drinks are user-supplied best-guess reconstructions, not externally verified Handshake specifications. Quantities and optional notes are preserved. Unspecified service details and family/style placement are app defaults. Supporting coconut-rich and milk-clarification preparations are labeled app estimates. No olive-oil preparation ratios were supplied, so none are invented. ABV, sugar, acidity and finished yield are not verified. Existing drink specifications were compared against the attached build and preserved.
