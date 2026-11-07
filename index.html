@@ -314,7 +314,7 @@ nav.tabs{position:fixed!important;bottom:0!important;top:auto!important;transfor
 .varpick button{max-width:100%;white-space:normal;overflow-wrap:anywhere}.varpick .pillbar{min-width:0;max-width:100%}
 @media(max-width:600px){#apo-body .rail.fruits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 14px;padding:2px;overflow:visible;scroll-snap-type:none}#apo-body .rail.fruits .tile{min-width:0;width:100%;box-sizing:border-box;padding:12px 3px 10px;justify-content:center;text-align:center;min-height:72px}#apo-body .rail.fruits .tile span{white-space:normal;overflow-wrap:anywhere;font-size:12px;line-height:1.2;max-width:100%}#app>.rail.tools{margin:8px 0 16px;padding:3px 2px 6px;gap:9px;scroll-padding-inline:2px;box-sizing:border-box;max-width:100%}}@media(max-width:350px){#apo-body .rail.fruits{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
-<style>body.noscroll > nav.tabs,body.noscroll .tabs{visibility:hidden}</style><style>.brand h1{display:flex;align-items:center;gap:6px}.header-lute{width:46px;height:52px;object-fit:contain;flex:none;vertical-align:middle}@media(max-width:480px){.brand h1{gap:4px}.header-lute{width:36px;height:43px}}</style></head>
+<style>body.noscroll > nav.tabs,body.noscroll .tabs{visibility:hidden}</style><style>.brand h1{display:flex;align-items:center;gap:6px}.header-lute{width:46px;height:52px;object-fit:contain;flex:none;vertical-align:middle}@media(max-width:480px){.brand h1{gap:4px}.header-lute{width:36px;height:43px}}</style><style>.drink-options{padding:10px 14px}.drink-options summary{cursor:pointer;font-size:14px}.drink-option-body{padding-top:10px;display:flex;flex-wrap:wrap;gap:8px}#variantpicker{width:100%}#variantpicker[hidden]{display:none}#variantpicker label{display:block;margin:8px 0}#variantpicker input,#variantpicker select{width:100%;margin-bottom:8px;min-height:44px}.drink-option-body .btn{font-size:13px;padding:8px 12px}.xlinks{flex-wrap:wrap}</style></head>
 <body>
 <main id="app"><p class="muted">Tuning the lute…</p></main>
 <nav class="tabs">
@@ -2552,7 +2552,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       var anchors={};
       ['old-fashioned','martini','daiquiri','margarita','mai-tai','negroni','manhattan','whiskey-sour','gimlet','last-word','espresso-martini','white-russian','revolver','bloody-mary','caipirinha','hot-toddy','cuba-libre','pina-colada','spritz','french-75','sazerac','sidecar','paloma','mojito','zombie','test-pilot','army-navy','penicillin','pisco-sour'].forEach(function(k){if(map[k])anchors[k]=1;});
       function root(id){var seen={},path=[],cur=id;
-        while(map[cur]){if((user.detachedSongs||{})[cur])return cur;if(map[cur].rd||map[cur].cat==='R&D')return cur;if(seen[cur]){return path.slice().sort()[0];}seen[cur]=1;path.push(cur);
+        while(map[cur]){var chosen=(user.variantHomes||{})[cur];if(chosen&&map[chosen]&&chosen!==cur){if(seen[cur])return cur;seen[cur]=1;path.push(cur);cur=chosen;continue;}if((user.detachedSongs||{})[cur])return cur;if(map[cur].rd||map[cur].cat==='R&D')return cur;if(seen[cur]){return path.slice().sort()[0];}seen[cur]=1;path.push(cur);
           if(anchors[cur]&&!NAVIGATION_HOMES[cur])return cur;
           var next=NAVIGATION_HOMES[cur]||owners[cur]||map[cur].variantOf||map[cur].parent;
           if(!next||!map[next]||next===cur||map[next].rd||map[next].cat==='R&D')return cur;cur=next;
@@ -3054,24 +3054,25 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       h += '<section class="panel"><h2>Lore ' + confBadge(p.conf) + '</h2><div class="kv">' +
         '<div><span>Creator</span>' + esc(p.who) + '</div><div><span>Where</span>' + esc(p.where) + '</div><div><span>When</span>' + esc(p.year) + '</div></div>' +
         (p.note ? '<p class="small">' + esc(p.note) + '</p>' : '') +
-        (p.conf !== 'own' && !d.custom && !d.rd ? '<p class="muted small">Confidence rates the creator, venue and date, not the recipe. Confirm in the Oxford Companion and tick it below.</p>' : '') + '</section>';
-      if (d.src !== 'andrew' && !d.custom) {
-        h += '<section class="panel"><h2>Sources <span class="muted small">· ' + overlap(id) + ' ticked</span></h2><div class="srcs">' +
-          SOURCES.map(function (s) { return '<label class="src"><input type="checkbox" data-s="' + s.k + '"' + (u.sources[s.k] ? ' checked' : '') + '> ' + esc(s.n) + '</label>'; }).join('') +
-          '</div><div class="xlinks">' + XLINKS.map(function (x) {
-            return '<a target="_blank" rel="noopener" href="https://www.google.com/search?q=' + encodeURIComponent('site:' + x.site + ' ' + d.name + ' cocktail') + '">Check on ' + x.n + ' ↗</a>';
-          }).join('') + '</div></section>';
-      }
-      h += '<section class="panel"><h2>Bard’s notes</h2>' +
+        (p.conf !== 'own' && !d.custom && !d.rd ? '<p class="muted small">Confidence rates the creator, venue and date, not the recipe. Confirm in the Oxford Companion for reference.</p>' : '') + '</section>';
+      h += '<section class="panel"><h2>Notes</h2>' +
         (d.said ? '<div class="said"><span>As written in your notes</span>' + esc(d.said) + '</div>' : '') +
         '<div class="stars">' + [1,2,3,4,5].map(function (r) { return '<button data-r="' + r + '" class="' + (u.rating >= r ? 'on' : '') + '" aria-label="' + r + ' stars">★</button>'; }).join('') + '</div>' +
-        '<div class="toggles"><label><input type="checkbox" id="favorite"' + (recipeFavorite(d,v) ? ' checked' : '') + '> ★ Favorite</label><label><input type="checkbox" id="tried"' + (u.tried ? ' checked' : '') + '> Made it</label>' +
-        '<label><input type="checkbox" id="verified"' + (u.verified ? ' checked' : '') + '> ' + (d.src === 'andrew' || d.custom ? 'Spec is final' : 'Spec verified against my book') + '</label></div>' +
+        '<div class="toggles"><label><input type="checkbox" id="favorite"' + (recipeFavorite(d,v) ? ' checked' : '') + '> &#9733; Favorite</label></div>' +
+        '<div class="xlinks">' + XLINKS.map(function(x){return '<a target="_blank" rel="noopener" href="https://www.google.com/search?q='+encodeURIComponent('site:'+x.site+' '+recipeName(d,v)+' cocktail')+'">Check on '+x.n+'</a>';}).join('') + '</div>' +
         '<textarea id="notes" rows="5" placeholder="Tweaks, bottles used, what to try next…">' + esc(u.notes) + '</textarea><p class="muted small" id="saved"></p></section>';
-      h += '<section class="panel hidepanel"><button class="btn ghost hidebtn" id="hidebtn">'+(recipeHidden(d,v)?'👁 Unhide ':'🙈 Hide ')+esc(recipeName(d,v))+(v.mine?' · BV':'')+'</button><p class="muted small">Only this recipe variant is affected. Other versions remain available.</p></section>';
-      var detached=!!(user.detachedSongs||{})[id],split=separateRecipe(d,v);
-      if(d.id!==main.id||detached||d.versions.length>1||split){h+='<section class="panel"><button class="btn ghost" id="separatesong">'+(detached||split?'↩ Return to cocktail variants':'↗ Show as separate song')+'</button><p class="muted small">Changes browsing placement only. Your recipe, favorites and edits stay intact.</p></section>';}
+      h += '<details class="panel drink-options"><summary>Drink options</summary><div class="drink-option-body"><button class="btn ghost" id="hidebtn">'+(recipeHidden(d,v)?'Unhide drink':'Hide drink')+'</button><button class="btn ghost" id="assignvariant">Add cocktail as variant</button><div id="variantpicker" hidden><label for="variantsearch">Choose parent cocktail</label><input id="variantsearch" type="search" placeholder="Search all cocktails"><select id="variantparent" aria-label="Parent cocktail"></select><button class="btn" id="savevariant">Save variant placement</button></div></div></details>';
       renderHTML(h);
+      document.getElementById('assignvariant').onclick=function(){
+        var picker=document.getElementById('variantpicker'),search=document.getElementById('variantsearch'),select=document.getElementById('variantparent');picker.hidden=!picker.hidden;
+        function fill(){var q=searchText(search.value);select.innerHTML='<option value="">Select cocktail</option>'+Object.keys(VAR).map(function(k){var m=VAR[k];return m.main.variants[m.i];}).filter(function(x){return x.id!==id&&searchText(x.name).indexOf(q)>=0;}).sort(function(a,b){return a.name.localeCompare(b.name);}).map(function(x){return '<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>';}).join('');}fill();search.oninput=fill;
+        document.getElementById('savevariant').onclick=function(){var target=select.value;if(!target)return;user.variantHomes=user.variantHomes||{};user.detachedSongs=user.detachedSongs||{};
+          delete user.variantHomes[target];user.detachedSongs[target]=true;delete user.detachedSongs[id];user.variantHomes[id]=target;
+          d.versions.forEach(function(z){delete (user.separateRecipes||{})[recipeKey(d,z)];});
+          save();applyUser();renderDrink(id,v.sourceIndex);
+        };
+      };
+
       var move=document.getElementById('separatesong');if(move)move.onclick=function(){user.detachedSongs=user.detachedSongs||{};user.separateRecipes=user.separateRecipes||{};var k=recipeKey(d,v);if(detached)delete user.detachedSongs[id];else if(split)delete user.separateRecipes[k];else if(d.id!==main.id)user.detachedSongs[id]=true;else user.separateRecipes[k]=true;save();applyUser();renderDrink(id,v.sourceIndex);};
       document.getElementById('hidebtn').onclick=function(){var k=recipeKey(d,v);if(user.hiddenRecipes[k]){delete user.hiddenRecipes[k];save();renderDrink(id,v.sourceIndex);}else{user.hiddenRecipes[k]=Date.now();save();location.hash='#/';}};
       $app.querySelectorAll('.seg button').forEach(function (b) { b.onclick = function () { user.settings.unit = b.dataset.u; save(); keep(renderDrink, id); }; });
@@ -3082,8 +3083,8 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       $app.querySelectorAll('.src input').forEach(function (c) { c.onchange = function () { u.sources[c.dataset.s] = c.checked; save(); keep(renderDrink, id); }; });
       $app.querySelectorAll('.stars button').forEach(function (b) { b.onclick = function () { var r = +b.dataset.r; u.rating = u.rating === r ? 0 : r; save(); keep(renderDrink, id); }; });
       document.getElementById('favorite').onchange=function(e){if(e.target.checked)user.recipeFavorites[recipeKey(d,v)]=true;else delete user.recipeFavorites[recipeKey(d,v)];save();};
-      document.getElementById('tried').onchange = function (e) { u.tried = e.target.checked; save(); };
-      document.getElementById('verified').onchange = function (e) { u.verified = e.target.checked; save(); };
+
+
       var t, nt = document.getElementById('notes');
       nt.oninput = function () { clearTimeout(t); t = setTimeout(function () { u.notes = nt.value; save(); document.getElementById('saved').textContent = 'Inscribed on this device'; }, 400); };
     }
