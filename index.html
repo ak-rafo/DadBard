@@ -313,6 +313,8 @@ nav.tabs{position:fixed!important;bottom:0!important;top:auto!important;transfor
 
 .varpick button{max-width:100%;white-space:normal;overflow-wrap:anywhere}.varpick .pillbar{min-width:0;max-width:100%}
 @media(max-width:600px){#apo-body .rail.fruits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 14px;padding:2px;overflow:visible;scroll-snap-type:none}#apo-body .rail.fruits .tile{min-width:0;width:100%;box-sizing:border-box;padding:12px 3px 10px;justify-content:center;text-align:center;min-height:72px}#apo-body .rail.fruits .tile span{white-space:normal;overflow-wrap:anywhere;font-size:12px;line-height:1.2;max-width:100%}#app>.rail.tools{margin:8px 0 16px;padding:3px 2px 6px;gap:9px;scroll-padding-inline:2px;box-sizing:border-box;max-width:100%}}@media(max-width:350px){#apo-body .rail.fruits{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.rating-favorite-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.rating-favorite-row .stars{margin:0}.favorite-toggle{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:6px 12px;border:1px solid #57412b;border-radius:24px;background:transparent;color:inherit;font:inherit;cursor:pointer}.favorite-star{font-size:28px;line-height:1;color:#b49a78}.favorite-toggle[aria-pressed="true"]{border-color:#d6a441;color:#e7bd70;background:rgba(214,164,65,.1)}.favorite-toggle[aria-pressed="true"] .favorite-star{color:#d6a441}.favorite-toggle:focus-visible{outline:2px solid #d6a441;outline-offset:3px}.rating-links .xlinks{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0}
 </style>
 <style>body.noscroll > nav.tabs,body.noscroll .tabs{visibility:hidden}</style><style>.brand h1{display:flex;align-items:center;gap:6px}.header-lute{width:46px;height:52px;object-fit:contain;flex:none;vertical-align:middle}@media(max-width:480px){.brand h1{gap:4px}.header-lute{width:36px;height:43px}}</style><style>.drink-options{padding:10px 14px}.drink-options summary{cursor:pointer;font-size:14px}.drink-option-body{padding-top:10px;display:flex;flex-wrap:wrap;gap:8px}#variantpicker{width:100%}#variantpicker[hidden]{display:none}#variantpicker label{display:block;margin:8px 0}#variantpicker input,#variantpicker select{width:100%;margin-bottom:8px;min-height:44px}.drink-option-body .btn{font-size:13px;padding:8px 12px}.xlinks{flex-wrap:wrap}</style><style>
 #apo-body .rail.fruits.acid-fruits {display:flex;justify-content:center;gap:10px;overflow:visible;flex-wrap:nowrap;}
@@ -2424,7 +2426,7 @@ D.ALL=D.DRINKS.reduce(function(a,d){return a.concat([d],d.vars||[]);},[]);
       { k:'sc', n:'Smuggler’s Cove' }, { k:'ss', n:'Sippin’ Safari' }, { k:'tm', n:'Tiki: Modern Tropical Cocktails' },
       { k:'ox', n:'Oxford Companion' }, { k:'lq', n:'Liquor.com' }, { k:'df', n:'Difford’s Guide' }, { k:'im', n:'Imbibe' }
     ];
-    var XLINKS = [{ n:'Difford’s Guide', site:'diffordsguide.com' }, { n:'Liquor.com', site:'liquor.com' }, { n:'Imbibe', site:'imbibemagazine.com' }];
+    var XLINKS = [{ n:'Difford&#39;s Guide', site:'diffordsguide.com' }, { n:'Liquor.com', site:'liquor.com' }, { n:'Imbibe Magazine', site:'imbibemagazine.com' }];
     var EQUIP = { 'shake':'Shaker', 'dry-shake':'Shaker', 'whip-shake':'Shaker', 'stir':'Mixing glass', 'swizzle':'Swizzle stick', 'flash-blend':'Blender',
       'muddle':'Muddler', 'fat-wash':'Freezer', 'fluffy-juice':'Juicer', 'infusion':'Infusion jar', 'flamed-twist':'Lighter', 'freeze':'Freezer', 'foam':'Shaker' };
     var METHOD_LABEL = { shake:'Shake', dryshake:'Dry shake', stir:'Stir', build:'Build', swizzle:'Swizzle', blend:'Flash blend', freeze:'Freeze' };
@@ -3027,7 +3029,7 @@ absorbNovember7();
       h += '<section class="panel controls"><div class="seg"><button data-u="oz" class="' + (unit === 'oz' ? 'on' : '') + '">oz</button><button data-u="ml" class="' + (unit === 'ml' ? 'on' : '') + '">ml</button></div>' +
         '<div class="scaler"><button id="sminus" aria-label="Fewer">−</button><span>' + batchWord + '</span><button id="splus" aria-label="More">+</button></div></section>';
       h += '<section class="panel' + (v.mine ? ' mine' : v.guest ? ' guest' : '') + '">';
-      h += '<h2>'+esc(v.label)+'</h2>';
+      h += '<h2>Recipe</h2>';
       if (d.match && vi > 0) h += '<p class="matchnote">✓ Your notes match the traditional spec' + (d.av && d.av.note ? '. ' + esc(d.av.note) : '.') + '</p>';
       else if (v.note) h += '<p class="vnote">' + esc(v.note) + '</p>';
       h += specList(v.spec, unit, serves);
@@ -3073,11 +3075,13 @@ absorbNovember7();
         '<div><span>Creator</span>' + esc(p.who) + '</div><div><span>Where</span>' + esc(p.where) + '</div><div><span>When</span>' + esc(p.year) + '</div></div>' +
         (p.note ? '<p class="small">' + esc(p.note) + '</p>' : '') +
         (p.conf !== 'own' && !d.custom && !d.rd ? '<p class="muted small">Confidence rates the creator, venue and date, not the recipe. Confirm in the Oxford Companion for reference.</p>' : '') + '</section>';
+      h += '<section class="panel rating-links"><h2>Rating &amp; Links</h2><div class="rating-favorite-row">' +
+        '<div class="stars">' + [1,2,3,4,5].map(function (r) { return '<button data-r="' + r + '" class="' + (u.rating >= r ? 'on' : '') + '" aria-label="' + r + ' stars">★</button>'; }).join('') + '</div>' +
+        '<button type="button" id="favorite" class="favorite-toggle" aria-pressed="' + (recipeFavorite(d,v)?'true':'false') + '"><span class="favorite-star" aria-hidden="true">' + (recipeFavorite(d,v)?'&#9733;':'&#9734;') + '</span> Favorite</button></div>' +
+        '<div class="xlinks">' + XLINKS.map(function(x){return '<a target="_blank" rel="noopener" href="https://www.google.com/search?q='+encodeURIComponent('site:'+x.site+' '+recipeName(d,v)+' cocktail')+'">'+x.n+'</a>';}).join('') + '</div>' +
+        '</section>';
       h += '<section class="panel"><h2>Notes</h2>' +
         (d.said ? '<div class="said"><span>As written in your notes</span>' + esc(d.said) + '</div>' : '') +
-        '<div class="stars">' + [1,2,3,4,5].map(function (r) { return '<button data-r="' + r + '" class="' + (u.rating >= r ? 'on' : '') + '" aria-label="' + r + ' stars">★</button>'; }).join('') + '</div>' +
-        '<div class="toggles"><label><input type="checkbox" id="favorite"' + (recipeFavorite(d,v) ? ' checked' : '') + '> &#9733; Favorite</label></div>' +
-        '<div class="xlinks">' + XLINKS.map(function(x){return '<a target="_blank" rel="noopener" href="https://www.google.com/search?q='+encodeURIComponent('site:'+x.site+' '+recipeName(d,v)+' cocktail')+'">Check on '+x.n+'</a>';}).join('') + '</div>' +
         '<textarea id="notes" rows="5" placeholder="Tweaks, bottles used, what to try next…">' + esc(u.notes) + '</textarea><p class="muted small" id="saved"></p></section>';
       h += '<details class="panel drink-options"><summary>Drink options</summary><div class="drink-option-body"><button class="btn ghost" id="hidebtn">'+(recipeHidden(d,v)?'Unhide drink':'Hide drink')+'</button><button class="btn ghost" id="assignvariant">Add cocktail as variant</button><div id="variantpicker" hidden><label for="variantsearch">Choose parent cocktail</label><input id="variantsearch" type="search" placeholder="Search all cocktails"><select id="variantparent" aria-label="Parent cocktail"></select><button class="btn" id="savevariant">Save variant placement</button></div></div></details>';
       renderHTML(h);
@@ -3100,7 +3104,7 @@ absorbNovember7();
       document.getElementById('splus').onclick = function () { if (serves < 24) { serves++; keep(renderDrink, id); } };
       $app.querySelectorAll('.src input').forEach(function (c) { c.onchange = function () { u.sources[c.dataset.s] = c.checked; save(); keep(renderDrink, id); }; });
       $app.querySelectorAll('.stars button').forEach(function (b) { b.onclick = function () { var r = +b.dataset.r; u.rating = u.rating === r ? 0 : r; save(); keep(renderDrink, id); }; });
-      document.getElementById('favorite').onchange=function(e){if(e.target.checked)user.recipeFavorites[recipeKey(d,v)]=true;else delete user.recipeFavorites[recipeKey(d,v)];save();};
+      document.getElementById('favorite').onclick=function(){var k=recipeKey(d,v);if(recipeFavorite(d,v))delete user.recipeFavorites[k];else user.recipeFavorites[k]=true;save();this.setAttribute('aria-pressed',recipeFavorite(d,v)?'true':'false');this.querySelector('.favorite-star').innerHTML=recipeFavorite(d,v)?'&#9733;':'&#9734;';};
 
 
       var t, nt = document.getElementById('notes');
