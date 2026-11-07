@@ -1,1 +1,26 @@
-{"version": "6.12", "syntaxPassed": true, "physicalIphoneTested": false, "browserChecks": []}
+[
+  {
+    "width": 320,
+    "checks": "passed"
+  },
+  {
+    "width": 375,
+    "checks": "passed"
+  },
+  {
+    "width": 390,
+    "checks": "passed"
+  },
+  {
+    "width": 430,
+    "checks": "passed"
+  },
+  {
+    "width": 768,
+    "checks": "passed"
+  },
+  {
+    "width": 1440,
+    "checks": "passed"
+  }
+]
